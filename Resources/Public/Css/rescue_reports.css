@@ -1,0 +1,99 @@
+.rescue-brigade-card {
+    background: #f8f9fa;
+    border-left: 4px solid #cc0000;
+}
+.rescue-brigade-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+.rescue-brigade-dot {
+    width:10px;
+    height:10px;
+    background:#cc0000;
+    border-radius:50%;
+}
+
+.einsatzfahrzeug-card {
+    background:#f6f6f6;
+    border-radius:10px;
+    padding:10px;
+    transition: all .15s ease;
+}
+
+.einsatzfahrzeug-card:hover {
+    background:#ffffff;
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+.vehicle-count {
+    font-size:.75rem;
+    background:#e9ecef;
+}
+/* Nummern links blau und groß */
+.enumber {
+  font-size: 2.5rem;       /* Größe anpassen */
+  font-weight: 700;
+  color: #5c91d3;          /* Bootstrap-Blau oder dein Farbwert blau #5c91d3 rot #E50B00*/
+  line-height: 1;
+}
+
+/* Datum: roter Unterstrich */
+.emeta a {
+  color: inherit;                /* Text bleibt schwarz/grau */
+  text-decoration: underline;    /* Unterstreichung aktiv */
+  text-decoration-color: red;    /* Unterstreichung rot */
+  text-underline-offset: 2px;    /* schöner Abstand */
+}
+
+/* jede gerade Zeile leicht hellblau hinterlegen */
+.list-striped .list-group-item:nth-child(even) {
+  background-color: #f5f8fc; /* hellblau, kannst du anpassen */
+}
+
+.text-bg-light-blue {
+  background-color: #f5f8fc;
+  border-color: #dfecfb;
+}
+.card-panel-primary h1 {color:white !important;}
+.btn-primary  {color:white !important;}
+ul.no-bullet li {
+    background: none;
+    margin: 0;
+}
+.card-group-element-item .card:hover {
+  background-color: #f5f8fc;
+}
+.card-menu-item .card:hover {
+  background-color: #f5f8fc;
+}
+
+/* Bild für sanften Zoom vorbereiten */
+.card .card-img-top picture,
+.card-group-element-item .card .card-img-top img {
+  display: block;                  /* vermeidet Lücken */
+  width: 100%;
+  height: auto;
+}
+
+.card-group-element-item .card .card-img-top img {
+  transform-origin: center center;
+  transition: transform .5s ease, filter .5s ease;
+  will-change: transform;
+}
+
+/* Hover/Fokus: Bild leicht einzoomen + minimal abdunkeln */
+.card-group-element-item .card:hover .card-img-top img,
+.card-group-element-item .card:focus-within .card-img-top img {
+  transform: scale(1.06);
+  filter: brightness(.96);
+}
+
+/* Optional: Card beim Hover leicht anheben */
+.card-group-element-item .card {
+  transition: box-shadow .3s ease, transform .3s ease;
+}
+.card-group-element-item .card:hover,
+.card-group-element-item .card:focus-within {
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+  transform: translateY(-2px);
+}
+

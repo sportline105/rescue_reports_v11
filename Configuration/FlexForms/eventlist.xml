@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<T3DataStructure>
+  <sheets>
+    <sDEF>
+      <ROOT>
+        <TCEforms>
+          <sheetTitle>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:sheet.general</sheetTitle>
+        </TCEforms>
+        <type>array</type>
+        <el>
+
+          <!-- Template-Variante -->
+          <settings.templateVariant>
+            <TCEforms>
+              <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:templateVariant</label>
+              <config>
+                <type>select</type>
+                <renderType>selectSingle</renderType>
+                <items type="array">
+                  <numIndex index="0">
+                    <numIndex index="0">Standard</numIndex>
+                    <numIndex index="1">standard</numIndex>
+                  </numIndex>
+                  <numIndex index="1">
+                    <numIndex index="0">Sidebar</numIndex>
+                    <numIndex index="1">sidebar</numIndex>
+                  </numIndex>
+                  <numIndex index="2">
+                    <numIndex index="0">NewDesign</numIndex>
+                    <numIndex index="1">newdesign</numIndex>
+                  </numIndex>
+                  <numIndex index="3">
+                    <numIndex index="0">NewDesignSidebar</numIndex>
+                    <numIndex index="1">newdesignsidebar</numIndex>
+                  </numIndex>
+                </items>
+                <default>standard</default>
+              </config>
+            </TCEforms>
+          </settings.templateVariant>
+
+          <!-- Max. Anzahl -->
+          <settings.maxCount>
+            <TCEforms>
+              <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:maxCount</label>
+              <config>
+                <type>input</type>
+                <eval>int</eval>
+                <size>5</size>
+                <default>0</default>
+              </config>
+            </TCEforms>
+          </settings.maxCount>
+
+          <!-- Von Datum -->
+          <settings.dateFrom>
+            <TCEforms>
+              <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:dateFrom</label>
+              <config>
+                <type>input</type>
+                <renderType>inputDateTime</renderType>
+                <eval>date</eval>
+              </config>
+            </TCEforms>
+          </settings.dateFrom>
+
+          <!-- Bis Datum -->
+          <settings.dateTo>
+            <TCEforms>
+              <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:dateTo</label>
+              <config>
+                <type>input</type>
+                <renderType>inputDateTime</renderType>
+                <eval>date</eval>
+              </config>
+            </TCEforms>
+          </settings.dateTo>
+
+          <!-- Suche anzeigen -->
+          <settings.enableSearch>
+            <TCEforms>
+              <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:enableSearch</label>
+              <config>
+                <type>check</type>
+                <items>
+                  <numIndex index="0">
+                    <numIndex index="0">Ja</numIndex>
+                  </numIndex>
+                </items>
+              </config>
+            </TCEforms>
+          </settings.enableSearch>
+
+          <!-- Detailseite -->
+          <settings.detailPageUid>
+            <TCEforms>
+              <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:detailPageUid</label>
+              <config>
+                <type>group</type>
+                <internal_type>db</internal_type>
+                <allowed>pages</allowed>
+                <size>1</size>
+                <maxitems>1</maxitems>
+                <minitems>0</minitems>
+              </config>
+            </TCEforms>
+          </settings.detailPageUid>
+
+        </el>
+      </ROOT>
+    </sDEF>
+  </sheets>
+</T3DataStructure>

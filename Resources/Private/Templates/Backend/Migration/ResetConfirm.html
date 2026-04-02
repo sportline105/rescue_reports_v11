@@ -1,0 +1,10 @@
+// === Resources/Private/Templates/Backend/Migration/ResetConfirm.html ===
+<f:layout name="Default" />
+<f:section name="main">
+    <h1>MM-Zurücksetzen bestätigen</h1>
+    <p>Willst du wirklich <strong>alle MM-Einträge löschen</strong>? Diese Aktion kann nicht rückgängig gemacht werden!</p>
+    <f:form action="reset">
+        <f:form.submit value="Ja, endgültig löschen" class="btn btn-danger" />
+    </f:form>
+    <f:link.action action="index" class="btn btn-default">Abbrechen</f:link.action>
+</f:section>

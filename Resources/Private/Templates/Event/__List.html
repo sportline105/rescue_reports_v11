@@ -1,0 +1,42 @@
+<f:layout name="Default" />
+
+<f:section name="main">
+    <h1>Einsätze</h1>
+
+    <f:if condition="{events -> f:count()}">
+    <f:then>
+        <table>
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Nummer</th>
+                    <th>Ort</th>
+                    <th>Fahrzeuge</th>
+                </tr>
+            </thead>
+            <tbody>
+                <f:for each="{events}" as="event">
+                    <tr>
+                        <td><f:format.date format="d.m.Y H:i">{event.start}</f:format.date></td>
+                        <td>{event.number}</td>
+                        <td>{event.location}</td>
+                        <td>
+                            <f:for each="{event.cars}" as="car" iteration="carIterator">
+                                {car.name}<f:if condition="!{carIterator.isLast}">, </f:if>
+                            </f:for>
+                        </td>
+                    </tr>
+                </f:for>
+            </tbody>
+        </table>
+    </f:then>
+    <f:else>
+        <p>Keine Einsätze gefunden.</p>
+    </f:else>
+    </f:if>
+    <f:for each="{event.eventVehicleAssignments}" as="assignment">
+    {assignment.car.name}
+</f:for>
+    
+    <f:debug>{events}</f:debug>
+</f:section>

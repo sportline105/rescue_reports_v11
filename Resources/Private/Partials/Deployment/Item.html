@@ -1,0 +1,6 @@
+<li>
+  <strong>{deployment.brigade.name}</strong>:
+  <f:for each="{deployment.stations}" as="station" iteration="i">
+    {station.name}<f:if condition="{!i.isLast}">, </f:if>
+  </f:for>
+</li>

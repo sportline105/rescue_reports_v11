@@ -1,0 +1,17 @@
+ //=== Fluid Template (Resources/Private/Templates/Event/List.html) ===
+ <f:layout name="Default" />
+ <f:section name="main">
+   <f:for each="{events}" as="event">
+     <div class="event">
+     <!-- Dies ist ein Test -->
+       <h2>{event.title}</h2>
+       <f:if condition="{event.deployments}">
+         <ul>
+           <f:for each="{event.deployments}" as="deployment">
+             <f:render partial="Deployment/Item" arguments="{deployment: deployment}" />
+           </f:for>
+         </ul>
+       </f:if>
+     </div>
+   </f:for>
+ </f:section>

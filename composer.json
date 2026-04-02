@@ -1,0 +1,19 @@
+{
+  "name": "In2code/rescue-reports",
+  "type": "typo3-cms-extension",
+  "description": "Extbase-basierte Feuerwehr-Extension mit Einsatzverwaltung",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "typo3/cms-core": "^11.5 || ^12.4"
+  },
+  "autoload": {
+  "psr-4": {
+    "In2code\\RescueReports\\": "Classes/"
+  }
+},
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "rescue-reports"
+    }
+  }
+}

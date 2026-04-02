@@ -1,0 +1,373 @@
+<f:layout name="Default" />
+
+<f:section name="main">
+    <f:switch expression="{templateVariant}">
+
+        <!-- =========================================================
+             Sidebar
+             Keine Filter-Info, kein Suchformular
+        ========================================================== -->
+        <f:case value="sidebar">
+            <h1 class="element-header">Letzte Einsätze</h1>
+
+            <f:render section="EventListContentSidebar" arguments="{_all}" />
+        </f:case>
+
+        <!-- =========================================================
+             NewDesign
+        ========================================================== -->
+        <f:case value="newdesign">
+            <div class="rescue-reports rescue-reports--newdesign">
+                <h1 class="element-header">Einsatzübersicht</h1>
+
+                <f:if condition="{maxCount} > 0">
+                    <f:then>
+                        <div class="filter-info mb-4 p-3 bg-light border-start border-4 border-danger small text-muted">
+                            <div>Anzeige auf maximal {maxCount} Einsätze begrenzt.</div>
+
+                            <f:if condition="{dateFrom}">
+                                <div>
+                                    Ab <f:format.date format="d.m.Y">{dateFrom}</f:format.date>
+                                    <f:if condition="{dateTo}">
+                                        bis <f:format.date format="d.m.Y">{dateTo}</f:format.date>
+                                    </f:if>
+                                </div>
+                            </f:if>
+                        </div>
+                    </f:then>
+                    <f:else>
+                        <f:if condition="{dateFrom}">
+                            <div class="filter-info mb-4 p-3 bg-light border-start border-4 border-danger small text-muted">
+                                <div>
+                                    Ab <f:format.date format="d.m.Y">{dateFrom}</f:format.date>
+                                    <f:if condition="{dateTo}">
+                                        bis <f:format.date format="d.m.Y">{dateTo}</f:format.date>
+                                    </f:if>
+                                </div>
+                            </div>
+                        </f:if>
+                    </f:else>
+                </f:if>
+
+                <f:if condition="{enableSearch}">
+                    <div class="card mb-1 border-0">
+                        <div class="card-body">
+                            <f:form action="list" method="get">
+                                <div class="row g-2 align-items-stretch">
+                                    <div class="col-12 col-md-8">
+                                        <f:form.textfield
+                                            name="searchWord"
+                                            id="searchWordNewdesign"
+                                            type="search"
+                                            value="{searchWord}"
+                                            placeholder="Suchbegriff eingeben…"
+                                            class="form-control" />
+                                    </div>
+
+                                    <div class="col-12 col-md-2">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            Suchen
+                                        </button>
+                                    </div>
+
+                                    <div class="col-12 col-md-2">
+                                        <f:link.action
+                                            action="list"
+                                            arguments="{searchWord: ''}"
+                                            class="btn btn-outline-secondary w-100">
+                                            Reset
+                                        </f:link.action>
+                                    </div>
+                                </div>
+                            </f:form>
+                        </div>
+                    </div>
+                </f:if>
+
+                <f:render section="EventListContentNewDesign" arguments="{_all}" />
+            </div>
+        </f:case>
+
+        <!-- =========================================================
+             NewDesignSidebar
+             Keine Filter-Info, kein Suchformular
+        ========================================================== -->
+        <f:case value="newdesignsidebar">
+            <div class="rescue-reports rescue-reports--newdesignsidebar">
+                <h1 class="element-header">Letzte Einsätze</h1>
+
+                <f:render section="EventListContentSidebarNewDesign" arguments="{_all}" />
+            </div>
+        </f:case>
+
+        <!-- =========================================================
+             Standard
+        ========================================================== -->
+        <f:defaultCase>
+            <h1 class="csc-firstHeader">Einsatzübersicht</h1>
+
+            <div class="filter-info" style="margin-bottom: 10px; font-size: 0.9em; color: #555;">
+                <f:if condition="{maxCount} > 0">
+                    <div>Anzeige auf maximal {maxCount} Einsätze begrenzt.</div>
+                </f:if>
+
+                <f:if condition="{dateFrom}">
+                    <div>
+                        Ab <f:format.date format="d.m.Y">{dateFrom}</f:format.date>
+                        <f:if condition="{dateTo}">
+                            bis <f:format.date format="d.m.Y">{dateTo}</f:format.date>
+                        </f:if>
+                    </div>
+                </f:if>
+            </div>
+
+            <f:if condition="{enableSearch}">
+                <div class="row" style="padding-top:10px;">
+                    <div class="small-12 columns">
+                        <f:form action="list" method="get">
+                            <div class="row collapse">
+                                <div class="small-7 columns">
+                                    <f:form.textfield
+                                        name="searchWord"
+                                        id="searchWord"
+                                        type="search"
+                                        value="{searchWord}"
+                                        placeholder="Suchbegriff eingeben…" />
+                                </div>
+
+                                <div class="small-2 columns">
+                                    <button type="submit" class="button postfix expand">
+                                        Suchen
+                                    </button>
+                                </div>
+
+                                <div class="small-3 columns">
+                                    <f:link.action
+                                        action="list"
+                                        arguments="{searchWord: ''}"
+                                        class="button postfix expand secondary">
+                                        Filter zurücksetzen
+                                    </f:link.action>
+                                </div>
+                            </div>
+                        </f:form>
+                    </div>
+                </div>
+            </f:if>
+
+            <f:render section="EventListContent" arguments="{_all}" />
+        </f:defaultCase>
+
+    </f:switch>
+</f:section>
+
+<!-- =========================================================
+     Standard-Ausgabeliste
+========================================================== -->
+<f:section name="EventListContent">
+    <f:if condition="{events}">
+        <f:then>
+            <f:if condition="{searchWord}">
+                <div class="result-info" style="margin-top:10px;">
+                    <strong>{events -> f:count()}</strong>
+                    <f:if condition="{events -> f:count()} == 1">
+                        Einsatz gefunden
+                    </f:if>
+                    <f:if condition="{events -> f:count()} != 1">
+                        Einsätze gefunden
+                    </f:if>
+                </div>
+            </f:if>
+
+            <f:for each="{events}" as="event">
+                <div class="panelsmall" style="margin-bottom:10px;">
+                    <f:link.action
+                        action="show"
+                        arguments="{event: event}"
+                        pageUid="{detailPageUid}"
+                        class="btn btn-sm btn-primary">
+
+                        <div class="row">
+                            <div class="small-2 medium-1 columns enumber text-center">
+                                {event.numberShort}
+                            </div>
+
+                            <div class="small-10 medium-11 column">
+                                <div class="row">
+                                    <div class="small-12 column emeta">
+                                        <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
+                                        <f:if condition="{event.end}">
+                                            -
+                                            <f:format.date format="H:i">{event.end}</f:format.date> Uhr
+                                        </f:if>
+                                    </div>
+
+                                    <div class="small-12 column etitle">
+                                        <b>{event.title}</b>
+                                        <f:if condition="{event.location}">
+                                            – <em>{event.location}</em>
+                                        </f:if>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:link.action>
+                </div>
+            </f:for>
+        </f:then>
+
+        <f:else>
+            <div class="text-center">
+                <img
+                    src="https://www.feuerwehr-zoerbig.de/fileadmin/user_upload/kein-einsatz-vorhanden2.jpg"
+                    alt="In diesem Jahr wurden noch keine Einsatzberichte veröffentlicht."
+                    style="max-width:100%;height:auto;" />
+            </div>
+        </f:else>
+    </f:if>
+</f:section>
+
+<!-- =========================================================
+     Sidebar-Ausgabeliste
+     Übernommen aus firefighter, angepasst auf rescue_reports
+========================================================== -->
+<f:section name="EventListContentSidebar">
+    <f:if condition="{events}">
+        <f:then>
+            <f:variable name="total" value="{events -> f:count()}" />
+
+            <ul class="einsaetze">
+                <f:for each="{events}" as="event" iteration="i">
+                    <li>
+                        <f:link.action
+                            action="show"
+                            arguments="{event: event}"
+                            pageUid="{detailPageUid}"
+                            class="einsatz-link">
+
+                            <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
+                        </f:link.action>
+                    </li>
+                </f:for>
+            </ul>
+        </f:then>
+
+        <f:else>
+            <p>Keine Einsätze gefunden.</p>
+        </f:else>
+    </f:if>
+</f:section>
+
+<!-- =========================================================
+     NewDesign-Ausgabeliste
+========================================================== -->
+<f:section name="EventListContentNewDesign">
+    <f:if condition="{events}">
+        <f:then>
+            <f:if condition="{searchWord}">
+                <div class="result-info mt-3">
+                    <strong>{events -> f:count()}</strong>
+                        <f:if condition="{events -> f:count()} == 1">
+                            Einsatz gefunden
+                        </f:if>
+                        <f:if condition="{events -> f:count()} != 1">
+                            Einsätze gefunden
+                        </f:if>
+                </div>
+            </f:if>
+
+            <ul class="list-group list-group-flush no-bullet event-list-newdesign"
+                style="margin:0; padding:0; list-style:none;">
+
+                <f:for each="{events}" as="event">
+
+                    <li class="panelsmall" style="padding:12px 10px; border-bottom:1px solid #e5e9f2; position:relative;">
+
+                        <div class="row g-2 align-items-center">
+
+                            <!-- Nummer -->
+                            <div class="col-auto enumber" style="font-size:1.6rem; font-weight:600; opacity: 0.8; color:#5b8fd9; min-width:60px;">
+                                <f:if condition="{event.number}">
+                                    {event.numberShort}
+                                </f:if>
+                            </div>
+
+                            <!-- Inhalt -->
+                            <div class="col">
+
+                                <!-- Titel -->
+                                <div style="font-size:1.1rem; font-weight:700; color:#111; line-height:1.2;">
+                                    {event.title}
+                                    <f:if condition="{event.location}">
+                                        <span style="font-style:italic; font-weight:500; color:#444;">
+                                            – {event.location}
+                                        </span>
+                                    </f:if>
+                                </div>
+
+                                <!-- Meta -->
+                                <div style="font-size:0.85rem; color:#6c757d;">
+                                    <f:format.date format="d.m.Y">{event.start}</f:format.date>
+                                    ·
+                                    <f:format.date format="H:i">{event.start}</f:format.date>
+                                    <f:if condition="{event.end}">
+                                        – <f:format.date format="H:i">{event.end}</f:format.date>
+                                    </f:if>
+                                    Uhr
+                                </div>
+
+                                <!-- Klickbar -->
+                                <f:link.action
+                                    action="show"
+                                    arguments="{event: event}"
+                                    pageUid="{detailPageUid}"
+                                    class="stretched-link">
+                                    <span class="visually-hidden">Zum Einsatz {event.title}</span>
+                                </f:link.action>
+
+                            </div>
+                        </div>
+
+                    </li>
+
+                </f:for>
+            </ul>
+        </f:then>
+
+        <f:else>
+            <div class="text-center">
+                <img
+                    src="https://www.feuerwehr-zoerbig.de/fileadmin/user_upload/kein-einsatz-vorhanden2.jpg"
+                    alt="In diesem Jahr wurden noch keine Einsatzberichte veröffentlicht."
+                    style="max-width:100%;height:auto;" />
+            </div>
+        </f:else>
+    </f:if>
+</f:section>
+
+<!-- =========================================================
+     NewDesignSidebar-Ausgabeliste
+     firefighter-Stil + NewDesign-Optik
+========================================================== -->
+<f:section name="EventListContentSidebarNewDesign">
+    <f:if condition="{events}">
+        <f:then>
+            <ul class="einsaetze">
+                <f:for each="{events}" as="event" iteration="i">
+                    <li>
+                        <f:link.action
+                            action="show"
+                            arguments="{event: event}"
+                            pageUid="{detailPageUid}"
+                            class="einsatz-link">
+                            <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
+                        </f:link.action>
+                    </li>
+                </f:for>
+            </ul>
+        </f:then>
+        <f:else>
+            <p>Keine Einsätze gefunden.</p>
+        </f:else>
+    </f:if>
+</f:section>

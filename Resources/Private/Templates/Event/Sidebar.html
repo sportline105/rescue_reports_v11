@@ -1,0 +1,105 @@
+<f:layout name="Default" />
+
+<f:section name="main">
+  <h1 class="csc-firstHeader">Einsatzübersicht</h1>
+
+  <!-- =========================
+       Suchformular (optional)
+  ========================== -->
+  <f:if condition="{enableSearch}">
+    <div class="row" style="padding-top:10px;">
+      <div class="small-12 columns">
+
+        <!-- Wichtig: keine pluginName/controller setzen -->
+        <f:form action="list" method="get">
+          <div class="row collapse">
+
+            <!-- Suchfeld -->
+            <div class="small-7 columns">
+              <f:form.textfield
+                name="searchWord"
+                id="searchWord"
+                type="search"
+                value="{searchWord}"
+                placeholder="Suchbegriff eingeben…" />
+            </div>
+
+            <!-- Suchen-Button -->
+            <div class="small-2 columns">
+              <button type="submit" class="button postfix expand">
+                Suchen
+              </button>
+            </div>
+
+            <!-- Reset-Button -->
+            <div class="small-3 columns">
+              <f:link.action
+                action="list"
+                arguments="{searchWord: ''}"
+                class="button postfix expand secondary">
+                Filter zurücksetzen
+              </f:link.action>
+            </div>
+          </div>
+        </f:form>
+
+      </div>
+    </div>
+  </f:if>
+
+  <!-- =========================
+       Ergebnisliste
+  ========================== -->
+  <f:if condition="{events}">
+    <f:then>
+      <div class="result-info" style="margin-top:10px;">
+        <strong>{events -> f:count()}</strong> Einsatz<f:if condition="{events -> f:count()} != 1">e</f:if> gefunden
+        <f:if condition="{maxCount} > 0">(max. {maxCount} angezeigt)</f:if>
+      </div>
+
+      <f:for each="{events}" as="event">
+        <div class="panelsmall" style="margin-bottom:10px;">
+
+          <f:link.action
+            action="show"
+            arguments="{event: event}"
+            class="btn btn-sm btn-primary">
+
+            <div class="row">
+              <div class="small-2 medium-2 columns enumber text-center">
+                {event.number}
+              </div>
+
+              <div class="small-10 medium-10 column">
+                <div class="row">
+                  <div class="small-12 column emeta">
+                    <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
+                    -
+                    <f:format.date format="H:i">{event.end}</f:format.date> Uhr
+                  </div>
+
+                  <div class="small-12 column etitle">
+                    <b>{event.title}</b>
+                    <f:if condition="{event.location}">
+                      – <em>{event.location}</em>
+                    </f:if>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </f:link.action>
+
+        </div>
+      </f:for>
+    </f:then>
+
+    <f:else>
+      <div class="text-center">
+        <img
+          src="https://www.feuerwehr-zoerbig.de/fileadmin/user_upload/kein-einsatz-vorhanden2.jpg"
+          alt="In diesem Jahr wurden noch keine Einsatzberichte veröffentlicht."
+          style="max-width:100%;height:auto;" />
+      </div>
+    </f:else>
+  </f:if>
+</f:section>

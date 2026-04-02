@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+  <file source-language="en" datatype="plaintext" original="messages" date="2024-01-01T00:00:00Z">
+    <header/>
+    <body>
+      <trans-unit id="tx_rescuereports_domain_model_event.title" xml:space="preserve">
+        <source>Titel</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event.description" xml:space="preserve">
+        <source>Beschreibung</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event.date" xml:space="preserve">
+        <source>Datum</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event.cars" xml:space="preserve">
+        <source>Fahrzeuge</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event.types" xml:space="preserve">
+        <source>Typen</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event.stations" xml:space="preserve">
+        <source>Eingesetzte Feuerwehren</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event.brigade" xml:space="preserve">
+        <source>Feuerwehr</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_brigade" xml:space="preserve">
+        <source>Stadtfeuerwehr</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_car" xml:space="preserve">
+        <source>Fahrzeugtyp</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event" xml:space="preserve">
+        <source>Einsatz</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_type" xml:space="preserve">
+        <source>Einsatzstichwort</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_station" xml:space="preserve">
+        <source>Ortsfeuerwehr</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_deployment" xml:space="preserve">
+        <source>Deployment</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_image" xml:space="preserve">
+        <source>Bilder</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_event.location">
+        <source>Einsatzort</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_type.deprecated">
+        <source>Veraltet</source>
+      </trans-unit>
+      <trans-unit id="maxCount">
+        <source>Max. Anzahl (0=alle)</source>
+      </trans-unit>
+      <trans-unit id="dateFrom">
+        <source>Von Datum</source>
+      </trans-unit>
+      <trans-unit id="dateTo">
+        <source>Bis Datum</source>
+      </trans-unit>
+      <trans-unit id="templateVariant">
+        <source>Template-Variante</source>
+      </trans-unit>
+      <trans-unit id="sheet.general">
+        <source>Erweiterungsoptionen</source>
+      </trans-unit>
+      <trans-unit id="enableSearch">
+        <source>Suche anzeigen (Nur bei Standard-Template)</source>
+      </trans-unit>
+      <trans-unit id="detailPageUid">
+        <source>Detailansicht auf Seite</source>
+      </trans-unit>
+      <trans-unit id="plugin.eventlist">
+        <source>Detaillierte Einsatzberichte für Feuerwehren und BOS</source>
+      </trans-unit>
+      
+    </body>
+  </file>
+</xliff>

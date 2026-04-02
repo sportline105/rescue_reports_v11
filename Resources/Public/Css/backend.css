@@ -1,0 +1,21 @@
+/* Für das Label der deaktivierten Checkbox */
+.t3js-formengine-checkboxgroup label.nowrap-disabled {
+    font-weight: bold;
+    color: blue;
+    background: #f7f7f7;
+    font-size: 1.1em;
+    border-radius: 3px;
+    padding: 2px 4px;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    display: inline-block;
+}
+input[type="checkbox"][disabled] + span {
+    font-weight: bold;
+    color: #444;
+}
+/* Alle Checkboxen, deren Value mit 'fz:' beginnt, einrücken */
+.t3js-formengine-checkboxgroup input[type="checkbox"][value^="fz:"] + span {
+    margin-left: 2em;
+}
+

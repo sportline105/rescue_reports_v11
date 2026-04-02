@@ -1,0 +1,24 @@
+mod.wizards.newContentElement.wizardItems.common {
+    elements {
+        eventlist {
+            iconIdentifier = rescue_reports_eventlist
+            title = Rescue Reports: Einsatzübersicht
+            description = Vollständige Einsatzliste mit Detailansicht
+            tt_content_defValues {
+                CType = list
+                list_type = rescuereports_eventlist
+            }
+        }
+
+        sidebar {
+            iconIdentifier = rescue_reports_sidebar
+            title = Rescue Reports: Sidebar
+            description = Kompakte Übersicht für Seitenleisten
+            tt_content_defValues {
+                CType = list
+                list_type = rescuereports_sidebar
+            }
+        }
+    }
+    show := addToList(eventlist,sidebar)
+}

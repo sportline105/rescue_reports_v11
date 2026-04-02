@@ -1,0 +1,13 @@
+// === Resources/Private/Templates/Backend/Migration/Index.html ===
+<f:layout name="Default" />
+<f:section name="main">
+    <h1>Firefighter Migration</h1>
+    <p>Mit einem Klick werden die Relationen aus der alten Tabelle migriert.</p>
+    <f:flashMessages />
+    <f:form action="run">
+        <f:form.submit value="Migration starten" class="btn btn-primary" />
+    </f:form>
+    <f:form action="resetConfirm">
+        <f:form.submit value="Zurücksetzen (MM leeren)" class="btn btn-warning" />
+    </f:form>
+</f:section>
