@@ -1,22 +1,25 @@
 <?php
 namespace In2code\RescueReports\Domain\Repository;
 
-use TYPO3\CMS\Extbase\Persistence\Repository;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 class StationRepository extends Repository
 {
-    public function findAllGroupedByBrigade(): array
+    public function findPrimaryBrigadeStations()
     {
         $query = $this->createQuery();
-        $query->getQuerySettings()->setRespectStoragePage(true);
+        $query->getQuerySettings()->setRespectStoragePage(false);
+
+        $query->matching(
+            $query->equals('brigade.isPrimary', true)
+        );
 
         $query->setOrderings([
-            'brigade.priority' => QueryInterface::ORDER_ASCENDING,
-            'brigade.name' => QueryInterface::ORDER_ASCENDING,
-            'name' => QueryInterface::ORDER_ASCENDING
+            'sorting' => QueryInterface::ORDER_ASCENDING,
+            'name' => QueryInterface::ORDER_ASCENDING,
         ]);
 
-        return $query->execute()->toArray();
+        return $query->execute();
     }
 }

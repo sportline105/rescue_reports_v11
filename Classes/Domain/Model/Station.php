@@ -76,4 +76,15 @@ class Station extends AbstractEntity
     {
         $this->sorting = $sorting;
     }
+    protected string $prefix = '';
+
+    public function getPrefix(): string
+    {
+        return $this->prefix;
+    }
+
+    public function setPrefix(string $prefix): void
+    {
+        $this->prefix = $prefix;
+    }
 }

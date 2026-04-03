@@ -3,6 +3,7 @@ namespace In2code\RescueReports\Controller;
 
 use In2code\RescueReports\Domain\Model\Event;
 use In2code\RescueReports\Domain\Repository\EventRepository;
+use In2code\RescueReports\Domain\Repository\StationRepository;
 use In2code\RescueReports\Domain\Repository\TypeRepository;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -11,6 +12,7 @@ class EventController extends ActionController
 {
     protected EventRepository $eventRepository;
     protected TypeRepository $typeRepository;
+    protected StationRepository $stationRepository;
 
     public function __construct(EventRepository $eventRepository)
     {
@@ -22,10 +24,15 @@ class EventController extends ActionController
         $this->typeRepository = $typeRepository;
     }
 
+    public function injectStationRepository(StationRepository $stationRepository): void
+    {
+        $this->stationRepository = $stationRepository;
+    }
+
     /**
      * Liste aller Einsätze (mit optionalen FlexForm-Filtern)
      */
-    public function listAction(string $searchWord = null): ResponseInterface
+    public function listAction(?string $searchWord = null, ?string $station = null): ResponseInterface
     {
         $maxCount = (int)($this->settings['maxCount'] ?? 0);
         $dateFromValue = $this->settings['dateFrom'] ?? null;
@@ -33,6 +40,18 @@ class EventController extends ActionController
         $enableSearch = (bool)($this->settings['enableSearch'] ?? false);
         $templateVariant = (string)($this->settings['templateVariant'] ?? 'standard');
         $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
+
+        $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
+        $selectedStationUid = $this->normalizeRecordUid($station);
+        $activeStationUid = $selectedStationUid > 0 ? $selectedStationUid : $defaultStationUid;
+        
+        if ($activeStationUid === 0) {
+            // Fallback: erste Station nehmen
+            $firstStation = $this->stationRepository->findPrimaryBrigadeStations()->getFirst();
+            if ($firstStation) {
+                $activeStationUid = (int)$firstStation->getUid();
+            }
+        }
 
         $allowedTemplateVariants = [
             'standard',
@@ -51,14 +70,38 @@ class EventController extends ActionController
         $dateFrom = $dateFromValue;
         $dateTo = $dateToValue;
 
-        if ($enableSearch && $searchWord !== '') {
-            $events = $this->eventRepository->search($searchWord, $dateFrom, $dateTo, $maxCount);
+        if ($activeStationUid > 0) {
+            if ($enableSearch && $searchWord !== '') {
+                $events = $this->eventRepository->searchByStation(
+                    $activeStationUid,
+                    $searchWord,
+                    $dateFrom,
+                    $dateTo,
+                    $maxCount
+                );
+            } else {
+                $events = $this->eventRepository->findFilteredByStation(
+                    $activeStationUid,
+                    $dateFrom,
+                    $dateTo,
+                    $maxCount
+                );
+            }
         } else {
-            $events = $this->eventRepository->findFiltered($dateFrom, $dateTo, $maxCount);
+            if ($enableSearch && $searchWord !== '') {
+                $events = $this->eventRepository->search($searchWord, $dateFrom, $dateTo, $maxCount);
+            } else {
+                $events = $this->eventRepository->findFiltered($dateFrom, $dateTo, $maxCount);
+            }
         }
+
+        $eventItems = $this->buildEventItemsForStations($events, $activeStationUid);
+        $stations = $this->stationRepository->findPrimaryBrigadeStations();
 
         $this->view->assignMultiple([
             'events' => $events,
+            'eventItems' => $eventItems,
+            'stations' => $stations,
             'searchWord' => $searchWord,
             'enableSearch' => $enableSearch,
             'maxCount' => $maxCount,
@@ -66,6 +109,8 @@ class EventController extends ActionController
             'dateTo' => $this->createDateTimeFromFlexFormValue($dateToValue),
             'templateVariant' => $templateVariant,
             'detailPageUid' => $detailPageUid,
+            'defaultStationUid' => $defaultStationUid,
+            'activeStationUid' => $activeStationUid,
             'settings' => $this->settings,
         ]);
 
@@ -84,11 +129,88 @@ class EventController extends ActionController
             'event' => $event,
             'groupedVehicleData' => $groupedVehicleData,
             'detailPageUid' => $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null),
+            'defaultStationUid' => (int)($this->settings['defaultStation'] ?? 0),
             'templateVariant' => (string)($this->settings['templateVariant'] ?? 'standard'),
             'settings' => $this->settings,
         ]);
 
         return $this->htmlResponse();
+    }
+
+    /**
+     * Baut View-Daten für dynamische Einsatznummern pro Station auf.
+     *
+     * Ein Einsatz kann mehrere Stationsnummern haben, z.B.:
+     * ZÖ/030 und STD/005
+     */
+    protected function buildEventItemsForStations(iterable $events, int $selectedStationUid = 0): array
+    {
+        $items = [];
+
+        foreach ($events as $event) {
+            if (!$event instanceof Event) {
+                continue;
+            }
+
+            $start = $event->getStart();
+            $stationNumbers = [];
+            $primaryNumber = '';
+            $primaryStationName = '';
+
+            if ($start instanceof \DateTime) {
+                foreach ($event->getStations() as $station) {
+                    $stationUid = (int)$station->getUid();
+
+                    if ($stationUid <= 0) {
+                        continue;
+                    }
+
+                    $runningNumber = $this->eventRepository->countByStationAndYearUntil(
+                        $start,
+                        $stationUid,
+                        (int)$event->getUid()
+                    );
+
+                    $prefix = '';
+                    if (method_exists($station, 'getPrefix')) {
+                        $prefix = trim((string)$station->getPrefix());
+                    }
+
+                    $formattedNumber = $prefix !== ''
+                        ? $prefix . '/' . str_pad((string)$runningNumber, 3, '0', STR_PAD_LEFT)
+                        : str_pad((string)$runningNumber, 3, '0', STR_PAD_LEFT);
+
+                    $stationNumbers[] = [
+                        'station' => $station,
+                        'stationUid' => $stationUid,
+                        'stationName' => $station->getName(),
+                        'prefix' => $prefix,
+                        'runningNumber' => $runningNumber,
+                        'formattedNumber' => $formattedNumber,
+                        'year' => $start->format('Y'),
+                    ];
+
+                    if ($selectedStationUid > 0 && $stationUid === $selectedStationUid) {
+                        $primaryNumber = $formattedNumber;
+                        $primaryStationName = $station->getName();
+                    }
+
+                    if ($primaryNumber === '') {
+                        $primaryNumber = $formattedNumber;
+                        $primaryStationName = $station->getName();
+                    }
+                }
+            }
+
+            $items[] = [
+                'event' => $event,
+                'number' => $primaryNumber,
+                'stationName' => $primaryStationName,
+                'numbers' => $stationNumbers,
+            ];
+        }
+
+        return $items;
     }
 
     /**
@@ -190,6 +312,32 @@ class EventController extends ActionController
 
         if ($value === null || $value === '' || $value === '0' || $value === 0) {
             return null;
+        }
+
+        return (int)$value;
+    }
+
+    /**
+     * Normalisiert eine Datensatz-UID aus Request/FlexForm
+     */
+    protected function normalizeRecordUid($value): int
+    {
+        if (is_array($value)) {
+            $value = $value[0] ?? null;
+        }
+
+        if (is_string($value) && strpos($value, ',') !== false) {
+            $parts = explode(',', $value);
+            $value = $parts[0] ?? null;
+        }
+
+        if (is_string($value) && strpos($value, '_') !== false) {
+            $parts = explode('_', $value);
+            $value = end($parts);
+        }
+
+        if ($value === null || $value === '' || $value === '0' || $value === 0) {
+            return 0;
         }
 
         return (int)$value;

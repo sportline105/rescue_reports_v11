@@ -51,4 +51,16 @@ class Brigade extends AbstractEntity
     {
         $this->stations = $stations;
     }
+    protected bool $isPrimary = false;
+
+    public function isPrimary(): bool
+    {
+        return $this->isPrimary;
+    }
+
+    public function setIsPrimary(bool $isPrimary): void
+    {
+        $this->isPrimary = $isPrimary;
+    }
+    
 }

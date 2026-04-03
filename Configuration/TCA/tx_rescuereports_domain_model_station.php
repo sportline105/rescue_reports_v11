@@ -22,7 +22,7 @@ return [
     ],
     'types' => [
         '1' => [
-            'showitem' => 'name, cars, vehicles, --div--;Access, hidden, starttime, endtime'
+            'showitem' => 'name, prefix, cars, vehicles, --div--;Access, hidden, starttime, endtime'
         ],
     ],
     'columns' => [
@@ -77,32 +77,41 @@ return [
                 'default' => 'Ortsfeuerwehr '
                 ]
         ],
-'vehicles' => [
-    'exclude' => true,
-    'label' => 'Fahrzeuge dieser Station',
-    'config' => [
-        'type' => 'inline',
-        'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
-        'foreign_field' => 'station',
-        'foreign_label_userFunc' => \In2code\RescueReports\Utility\VehicleLabelUtility::class . '->getCustomLabel',
-        'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
-        'foreign_table_where' => 'AND 1=1 ORDER BY name ASC',
-        'maxitems' => 9999,
-        'appearance' => [
-            'collapseAll' => 1,
-            'newRecordLinkAddTitle' => 1,
-            'useSortable' => 1,
+        'vehicles' => [
+            'exclude' => true,
+            'label' => 'Fahrzeuge dieser Station',
+            'config' => [
+                'type' => 'inline',
+                'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
+                'foreign_field' => 'station',
+                'foreign_label_userFunc' => \In2code\RescueReports\Utility\VehicleLabelUtility::class . '->getCustomLabel',
+                'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
+                'foreign_table_where' => 'AND 1=1 ORDER BY name ASC',
+                'maxitems' => 9999,
+                'appearance' => [
+                    'collapseAll' => 1,
+                    'newRecordLinkAddTitle' => 1,
+                    'useSortable' => 1,
+                ],
+            ],
         ],
-    ],
-],
-'brigade' => [
-    'label' => 'Feuerwehr',
-    'config' => [
-        'type' => 'select',
-        'renderType' => 'selectSingle',
-        'foreign_table' => 'tx_rescuereports_domain_model_brigade',
-        'default' => 0,
-    ],
-],
+        'brigade' => [
+            'label' => 'Feuerwehr',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'foreign_table' => 'tx_rescuereports_domain_model_brigade',
+                'default' => 0,
+            ],
+        ],
+        'prefix' => [
+            'label' => 'Präfix / Kürzel',
+            'config' => [
+                'type' => 'input',
+                'eval' => 'trim',
+                'max' => 10,
+                'default' => '',
+            ],
+        ],
     ]
 ];

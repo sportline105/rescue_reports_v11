@@ -22,7 +22,7 @@ return [
         'iconfile' => 'EXT:rescue_reports/Resources/Public/Icons/tx_rescuereports_domain_model_brigade.svg'
     ],
     'types' => [
-    '1' => ['showitem' => 'name, priority, organization, stations, --div--;Access, hidden, starttime, endtime'],
+    '1' => ['showitem' => 'name, is_primary, priority, organization, stations, --div--;Access, hidden, starttime, endtime'],
 ],
     'columns' => [
         'sys_language_uid' => ['exclude' => true, 'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.language','config' => ['type' => 'language']],
@@ -65,6 +65,15 @@ return [
                 'default' => 0,
                 'size' => 3,
             ]
+        ],
+        'is_primary' => [
+            'label' => 'Primäre Stadtfeuerwehr',
+            'config' => [
+                'type' => 'check',
+                'items' => [
+                    ['Diese Feuerwehr als primär verwenden', 1],
+                ],
+            ],
         ],
         'organization' => [
             'label' => 'Organisation',
