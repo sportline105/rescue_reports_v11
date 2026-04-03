@@ -1,6 +1,6 @@
 <?php
 
-namespace In2code\RescueReports\Utility;
+namespace Nkfire\RescueReports\Utility;
 
 class TestDebugUtility
 {

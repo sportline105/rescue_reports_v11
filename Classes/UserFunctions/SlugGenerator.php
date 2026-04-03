@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace In2code\RescueReports\UserFunctions;
+namespace Nkfire\RescueReports\UserFunctions;
 
 class SlugGenerator
 {

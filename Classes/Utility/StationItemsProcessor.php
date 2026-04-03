@@ -1,6 +1,6 @@
 <?php
 
-namespace In2code\RescueReports\Utility\Tca;
+namespace Nkfire\RescueReports\Utility\Tca;
 
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaSelectItems;
 

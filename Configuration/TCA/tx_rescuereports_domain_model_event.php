@@ -98,7 +98,7 @@ return [
                 'foreign_table_where' => '
                     ORDER BY tx_rescuereports_domain_model_type.title
                 ',
-                'itemsProcFunc' => \In2code\RescueReports\UserFunctions\TypeItemsProcFunc::class . '->filterDeprecatedTypes',
+                'itemsProcFunc' => \Nkfire\RescueReports\UserFunctions\TypeItemsProcFunc::class . '->filterDeprecatedTypes',
                 'MM' => 'tx_rescuereports_event_type_mm',
                 'minitems' => 0,
                 'maxitems' => 1,
@@ -111,7 +111,7 @@ return [
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectCheckBox',
-                'itemsProcFunc' => 'In2code\\RescueReports\\Utility\\StationLabelUtility->addGroupedStations',
+                'itemsProcFunc' => 'Nkfire\\RescueReports\\Utility\\StationLabelUtility->addGroupedStations',
                 'foreign_table' => 'tx_rescuereports_domain_model_station',
                 'foreign_table_where' => 'AND 1=0',
                 'MM' => 'tx_rescuereports_event_station_mm',
@@ -126,7 +126,7 @@ return [
                 'type' => 'select',
                 'renderType' => 'selectMultipleSideBySide',
                 //'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
-                'itemsProcFunc' => \In2code\RescueReports\Utility\EventVehicleSelectionUtility::class . '->getAvailableVehicles',
+                'itemsProcFunc' => \Nkfire\RescueReports\Utility\EventVehicleSelectionUtility::class . '->getAvailableVehicles',
                 //'foreign_table_where' => '', // ← wichtig, NICHT setzen!
                 'size' => 15,
                 'maxitems' => 999,
