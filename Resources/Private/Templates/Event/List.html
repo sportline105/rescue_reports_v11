@@ -181,37 +181,67 @@
 
             <f:for each="{events}" as="event">
                 <div class="panelsmall" style="margin-bottom:10px;">
-                    <f:link.action
-                        action="show"
-                        arguments="{event: event}"
-                        pageUid="{detailPageUid}"
-                        class="btn btn-sm btn-primary">
+                    <f:if condition="{event.slug}">
+                        <f:then>
+                            <f:link.action
+                                action="show"
+                                arguments="{event: event}"
+                                pageUid="{detailPageUid}"
+                                class="btn btn-sm btn-primary">
 
-                        <div class="row">
-                            <div class="small-2 medium-1 columns enumber text-center">
-                                {event.numberShort}
-                            </div>
-
-                            <div class="small-10 medium-11 column">
                                 <div class="row">
-                                    <div class="small-12 column emeta">
-                                        <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
-                                        <f:if condition="{event.end}">
-                                            -
-                                            <f:format.date format="H:i">{event.end}</f:format.date> Uhr
-                                        </f:if>
+                                    <div class="small-2 medium-1 columns enumber text-center">
+                                        {event.numberShort}
                                     </div>
 
-                                    <div class="small-12 column etitle">
-                                        <b>{event.title}</b>
-                                        <f:if condition="{event.location}">
-                                            – <em>{event.location}</em>
-                                        </f:if>
+                                    <div class="small-10 medium-11 column">
+                                        <div class="row">
+                                            <div class="small-12 column emeta">
+                                                <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
+                                                <f:if condition="{event.end}">
+                                                    -
+                                                    <f:format.date format="H:i">{event.end}</f:format.date> Uhr
+                                                </f:if>
+                                            </div>
+
+                                            <div class="small-12 column etitle">
+                                                <b>{event.title}</b>
+                                                <f:if condition="{event.location}">
+                                                    – <em>{event.location}</em>
+                                                </f:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </f:link.action>
+                        </f:then>
+                        <f:else>
+                            <div class="row">
+                                <div class="small-2 medium-1 columns enumber text-center">
+                                    {event.numberShort}
+                                </div>
+
+                                <div class="small-10 medium-11 column">
+                                    <div class="row">
+                                        <div class="small-12 column emeta">
+                                            <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
+                                            <f:if condition="{event.end}">
+                                                -
+                                                <f:format.date format="H:i">{event.end}</f:format.date> Uhr
+                                            </f:if>
+                                        </div>
+
+                                        <div class="small-12 column etitle">
+                                            <b>{event.title}</b>
+                                            <f:if condition="{event.location}">
+                                                – <em>{event.location}</em>
+                                            </f:if>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </f:link.action>
+                        </f:else>
+                    </f:if>
                 </div>
             </f:for>
         </f:then>
@@ -239,14 +269,20 @@
             <ul class="einsaetze">
                 <f:for each="{events}" as="event" iteration="i">
                     <li>
-                        <f:link.action
-                            action="show"
-                            arguments="{event: event}"
-                            pageUid="{detailPageUid}"
-                            class="einsatz-link">
-
-                            <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
-                        </f:link.action>
+                        <f:if condition="{event.slug}">
+                            <f:then>
+                                <f:link.action
+                                    action="show"
+                                    arguments="{event: event}"
+                                    pageUid="{detailPageUid}"
+                                    class="einsatz-link">
+                                    <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
+                                </f:link.action>
+                            </f:then>
+                            <f:else>
+                                <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
+                            </f:else>
+                        </f:if>
                     </li>
                 </f:for>
             </ul>
@@ -267,12 +303,12 @@
             <f:if condition="{searchWord}">
                 <div class="result-info mt-3">
                     <strong>{events -> f:count()}</strong>
-                        <f:if condition="{events -> f:count()} == 1">
-                            Einsatz gefunden
-                        </f:if>
-                        <f:if condition="{events -> f:count()} != 1">
-                            Einsätze gefunden
-                        </f:if>
+                    <f:if condition="{events -> f:count()} == 1">
+                        Einsatz gefunden
+                    </f:if>
+                    <f:if condition="{events -> f:count()} != 1">
+                        Einsätze gefunden
+                    </f:if>
                 </div>
             </f:if>
 
@@ -317,13 +353,15 @@
                                 </div>
 
                                 <!-- Klickbar -->
-                                <f:link.action
-                                    action="show"
-                                    arguments="{event: event}"
-                                    pageUid="{detailPageUid}"
-                                    class="stretched-link">
-                                    <span class="visually-hidden">Zum Einsatz {event.title}</span>
-                                </f:link.action>
+                                <f:if condition="{event.slug}">
+                                    <f:link.action
+                                        action="show"
+                                        arguments="{event: event}"
+                                        pageUid="{detailPageUid}"
+                                        class="stretched-link">
+                                        <span class="visually-hidden">Zum Einsatz {event.title}</span>
+                                    </f:link.action>
+                                </f:if>
 
                             </div>
                         </div>
@@ -355,13 +393,20 @@
             <ul class="einsaetze">
                 <f:for each="{events}" as="event" iteration="i">
                     <li>
-                        <f:link.action
-                            action="show"
-                            arguments="{event: event}"
-                            pageUid="{detailPageUid}"
-                            class="einsatz-link">
-                            <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
-                        </f:link.action>
+                        <f:if condition="{event.slug}">
+                            <f:then>
+                                <f:link.action
+                                    action="show"
+                                    arguments="{event: event}"
+                                    pageUid="{detailPageUid}"
+                                    class="einsatz-link">
+                                    <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
+                                </f:link.action>
+                            </f:then>
+                            <f:else>
+                                <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
+                            </f:else>
+                        </f:if>
                     </li>
                 </f:for>
             </ul>

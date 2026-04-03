@@ -212,4 +212,16 @@ class Event extends AbstractEntity
 
         return sprintf('%d Min.', $minutes);
     }
+
+    protected string $slug = '';
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
+    }
 }

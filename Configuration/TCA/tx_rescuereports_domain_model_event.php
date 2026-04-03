@@ -134,19 +134,27 @@ return [
                 'eval' => 'int',
             ],
         ],
-        'start_slug' => [
+        'slug_source' => [
+            'exclude' => true,
+            'label' => 'Slug Source',
             'config' => [
-                'type' => 'passthrough',
+                'type' => 'input',
+                'readOnly' => true,
             ],
         ],
         'slug' => [
+            'exclude' => true,
+            'label' => 'Slug',
             'config' => [
                 'type' => 'slug',
+                'size' => 50,
                 'generatorOptions' => [
-                    'userFunc' => \In2code\RescueReports\UserFunctions\SlugGenerator::class . '->generate',
+                    'fields' => ['slug_source'],
+                    'fieldSeparator' => '/',
                 ],
                 'fallbackCharacter' => '-',
                 'eval' => 'uniqueInSite',
+                'default' => '',
             ],
         ],
         // Bilder

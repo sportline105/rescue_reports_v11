@@ -9,6 +9,8 @@ CREATE TABLE tx_rescuereports_domain_model_event (
   location varchar(255) DEFAULT '' NOT NULL,
   cars varchar(255) DEFAULT '' NOT NULL,
   vehicles TEXT NOT NULL,
+  slug varchar(2048) DEFAULT '' NOT NULL,
+  slug_source varchar(255) DEFAULT '' NOT NULL,
   types int(11) DEFAULT '0' NOT NULL,
   images INT(11) DEFAULT 0 NOT NULL,
   brigade INT(11) DEFAULT 0 NOT NULL,
