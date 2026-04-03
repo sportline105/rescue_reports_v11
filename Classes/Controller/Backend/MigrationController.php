@@ -1,5 +1,5 @@
 <?php
-namespace In2code\RescueReports\Controller\Backend;
+namespace Nkfire\RescueReports\Controller\Backend;
 
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
