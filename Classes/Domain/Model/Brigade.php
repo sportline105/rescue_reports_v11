@@ -1,6 +1,6 @@
 <?php
 
-namespace In2code\RescueReports\Domain\Model;
+namespace Nkfire\RescueReports\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
@@ -12,7 +12,7 @@ class Brigade extends AbstractEntity
     protected int $priority = 0;
 
     /**
-     * @var ObjectStorage<\In2code\RescueReports\Domain\Model\Station>
+     * @var ObjectStorage<\Nkfire\RescueReports\Domain\Model\Station>
      * @Transient
      */
     protected ObjectStorage $stations;

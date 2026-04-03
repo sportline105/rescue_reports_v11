@@ -1,5 +1,5 @@
 <?php
-namespace In2code\RescueReports\Domain\Repository;
+namespace Nkfire\RescueReports\Domain\Repository;
 
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
@@ -27,7 +27,7 @@ class EventRepository extends Repository
 
         $event = $query->execute()->getFirst();
 
-        if ($event instanceof \In2code\RescueReports\Domain\Model\Event) {
+        if ($event instanceof \Nkfire\RescueReports\Domain\Model\Event) {
             $event->getStations();
             $event->getVehicles();
         }

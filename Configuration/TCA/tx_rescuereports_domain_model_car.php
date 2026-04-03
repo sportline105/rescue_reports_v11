@@ -3,7 +3,7 @@ return [
     'ctrl' => [
         'title' => 'LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:tx_rescuereports_domain_model_car',
         'label' => 'name',
-        'label_userFunc' => \In2code\RescueReports\Utility\CarLabelUtility::class . '->getCustomLabel',
+        'label_userFunc' => \Nkfire\RescueReports\Utility\CarLabelUtility::class . '->getCustomLabel',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',

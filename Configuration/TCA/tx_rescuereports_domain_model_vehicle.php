@@ -3,7 +3,7 @@ return [
     'ctrl' => [
         'title' => 'Fahrzeug',
         'label' => 'name',
-        ##'label_userFunc' => \In2code\RescueReports\Utility\VehicleLabelUtility::class . '->getCustomLabel',
+        ##'label_userFunc' => \Nkfire\RescueReports\Utility\VehicleLabelUtility::class . '->getCustomLabel',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
@@ -60,7 +60,7 @@ return [
         'renderType' => 'selectSingle',
         'foreign_table' => 'tx_rescuereports_domain_model_car',
         'foreign_table_where' => 'ORDER BY name ASC',
-        'itemsProcFunc' => \In2code\RescueReports\Utility\CarLabelItemsProcFunc::class . '->addOrganisationToLabel',
+        'itemsProcFunc' => \Nkfire\RescueReports\Utility\CarLabelItemsProcFunc::class . '->addOrganisationToLabel',
         'minitems' => 1,
         'maxitems' => 1,
     ],

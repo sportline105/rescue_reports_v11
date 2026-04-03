@@ -3,12 +3,12 @@
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 ExtensionUtility::registerModule(
-    'In2code.RescueReports',
+    'Nkfire.RescueReports',
     'tools',
     'migration',
     '',
     [
-        \In2code\RescueReports\Controller\Backend\MigrationController::class => 'index,run,resetConfirm,reset',
+        \Nkfire\RescueReports\Controller\Backend\MigrationController::class => 'index,run,resetConfirm,reset',
     ],
     [
         'access' => 'admin',
