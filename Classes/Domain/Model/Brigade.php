@@ -9,7 +9,7 @@ use TYPO3\CMS\Extbase\Annotation\ORM\Transient;
 class Brigade extends AbstractEntity
 {
     protected string $name = '';
-    protected int $sorting = 9999;
+    protected int $priority = 0;
 
     /**
      * @var ObjectStorage<\Nkfire\RescueReports\Domain\Model\Station>
@@ -32,14 +32,14 @@ class Brigade extends AbstractEntity
         $this->name = $name;
     }
 
-    public function getSorting(): int
+    public function getPriority(): int
     {
-        return $this->sorting;
+        return $this->priority;
     }
 
-    public function setSorting(int $sorting): void
+    public function setPriority(int $priority): void
     {
-        $this->sorting = $sorting;
+        $this->priority = $priority;
     }
 
     public function getStations(): ObjectStorage
