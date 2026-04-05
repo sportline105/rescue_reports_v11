@@ -1,6 +1,6 @@
 <?php
 
-namespace Nkfire\RescueReports\Utility\Tca;
+namespace In2code\RescueReports\Utility\Tca;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;

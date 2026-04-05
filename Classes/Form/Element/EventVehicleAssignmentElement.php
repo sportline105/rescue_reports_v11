@@ -1,5 +1,5 @@
 <?php
-namespace Nkfire\RescueReports\Form\Element;
+namespace In2code\RescueReports\Form\Element;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

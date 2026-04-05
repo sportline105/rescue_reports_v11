@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Nkfire\RescueReports\Hooks;
+namespace In2code\RescueReports\Hooks;
 
 use PDO;
 use TYPO3\CMS\Core\Database\ConnectionPool;

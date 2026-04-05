@@ -18,7 +18,7 @@ return [
             'label' => 'Fahrzeugeinsatz',
             'config' => [
                 'type' => 'select',
-                'itemsProcFunc' => \Nkfire\rescue_reports\Utility\EventVehicleAssignmentUtility::class . '->getAssignmentOptions',
+                'itemsProcFunc' => \In2code\rescue_reports\Utility\EventVehicleAssignmentUtility::class . '->getAssignmentOptions',
                 'renderType' => 'selectMultipleSideBySide',
                 'size' => 10,
                 'maxitems' => 999,
