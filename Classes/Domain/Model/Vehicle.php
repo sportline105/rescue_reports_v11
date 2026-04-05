@@ -1,5 +1,5 @@
 <?php
-namespace Nkfire\RescueReports\Domain\Model;
+namespace In2code\RescueReports\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
@@ -9,12 +9,12 @@ class Vehicle extends AbstractEntity
     protected string $name = '';
 
     /**
-         * @var \Nkfire\RescueReports\Domain\Model\Car
+         * @var \In2code\RescueReports\Domain\Model\Car
          */
         protected $car;
 
     /**
-     * @var \Nkfire\RescueReports\Domain\Model\Station|null
+     * @var \In2code\RescueReports\Domain\Model\Station|null
      */
     protected $station = null;
 

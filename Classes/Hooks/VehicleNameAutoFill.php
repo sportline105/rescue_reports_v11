@@ -1,5 +1,5 @@
 <?php
-namespace Nkfire\RescueReports\Hooks;
+namespace In2code\RescueReports\Hooks;
 
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

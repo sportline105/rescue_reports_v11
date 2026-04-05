@@ -1,5 +1,5 @@
 <?php
-namespace Nkfire\RescueReports\Domain\Repository;
+namespace In2code\RescueReports\Domain\Repository;
 
 use PDO;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -30,7 +30,7 @@ class EventRepository extends Repository
 
         $event = $query->execute()->getFirst();
 
-        if ($event instanceof \Nkfire\RescueReports\Domain\Model\Event) {
+        if ($event instanceof \In2code\RescueReports\Domain\Model\Event) {
             $event->getStations();
             $event->getVehicles();
         }
