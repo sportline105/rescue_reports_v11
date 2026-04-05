@@ -70,7 +70,7 @@ CREATE TABLE tx_rescuereports_domain_model_brigade (
   pid int(11) DEFAULT '0' NOT NULL,
   name varchar(255) DEFAULT '' NOT NULL,
   organization INT(11) DEFAULT '0' NOT NULL,
-  sorting int(11) DEFAULT '0' NOT NULL,
+  priority INT DEFAULT 0,
   stations int(11) DEFAULT '0' NOT NULL,
   is_primary int(1) DEFAULT 0 NOT NULL,
   hidden tinyint(4) DEFAULT '0' NOT NULL,

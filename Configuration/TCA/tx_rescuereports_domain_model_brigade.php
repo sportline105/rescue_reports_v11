@@ -19,12 +19,11 @@ return [
             'endtime' => 'endtime',
         ],
         'searchFields' => 'name',
-        'iconfile' => 'EXT:rescue_reports/Resources/Public/Icons/tx_rescuereports_domain_model_brigade.svg',
-        'sortby' => 'sorting',
+        'iconfile' => 'EXT:rescue_reports/Resources/Public/Icons/tx_rescuereports_domain_model_brigade.svg'
     ],
     'types' => [
-        '1' => ['showitem' => 'name, is_primary, organization, stations, --div--;Access, hidden, starttime, endtime'],
-    ],
+    '1' => ['showitem' => 'name, is_primary, priority, organization, stations, --div--;Access, hidden, starttime, endtime'],
+],
     'columns' => [
         'sys_language_uid' => ['exclude' => true, 'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.language','config' => ['type' => 'language']],
         'l18n_parent' => ['displayCond' => 'FIELD:sys_language_uid:>:0','label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.l18n_parent','config' => ['type' => 'select','renderType' => 'selectSingle','items' => [['', 0]],'foreign_table' => 'tx_rescuereports_domain_model_brigade','foreign_table_where' => 'AND {#tx_rescuereports_domain_model_brigade}.{#pid}=###CURRENT_PID### AND {#tx_rescuereports_domain_model_brigade}.{#sys_language_uid} IN (-1,0)','default' => 0]],
@@ -58,10 +57,14 @@ return [
                 ]
             ],
         ],
-        'sorting' => [
+        'priority' => [
+            'label' => 'Priorität',
             'config' => [
-                'type' => 'passthrough',
-            ],
+                'type' => 'input',
+                'eval' => 'int',
+                'default' => 0,
+                'size' => 3,
+            ]
         ],
         'is_primary' => [
             'label' => 'Primäre Stadtfeuerwehr',
