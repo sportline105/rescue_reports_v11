@@ -20,6 +20,18 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         ]
     );
 
+    // Statistik-Plugin
+    ExtensionUtility::configurePlugin(
+        'RescueReports',
+        'Statistics',
+        [
+            EventController::class => 'statistics',
+        ],
+        [
+            EventController::class => '',
+        ]
+    );
+
     // Sidebar-Plugin
     ExtensionUtility::configurePlugin(
         'RescueReports',

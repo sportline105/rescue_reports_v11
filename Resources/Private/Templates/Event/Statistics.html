@@ -1,0 +1,55 @@
+<f:layout name="Default" />
+
+<f:section name="main">
+<div class="rescue-reports-statistics">
+
+    <f:if condition="{statistics}">
+        <f:then>
+            <f:for each="{statistics}" as="categories" key="year">
+                <div class="statistics-year">
+                    <h2 class="statistics-year__title">{year}</h2>
+
+                    <f:for each="{categories}" as="types" key="category">
+                        <div class="statistics-category">
+                            <h3 class="statistics-category__title">{category}</h3>
+
+                            <table class="statistics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Einsatzart</th>
+                                        <th class="statistics-table__count">Anzahl</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <f:for each="{types}" as="count" key="typeName">
+                                        <tr>
+                                            <td>{typeName}</td>
+                                            <td class="statistics-table__count">{count}</td>
+                                        </tr>
+                                    </f:for>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Gesamt</th>
+                                        <th class="statistics-table__count">
+                                            <f:variable name="catTotal" value="0" />
+                                            <f:for each="{types}" as="count">
+                                                <f:variable name="catTotal" value="{catTotal + count}" />
+                                            </f:for>
+                                            {catTotal}
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </f:for>
+                </div>
+            </f:for>
+        </f:then>
+        <f:else>
+            <p>Keine Einsatzdaten vorhanden.</p>
+        </f:else>
+    </f:if>
+
+</div>
+</f:section>

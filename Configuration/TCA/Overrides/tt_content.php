@@ -24,6 +24,14 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         'FILE:EXT:rescue_reports/Configuration/FlexForms/eventlist.xml'
     );
 
+    // Statistik-Plugin
+    ExtensionUtility::registerPlugin(
+        'RescueReports',
+        'Statistics',
+        'Rescue Reports: Jahresstatistik',
+        'rescue_reports_statistics'
+    );
+
     // Sidebar-Plugin
     ExtensionUtility::registerPlugin(
         'RescueReports',

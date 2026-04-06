@@ -119,6 +119,16 @@ class EventController extends ActionController
     }
 
     /**
+     * Jahresstatistik nach Kategorie und Einsatzart
+     */
+    public function statisticsAction(): ResponseInterface
+    {
+        $statistics = $this->eventRepository->getYearlyStatistics();
+        $this->view->assign('statistics', $statistics);
+        return $this->htmlResponse();
+    }
+
+    /**
      * Detailansicht eines einzelnen Einsatzes
      */
     public function showAction(Event $event, ?string $station = null): ResponseInterface
