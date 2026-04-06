@@ -56,7 +56,7 @@ class CarFilterUtility
                     $brigadeQuery = GeneralUtility::makeInstance(ConnectionPool::class)
                         ->getQueryBuilderForTable('tx_rescuereports_domain_model_brigade');
                     $brigade = $brigadeQuery
-                        ->select('uid', 'name', 'priority')
+                        ->select('uid', 'name', 'sorting')
                         ->from('tx_rescuereports_domain_model_brigade')
                         ->where(
                             $brigadeQuery->expr()->eq('uid', $brigadeQuery->createNamedParameter($station['brigade'], \PDO::PARAM_INT))
@@ -64,7 +64,7 @@ class CarFilterUtility
                         ->executeQuery()
                         ->fetchAssociative();
                     $brigadeName = $brigade['name'] ?? '';
-                    $brigadePriority = isset($brigade['priority']) ? (int)$brigade['priority'] : 9999;
+                    $brigadePriority = isset($brigade['sorting']) ? (int)$brigade['sorting'] : 9999;
                     $brigadeUid = (int)($brigade['uid'] ?? 0);
                 }
 
