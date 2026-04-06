@@ -1,55 +1,124 @@
 <f:layout name="Default" />
 
 <f:section name="main">
-<div class="rescue-reports-statistics">
+<div class="rescue-statistics">
+
+    <f:if condition="{stationName}">
+        <h2 class="rescue-statistics__station">Statistik: {stationName}</h2>
+    </f:if>
 
     <f:if condition="{statistics}">
         <f:then>
-            <f:for each="{statistics}" as="categories" key="year">
-                <div class="statistics-year">
-                    <h2 class="statistics-year__title">{year}</h2>
+            <f:for each="{statistics}" as="yearData" key="year">
+                <div class="rescue-statistics__year">
+                    <h3 class="rescue-statistics__year-title">
+                        {year}
+                        <span class="rescue-statistics__total">({yearData.total} Einsätze gesamt)</span>
+                    </h3>
 
-                    <f:for each="{categories}" as="types" key="category">
-                        <div class="statistics-category">
-                            <h3 class="statistics-category__title">{category}</h3>
+                    <div class="rescue-statistics__layout">
 
-                            <table class="statistics-table">
+                        <!-- Tortendiagramm -->
+                        <div class="rescue-statistics__chart-wrap">
+                            <canvas id="chart-{year}" width="260" height="260"></canvas>
+                        </div>
+
+                        <!-- Tabelle -->
+                        <div class="rescue-statistics__table-wrap">
+                            <table class="rescue-statistics__table">
                                 <thead>
                                     <tr>
-                                        <th>Einsatzart</th>
-                                        <th class="statistics-table__count">Anzahl</th>
+                                        <th></th>
+                                        <th>Kategorie</th>
+                                        <th class="rescue-statistics__num">Anzahl</th>
+                                        <th class="rescue-statistics__num">Anteil</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <f:for each="{types}" as="count" key="typeName">
+                                    <f:for each="{yearData.categories}" as="cat">
                                         <tr>
-                                            <td>{typeName}</td>
-                                            <td class="statistics-table__count">{count}</td>
+                                            <td><span class="rescue-statistics__dot" style="background:{cat.color}"></span></td>
+                                            <td>{cat.title}</td>
+                                            <td class="rescue-statistics__num">{cat.count}</td>
+                                            <td class="rescue-statistics__num">{cat.percent} %</td>
                                         </tr>
                                     </f:for>
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th>Gesamt</th>
-                                        <th class="statistics-table__count">
-                                            <f:variable name="catTotal" value="0" />
-                                            <f:for each="{types}" as="count">
-                                                <f:variable name="catTotal" value="{catTotal + count}" />
-                                            </f:for>
-                                            {catTotal}
-                                        </th>
+                                        <td colspan="2"><strong>Gesamt</strong></td>
+                                        <td class="rescue-statistics__num"><strong>{yearData.total}</strong></td>
+                                        <td class="rescue-statistics__num"><strong>100 %</strong></td>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
-                    </f:for>
-                </div>
+
+                    </div><!-- /.layout -->
+
+                    <!-- Chart.js-Initialisierung für dieses Jahr -->
+                    <script>
+                    (function() {
+                        var labels  = [<f:for each="{yearData.categories}" as="cat">'{f:format.raw(value: cat.title)}',</f:for>];
+                        var data    = [<f:for each="{yearData.categories}" as="cat">{cat.count},</f:for>];
+                        var colors  = [<f:for each="{yearData.categories}" as="cat">'{cat.color}',</f:for>];
+
+                        if (typeof Chart !== 'undefined') {
+                            new Chart(document.getElementById('chart-{year}'), {
+                                type: 'pie',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        data: data,
+                                        backgroundColor: colors,
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    plugins: {
+                                        legend: { display: false },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(ctx) {
+                                                    var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+                                                    var pct   = total > 0 ? Math.round(ctx.raw / total * 1000) / 10 : 0;
+                                                    return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    })();
+                    </script>
+
+                </div><!-- /.year -->
             </f:for>
         </f:then>
         <f:else>
-            <p>Keine Einsatzdaten vorhanden.</p>
+            <p class="rescue-statistics__empty">Keine Einsatzdaten vorhanden.</p>
         </f:else>
     </f:if>
 
 </div>
+
+<!-- Chart.js via CDN (einmalig am Ende der Seite) -->
+<f:if condition="{statistics}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</f:if>
+
+<style>
+.rescue-statistics__layout        { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; margin: 1rem 0 2rem; }
+.rescue-statistics__chart-wrap    { flex: 0 0 260px; }
+.rescue-statistics__table-wrap    { flex: 1 1 300px; }
+.rescue-statistics__table         { width: 100%; border-collapse: collapse; }
+.rescue-statistics__table th,
+.rescue-statistics__table td      { padding: .35rem .6rem; border-bottom: 1px solid #ddd; vertical-align: middle; }
+.rescue-statistics__num           { text-align: right; white-space: nowrap; }
+.rescue-statistics__dot           { display: inline-block; width: 14px; height: 14px; border-radius: 50%; }
+.rescue-statistics__total         { font-size: .85em; font-weight: normal; color: #666; margin-left: .5rem; }
+.rescue-statistics__year-title    { margin-bottom: .25rem; }
+</style>
+
 </f:section>

@@ -50,10 +50,14 @@ return [
         'category' => [
             'label' => 'Kategorie',
             'config' => [
-                'type' => 'input',
-                'eval' => 'trim',
-                'default' => '',
-                'placeholder' => 'z.B. Brand, Technische Hilfeleistung, ABC-Einsatz',
+                'type'          => 'select',
+                'renderType'    => 'selectSingle',
+                'foreign_table' => 'tx_rescuereports_domain_model_category',
+                'foreign_table_where' => 'ORDER BY tx_rescuereports_domain_model_category.title ASC',
+                'items'         => [['– keine –', 0]],
+                'minitems'      => 0,
+                'maxitems'      => 1,
+                'default'       => 0,
             ],
         ],
         'deprecated' => [

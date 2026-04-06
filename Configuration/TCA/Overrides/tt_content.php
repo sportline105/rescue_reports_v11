@@ -32,6 +32,13 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         'rescue_reports_statistics'
     );
 
+    $pluginSignatureStats = 'rescuereports_statistics';
+    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignatureStats] = 'pi_flexform';
+    ExtensionManagementUtility::addPiFlexFormValue(
+        $pluginSignatureStats,
+        'FILE:EXT:rescue_reports/Configuration/FlexForms/statistics.xml'
+    );
+
     // Sidebar-Plugin
     ExtensionUtility::registerPlugin(
         'RescueReports',
