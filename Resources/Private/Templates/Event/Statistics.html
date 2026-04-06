@@ -1,11 +1,6 @@
 <f:layout name="Default" />
 
 <f:section name="main">
-<!-- Chart.js muss vor den Inline-Scripts geladen sein -->
-<f:if condition="{statistics}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-</f:if>
-
 <div class="rescue-statistics">
 
     <f:if condition="{stationName}">
@@ -23,12 +18,10 @@
 
                     <div class="rescue-statistics__layout">
 
-                        <!-- Tortendiagramm -->
                         <div class="rescue-statistics__chart-wrap">
                             <canvas id="chart-{year}" width="260" height="260"></canvas>
                         </div>
 
-                        <!-- Tabelle -->
                         <div class="rescue-statistics__table-wrap">
                             <table class="rescue-statistics__table">
                                 <thead>
@@ -59,47 +52,62 @@
                             </table>
                         </div>
 
-                    </div><!-- /.layout -->
+                    </div>
+                </div>
+            </f:for>
 
-                    <!-- Chart.js-Initialisierung für dieses Jahr -->
-                    <script>
-                    (function() {
-                        var labels  = [<f:for each="{yearData.categories}" as="cat">'{f:format.raw(value: cat.title)}',</f:for>];
-                        var data    = [<f:for each="{yearData.categories}" as="cat">{cat.count},</f:for>];
-                        var colors  = [<f:for each="{yearData.categories}" as="cat">'{cat.color}',</f:for>];
+            <!-- Alle Chart-Daten gesammelt + dynamisches Laden von Chart.js -->
+            <script>
+            (function() {
+                var chartConfigs = [
+                    <f:for each="{statistics}" as="yearData" key="year">{
+                        id: 'chart-{year}',
+                        labels: [<f:for each="{yearData.categories}" as="cat">'{cat.title}',</f:for>],
+                        data:   [<f:for each="{yearData.categories}" as="cat">{cat.count},</f:for>],
+                        colors: [<f:for each="{yearData.categories}" as="cat">'{cat.color}',</f:for>]
+                    },</f:for>
+                ];
 
-                        if (typeof Chart !== 'undefined') {
-                            new Chart(document.getElementById('chart-{year}'), {
-                                type: 'pie',
-                                data: {
-                                    labels: labels,
-                                    datasets: [{
-                                        data: data,
-                                        backgroundColor: colors,
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    plugins: {
-                                        legend: { display: false },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function(ctx) {
-                                                    var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
-                                                    var pct   = total > 0 ? Math.round(ctx.raw / total * 1000) / 10 : 0;
-                                                    return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
-                                                }
+                function initCharts() {
+                    chartConfigs.forEach(function(cfg) {
+                        var el = document.getElementById(cfg.id);
+                        if (!el) return;
+                        new Chart(el, {
+                            type: 'pie',
+                            data: {
+                                labels: cfg.labels,
+                                datasets: [{
+                                    data: cfg.data,
+                                    backgroundColor: cfg.colors,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(ctx) {
+                                                var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
+                                                var pct   = total > 0 ? Math.round(ctx.raw/total*1000)/10 : 0;
+                                                return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
                                             }
                                         }
                                     }
                                 }
-                            });
-                        }
-                    })();
-                    </script>
+                            }
+                        });
+                    });
+                }
 
-                </div><!-- /.year -->
-            </f:for>
+                // Chart.js dynamisch laden – initCharts() läuft erst nach vollem Load
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
+                s.onload = initCharts;
+                document.head.appendChild(s);
+            })();
+            </script>
+
         </f:then>
         <f:else>
             <p class="rescue-statistics__empty">Keine Einsatzdaten vorhanden.</p>
@@ -109,16 +117,16 @@
 </div>
 
 <style>
-.rescue-statistics__layout        { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; margin: 1rem 0 2rem; }
-.rescue-statistics__chart-wrap    { flex: 0 0 260px; }
-.rescue-statistics__table-wrap    { flex: 1 1 300px; }
-.rescue-statistics__table         { width: 100%; border-collapse: collapse; }
+.rescue-statistics__layout      { display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap; margin:1rem 0 2rem; }
+.rescue-statistics__chart-wrap  { flex:0 0 260px; }
+.rescue-statistics__table-wrap  { flex:1 1 300px; }
+.rescue-statistics__table       { width:100%; border-collapse:collapse; }
 .rescue-statistics__table th,
-.rescue-statistics__table td      { padding: .35rem .6rem; border-bottom: 1px solid #ddd; vertical-align: middle; }
-.rescue-statistics__num           { text-align: right; white-space: nowrap; }
-.rescue-statistics__dot           { display: inline-block; width: 14px; height: 14px; border-radius: 50%; }
-.rescue-statistics__total         { font-size: .85em; font-weight: normal; color: #666; margin-left: .5rem; }
-.rescue-statistics__year-title    { margin-bottom: .25rem; }
+.rescue-statistics__table td    { padding:.35rem .6rem; border-bottom:1px solid #ddd; vertical-align:middle; }
+.rescue-statistics__num         { text-align:right; white-space:nowrap; }
+.rescue-statistics__dot         { display:inline-block; width:14px; height:14px; border-radius:50%; }
+.rescue-statistics__total       { font-size:.85em; font-weight:normal; color:#666; margin-left:.5rem; }
+.rescue-statistics__year-title  { margin-bottom:.25rem; }
 </style>
 
 </f:section>
