@@ -26,7 +26,7 @@ return [
             'config' => ['type' => 'input', 'eval' => 'trim,required'],
         ],
         'color' => [
-            'label'  => 'Farbe (Tortendiagramm)',
+            'label' => 'Farbe (Tortendiagramm)',
             'config' => [
                 'type'       => 'input',
                 'renderType' => 'colorpicker',
