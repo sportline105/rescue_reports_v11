@@ -18,7 +18,8 @@ return [
         ],
         'searchFields' => 'name',
         'iconfile' => 'EXT:rescue_reports/Resources/Public/Icons/tx_rescuereports_domain_model_station.svg',
-        'hideTable' => true, // ✅ das verhindert Anzeige im Seitenmodul
+        'hideTable' => true,
+        'sortby' => 'sorting',
     ],
     'types' => [
         '1' => [

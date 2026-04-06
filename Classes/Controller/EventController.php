@@ -285,7 +285,7 @@ class EventController extends ActionController
         foreach ($event->getStations() as $station) {
             $brigade = $station->getBrigade();
             $brigadeName = $brigade ? $brigade->getName() : 'Unbekannt';
-            $brigadePriority = ($brigade && method_exists($brigade, 'getPriority')) ? $brigade->getPriority() : 9999;
+            $brigadeSorting = ($brigade && method_exists($brigade, 'getSorting')) ? $brigade->getSorting() : 9999;
             $stationName = $station->getName();
             $stationSorting = method_exists($station, 'getSorting') ? $station->getSorting() : 9999;
 
@@ -296,14 +296,14 @@ class EventController extends ActionController
                 }
             }
 
-            if (!isset($grouped[$brigadePriority])) {
-                $grouped[$brigadePriority] = [
+            if (!isset($grouped[$brigadeSorting])) {
+                $grouped[$brigadeSorting] = [
                     'name' => $brigadeName,
                     'stations' => [],
                 ];
             }
 
-            $grouped[$brigadePriority]['stations'][] = [
+            $grouped[$brigadeSorting]['stations'][] = [
                 'name' => $stationName,
                 'sorting' => $stationSorting,
                 'vehicles' => $vehicles,
