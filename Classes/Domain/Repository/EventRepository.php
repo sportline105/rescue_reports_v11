@@ -396,4 +396,53 @@ class EventRepository extends Repository
 
         return (int)$count;
     }
+
+    /**
+     * Liefert Jahresstatistiken gruppiert nach Jahr, Kategorie und Einsatzart.
+     *
+     * Rückgabe: [
+     *   2025 => [
+     *     'Brand' => ['F1' => 12, 'F2' => 5, ...],
+     *     'TH'    => ['TH1' => 8, ...],
+     *   ],
+     *   2024 => [...],
+     * ]
+     */
+    public function getYearlyStatistics(): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $rows = $queryBuilder
+            ->select('t.title AS type_title', 't.category AS type_category')
+            ->addSelectLiteral('YEAR(e.start) AS year', 'COUNT(e.uid) AS cnt')
+            ->from('tx_rescuereports_domain_model_event', 'e')
+            ->leftJoin('e', 'tx_rescuereports_event_type_mm', 'mm', 'e.uid = mm.uid_local')
+            ->leftJoin('mm', 'tx_rescuereports_domain_model_type', 't', 'mm.uid_foreign = t.uid')
+            ->where(
+                $queryBuilder->expr()->eq('e.deleted', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('e.hidden', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->isNotNull('e.start')
+            )
+            ->groupBy('year', 't.category', 't.title')
+            ->orderBy('year', 'DESC')
+            ->addOrderBy('t.category', 'ASC')
+            ->addOrderBy('t.title', 'ASC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $statistics = [];
+        foreach ($rows as $row) {
+            $year     = (int)$row['year'];
+            $category = (string)($row['type_category'] ?: '–');
+            $type     = (string)($row['type_title']    ?: '(ohne Einsatzart)');
+            $count    = (int)$row['cnt'];
+
+            $statistics[$year][$category][$type] = $count;
+        }
+
+        return $statistics;
+    }
 }
