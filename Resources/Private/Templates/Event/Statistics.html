@@ -20,7 +20,7 @@
 
                         <!-- Tortendiagramm via CSS conic-gradient (kein JavaScript nötig) -->
                         <div class="rescue-statistics__chart-wrap">
-                            <div class="rescue-statistics__pie" style="background:{yearData.gradient -> f:format.raw()}"></div>
+                            <div class="rescue-statistics__pie rescue-statistics__pie-{year}"></div>
                         </div>
 
                         <!-- Tabelle -->
@@ -64,6 +64,14 @@
     </f:if>
 
 </div>
+
+<f:if condition="{statistics}">
+    <style>
+        <f:for each="{statistics}" as="yearData" key="year">
+        .rescue-statistics__pie-{year} { background: <f:format.raw>{yearData.gradient}</f:format.raw>; }
+        </f:for>
+    </style>
+</f:if>
 
 <style>
 .rescue-statistics__layout      { display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap; margin:1rem 0 2rem; }
