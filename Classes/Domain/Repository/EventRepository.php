@@ -463,17 +463,24 @@ class EventRepository extends Repository
             ];
         }
 
-        // Gesamtzahl + Prozentwerte berechnen
+        // Gesamtzahl + Prozentwerte + conic-gradient berechnen
         $statistics = [];
         foreach ($raw as $year => $categories) {
             $total = array_sum(array_column($categories, 'count'));
+            $cumulative = 0.0;
+            $gradientParts = [];
             foreach ($categories as &$cat) {
                 $cat['percent'] = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
+                $startDeg = round($cumulative, 2);
+                $cumulative += $total > 0 ? ($cat['count'] / $total * 360) : 0;
+                $endDeg = round($cumulative, 2);
+                $gradientParts[] = $cat['color'] . ' ' . $startDeg . 'deg ' . $endDeg . 'deg';
             }
             unset($cat);
             $statistics[$year] = [
                 'total'      => $total,
                 'categories' => $categories,
+                'gradient'   => 'conic-gradient(' . implode(', ', $gradientParts) . ')',
             ];
         }
 

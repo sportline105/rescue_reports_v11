@@ -18,10 +18,12 @@
 
                     <div class="rescue-statistics__layout">
 
+                        <!-- Tortendiagramm via CSS conic-gradient (kein JavaScript nötig) -->
                         <div class="rescue-statistics__chart-wrap">
-                            <canvas id="chart-{year}" width="260" height="260"></canvas>
+                            <div class="rescue-statistics__pie" style="background:{yearData.gradient}"></div>
                         </div>
 
+                        <!-- Tabelle -->
                         <div class="rescue-statistics__table-wrap">
                             <table class="rescue-statistics__table">
                                 <thead>
@@ -55,59 +57,6 @@
                     </div>
                 </div>
             </f:for>
-
-            <!-- Alle Chart-Daten gesammelt + dynamisches Laden von Chart.js -->
-            <script>
-            (function() {
-                var chartConfigs = [
-                    <f:for each="{statistics}" as="yearData" key="year">{
-                        id: 'chart-{year}',
-                        labels: [<f:for each="{yearData.categories}" as="cat">'{cat.title}',</f:for>],
-                        data:   [<f:for each="{yearData.categories}" as="cat">{cat.count},</f:for>],
-                        colors: [<f:for each="{yearData.categories}" as="cat">'{cat.color}',</f:for>]
-                    },</f:for>
-                ];
-
-                function initCharts() {
-                    chartConfigs.forEach(function(cfg) {
-                        var el = document.getElementById(cfg.id);
-                        if (!el) return;
-                        new Chart(el, {
-                            type: 'pie',
-                            data: {
-                                labels: cfg.labels,
-                                datasets: [{
-                                    data: cfg.data,
-                                    backgroundColor: cfg.colors,
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                plugins: {
-                                    legend: { display: false },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: function(ctx) {
-                                                var total = ctx.dataset.data.reduce(function(a,b){return a+b;},0);
-                                                var pct   = total > 0 ? Math.round(ctx.raw/total*1000)/10 : 0;
-                                                return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    });
-                }
-
-                // Chart.js dynamisch laden – initCharts() läuft erst nach vollem Load
-                var s = document.createElement('script');
-                s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
-                s.onload = initCharts;
-                document.head.appendChild(s);
-            })();
-            </script>
-
         </f:then>
         <f:else>
             <p class="rescue-statistics__empty">Keine Einsatzdaten vorhanden.</p>
@@ -118,7 +67,8 @@
 
 <style>
 .rescue-statistics__layout      { display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap; margin:1rem 0 2rem; }
-.rescue-statistics__chart-wrap  { flex:0 0 260px; }
+.rescue-statistics__chart-wrap  { flex:0 0 220px; }
+.rescue-statistics__pie         { width:220px; height:220px; border-radius:50%; }
 .rescue-statistics__table-wrap  { flex:1 1 300px; }
 .rescue-statistics__table       { width:100%; border-collapse:collapse; }
 .rescue-statistics__table th,
