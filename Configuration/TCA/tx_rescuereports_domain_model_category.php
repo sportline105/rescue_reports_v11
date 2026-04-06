@@ -28,11 +28,10 @@ return [
         'color' => [
             'label' => 'Farbe (Tortendiagramm)',
             'config' => [
-                'type' => 'input',
+                'type'       => 'input',
                 'renderType' => 'colorpicker',
-                'size' => 10,
-                'default' => '#3498db',
-                'eval' => 'trim',
+                'default'    => '#3498db',
+                'size'       => 10,
             ],
         ],
     ],

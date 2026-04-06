@@ -1,6 +1,11 @@
 <f:layout name="Default" />
 
 <f:section name="main">
+<!-- Chart.js muss vor den Inline-Scripts geladen sein -->
+<f:if condition="{statistics}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</f:if>
+
 <div class="rescue-statistics">
 
     <f:if condition="{stationName}">
@@ -102,11 +107,6 @@
     </f:if>
 
 </div>
-
-<!-- Chart.js via CDN (einmalig am Ende der Seite) -->
-<f:if condition="{statistics}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-</f:if>
 
 <style>
 .rescue-statistics__layout        { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; margin: 1rem 0 2rem; }
