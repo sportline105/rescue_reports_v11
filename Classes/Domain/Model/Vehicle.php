@@ -9,9 +9,9 @@ class Vehicle extends AbstractEntity
     protected string $name = '';
 
     /**
-         * @var \Nkfire\RescueReports\Domain\Model\Car
-         */
-        protected $car;
+     * @var \Nkfire\RescueReports\Domain\Model\Car
+     */
+    protected $car;
 
     /**
      * @var \Nkfire\RescueReports\Domain\Model\Station|null
@@ -25,6 +25,8 @@ class Vehicle extends AbstractEntity
      */
     protected $image = null;
 
+    protected int $sorting = 9999;
+
     public function getName(): string
     {
         return $this->name;
@@ -36,14 +38,14 @@ class Vehicle extends AbstractEntity
     }
 
     public function getCar(): ?Car
-        {
-            return $this->car;
-        }
+    {
+        return $this->car;
+    }
 
-        public function setCar(?Car $car): void
-        {
-            $this->car = $car;
-        }
+    public function setCar(?Car $car): void
+    {
+        $this->car = $car;
+    }
 
     public function getStation(): ?Station
     {
@@ -73,5 +75,15 @@ class Vehicle extends AbstractEntity
     public function setImage(?FileReference $image): void
     {
         $this->image = $image;
+    }
+
+    public function getSorting(): int
+    {
+        return $this->sorting;
+    }
+
+    public function setSorting(int $sorting): void
+    {
+        $this->sorting = $sorting;
     }
 }

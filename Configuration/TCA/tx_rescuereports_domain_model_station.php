@@ -85,9 +85,8 @@ return [
                 'type' => 'inline',
                 'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
                 'foreign_field' => 'station',
+                'foreign_sortby' => 'sorting',
                 'foreign_label_userFunc' => \Nkfire\RescueReports\Utility\VehicleLabelUtility::class . '->getCustomLabel',
-                'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
-                'foreign_table_where' => 'AND 1=1 ORDER BY name ASC',
                 'maxitems' => 9999,
                 'appearance' => [
                     'collapseAll' => 1,

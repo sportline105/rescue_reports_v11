@@ -7,6 +7,9 @@ use Nkfire\RescueReports\Domain\Repository\StationRepository;
 use Nkfire\RescueReports\Domain\Repository\TypeRepository;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use PDO;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class EventController extends ActionController
 {
@@ -284,40 +287,67 @@ class EventController extends ActionController
 
         foreach ($event->getStations() as $station) {
             $brigade = $station->getBrigade();
-            $brigadeName = $brigade ? $brigade->getName() : 'Unbekannt';
-            $brigadeSorting = ($brigade && method_exists($brigade, 'getSorting')) ? $brigade->getSorting() : 9999;
-            $stationName = $station->getName();
-            $stationSorting = method_exists($station, 'getSorting') ? $station->getSorting() : 9999;
 
+            $brigadeUid = $brigade ? (int)$brigade->getUid() : 0;
+            $brigadeName = $brigade ? $brigade->getName() : 'Unbekannt';
+            $brigadeSorting = ($brigade && method_exists($brigade, 'getSorting')) ? (int)$brigade->getSorting() : 9999;
+
+            $stationName = $station->getName();
+            $stationSorting = method_exists($station, 'getSorting') ? (int)$station->getSorting() : 9999;
+
+            // Fahrzeuge der Station in DB-Sortierung laden
             $vehicles = [];
-            foreach ($station->getVehicles() as $vehicle) {
+            $stationVehicles = $this->getSortedVehiclesForStation($station);
+
+            foreach ($stationVehicles as $vehicle) {
                 if (in_array($vehicle, $eventVehicles, true)) {
                     $vehicles[] = $vehicle;
                 }
             }
 
-            if (!isset($grouped[$brigadeSorting])) {
-                $grouped[$brigadeSorting] = [
+            if (!isset($grouped[$brigadeUid])) {
+                $grouped[$brigadeUid] = [
+                    'uid' => $brigadeUid,
                     'name' => $brigadeName,
+                    'sorting' => $brigadeSorting,
                     'stations' => [],
                 ];
             }
 
-            $grouped[$brigadeSorting]['stations'][] = [
+            $grouped[$brigadeUid]['stations'][] = [
                 'name' => $stationName,
                 'sorting' => $stationSorting,
                 'vehicles' => $vehicles,
             ];
         }
 
-        ksort($grouped);
+        // 🔽 Brigaden sortieren
+        $grouped = array_values($grouped);
 
+        usort(
+            $grouped,
+            static function (array $a, array $b): int {
+                $compare = $a['sorting'] <=> $b['sorting'];
+                if ($compare !== 0) {
+                    return $compare;
+                }
+
+                return strcmp((string)$a['name'], (string)$b['name']);
+            }
+        );
+
+        // 🔽 Stationen sortieren
         foreach ($grouped as &$group) {
             if (isset($group['stations']) && is_array($group['stations'])) {
                 usort(
                     $group['stations'],
                     static function (array $a, array $b): int {
-                        return $a['sorting'] <=> $b['sorting'];
+                        $compare = $a['sorting'] <=> $b['sorting'];
+                        if ($compare !== 0) {
+                            return $compare;
+                        }
+
+                        return strcmp((string)$a['name'], (string)$b['name']);
                     }
                 );
             }
@@ -325,6 +355,64 @@ class EventController extends ActionController
         unset($group);
 
         return $grouped;
+    }
+
+    /**
+     * Liefert die Fahrzeuge einer Station in DB-Sortierung.
+     */
+    protected function getSortedVehiclesForStation($station): array
+    {
+        $stationUid = (int)$station->getUid();
+        if ($stationUid <= 0) {
+            return [];
+        }
+
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_vehicle');
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $rows = $queryBuilder
+            ->select('uid')
+            ->from('tx_rescuereports_domain_model_vehicle')
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'station',
+                    $queryBuilder->createNamedParameter($stationUid, PDO::PARAM_INT)
+                ),
+                $queryBuilder->expr()->eq(
+                    'deleted',
+                    $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                ),
+                $queryBuilder->expr()->eq(
+                    'hidden',
+                    $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                )
+            )
+            ->orderBy('sorting', 'ASC')
+            ->addOrderBy('uid', 'ASC')
+            ->executeQuery()
+            ->fetchFirstColumn();
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        $sortedVehicles = [];
+        $stationVehicles = $station->getVehicles()->toArray();
+
+        foreach ($rows as $vehicleUid) {
+            $vehicleUid = (int)$vehicleUid;
+
+            foreach ($stationVehicles as $vehicle) {
+                if ((int)$vehicle->getUid() === $vehicleUid) {
+                    $sortedVehicles[] = $vehicle;
+                    break;
+                }
+            }
+        }
+
+        return $sortedVehicles;
     }
 
     /**
