@@ -10,23 +10,6 @@
         <f:case value="sidebar">
             <h1 class="element-header">Letzte Einsätze</h1>
 
-            <div class="mb-3">
-                <f:form action="list" method="post">
-                    <div class="row g-2 align-items-stretch">
-                        <div class="col-12">
-                            <f:form.select
-                                name="station"
-                                options="{stations}"
-                                optionLabelField="name"
-                                optionValueField="uid"
-                                value="{activeStationUid}"
-                                class="form-select"
-                                additionalAttributes="{onchange: 'this.form.submit()'}" />
-                        </div>
-                    </div>
-                </f:form>
-            </div>
-
             <f:render section="EventListContentSidebar" arguments="{_all}" />
         </f:case>
 
@@ -139,24 +122,6 @@
         <f:case value="newdesignsidebar">
             <div class="rescue-reports rescue-reports--newdesignsidebar">
                 <h1 class="element-header">Letzte Einsätze</h1>
-
-                <div class="mb-3">
-                    <f:form action="list" method="post">
-                        <div class="row g-2 align-items-stretch">
-                            <div class="col-12">
-                                <f:form.select
-                                    name="station"
-                                    options="{stations}"
-                                    optionLabelField="name"
-                                    optionValueField="uid"
-                                    value="{activeStationUid}"
-                                    class="form-select"
-                                    additionalAttributes="{onchange: 'this.form.submit()'}" />
-                            </div>
-                        </div>
-                    </f:form>
-                </div>
-
                 <f:render section="EventListContentSidebarNewDesign" arguments="{_all}" />
             </div>
         </f:case>
@@ -166,28 +131,6 @@
         ========================================================== -->
         <f:defaultCase>
             <h1 class="csc-firstHeader">Einsatzübersicht</h1>
-
-            <div class="row" style="padding-top:10px; padding-bottom:10px;">
-                <div class="small-12 columns">
-                    <f:form action="list" method="post">
-                        <div class="row collapse">
-                            <div class="small-12 medium-6 columns">
-                                <f:form.select
-                                    name="station"
-                                    options="{stations}"
-                                    optionLabelField="name"
-                                    optionValueField="uid"
-                                    value="{activeStationUid}" />
-                            </div>
-                            <div class="small-12 medium-2 columns">
-                                <button type="submit" class="button postfix expand">
-                                    Wechseln
-                                </button>
-                            </div>
-                        </div>
-                    </f:form>
-                </div>
-            </div>
 
             <div class="filter-info" style="margin-bottom: 10px; font-size: 0.9em; color: #555;">
                 <f:if condition="{maxCount} > 0">
@@ -209,16 +152,8 @@
                     <div class="small-12 columns">
                         <f:form action="list" method="post">
                             <div class="row collapse">
-                                <div class="small-3 columns">
-                                    <f:form.select
-                                        name="station"
-                                        options="{stations}"
-                                        optionLabelField="name"
-                                        optionValueField="uid"
-                                        value="{activeStationUid}" />
-                                </div>
 
-                                <div class="small-4 columns">
+                                <div class="small-6 columns">
                                     <f:form.textfield
                                         name="searchWord"
                                         id="searchWord"
@@ -227,7 +162,7 @@
                                         placeholder="Suchbegriff eingeben…" />
                                 </div>
 
-                                <div class="small-2 columns">
+                                <div class="small-3 columns">
                                     <button type="submit" class="button postfix expand">
                                         Suchen
                                     </button>
@@ -274,16 +209,11 @@
             <f:for each="{eventItems}" as="item">
                 <f:variable name="event" value="{item.event}" />
 
-                <div class="panelsmall" style="margin-bottom:10px;">
-                    <f:link.action
-                        action="show"
-                        arguments="{event: event}"
-                        pageUid="{detailPageUid}"
-                        class="btn btn-sm btn-primary">
-
+                <div class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>">
+                    <div class="panelsmall__inner">
                         <div class="row">
                             <div class="small-2 medium-1 columns enumber text-center">
-                                {item.number}
+                                {item.plainNumber}
                             </div>
 
                             <div class="small-10 medium-11 column">
@@ -305,7 +235,17 @@
                                 </div>
                             </div>
                         </div>
-                    </f:link.action>
+                    </div>
+
+                    <f:if condition="!{event.disableDetail}">
+                        <f:link.action
+                            action="show"
+                            arguments="{event: event, station: activeStationUid}"
+                            pageUid="{detailPageUid}"
+                            class="panelsmall__overlaylink">
+                            Zum Einsatz {event.title}
+                        </f:link.action>
+                    </f:if>
                 </div>
             </f:for>
         </f:then>
@@ -328,21 +268,32 @@
 <f:section name="EventListContentSidebar">
     <f:if condition="{events}">
         <f:then>
-            <f:variable name="total" value="{events -> f:count()}" />
-
-            <ul class="einsaetze">
+            <ul class="einsaetze einsaetze--sidebar">
                 <f:for each="{eventItems}" as="item" iteration="i">
                     <f:variable name="event" value="{item.event}" />
 
-                    <li>
-                        <f:link.action
-                            action="show"
-                            arguments="{event: event}"
-                            pageUid="{detailPageUid}"
-                            class="einsatz-link">
-
-                            {item.number} · <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
-                        </f:link.action>
+                    <li class="einsaetze__item <f:if condition='!{event.disableDetail}'>einsaetze__item--clickable</f:if>">
+                        <f:if condition="!{event.disableDetail}">
+                            <f:then>
+                                <f:link.action
+                                    action="show"
+                                    arguments="{event: event, station: activeStationUid}"
+                                    pageUid="{detailPageUid}"
+                                    class="einsaetze__link">
+                                    <span class="einsaetze__date">
+                                        <f:format.date format="d.m.Y">{event.start}</f:format.date></span><span class="einsaetze__separator">:</span>
+                                    <span class="einsaetze__title">{event.title}</span>
+                                    <span class="einsaetze__indicator" aria-hidden="true">›</span>
+                                </f:link.action>
+                            </f:then>
+                            <f:else>
+                                <div class="einsaetze__text">
+                                    <span class="einsaetze__date">
+                                        <f:format.date format="d.m.Y">{event.start}</f:format.date></span><span class="einsaetze__separator">:</span>
+                                    <span class="einsaetze__title">{event.title}</span>
+                                </div>
+                            </f:else>
+                        </f:if>
                     </li>
                 </f:for>
             </ul>
@@ -378,12 +329,12 @@
                 <f:for each="{eventItems}" as="item">
                     <f:variable name="event" value="{item.event}" />
 
-                    <li class="panelsmall" style="padding:12px 10px; border-bottom:1px solid #e5e9f2; position:relative;">
+                    <li class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>" style="padding:12px 10px; border-bottom:1px solid #e5e9f2; position:relative;">
 
                         <div class="row g-2 align-items-center">
 
-                            <div class="col-auto enumber" style="font-size:1.6rem; font-weight:600; opacity: 0.8; color:#5b8fd9; min-width:60px;">
-                                {item.number}
+                            <div class="col-auto enumber" style="font-weight:600; opacity: 0.8; color:#5b8fd9; min-width:60px;">
+                                {item.plainNumber}
                             </div>
 
                             <div class="col">
@@ -406,13 +357,15 @@
                                     Uhr
                                 </div>
 
-                                <f:link.action
-                                    action="show"
-                                    arguments="{event: event}"
-                                    pageUid="{detailPageUid}"
-                                    class="stretched-link">
-                                    <span class="visually-hidden">Zum Einsatz {event.title}</span>
-                                </f:link.action>
+                                <f:if condition="!{event.disableDetail}">
+                                    <f:link.action
+                                        action="show"
+                                        arguments="{event: event, station: activeStationUid}"
+                                        pageUid="{detailPageUid}"
+                                        class="stretched-link">
+                                        <span class="visually-hidden">Zum Einsatz {event.title}</span>
+                                    </f:link.action>
+                                </f:if>
 
                             </div>
                         </div>
@@ -441,18 +394,36 @@
 <f:section name="EventListContentSidebarNewDesign">
     <f:if condition="{events}">
         <f:then>
-            <ul class="einsaetze">
+            <ul class="einsaetze einsaetze--sidebar einsaetze--sidebar-newdesign">
                 <f:for each="{eventItems}" as="item" iteration="i">
                     <f:variable name="event" value="{item.event}" />
 
-                    <li>
-                        <f:link.action
-                            action="show"
-                            arguments="{event: event}"
-                            pageUid="{detailPageUid}"
-                            class="einsatz-link">
-                            {item.number} · <f:format.date format="d.m.Y">{event.start}</f:format.date>: {event.title}
-                        </f:link.action>
+                    <li class="einsaetze__item <f:if condition='!{event.disableDetail}'>einsaetze__item--clickable</f:if>">
+                        <f:if condition="!{event.disableDetail}">
+                            <f:then>
+                                <f:link.action
+                                    action="show"
+                                    arguments="{event: event, station: activeStationUid}"
+                                    pageUid="{detailPageUid}"
+                                    class="einsaetze__link">
+                                    <span class="einsaetze__date">
+                                        <f:format.date format="d.m.Y">{event.start}</f:format.date>
+                                    </span>
+                                    <span class="einsaetze__separator">:</span>
+                                    <span class="einsaetze__title">{event.title}</span>
+                                    <span class="einsaetze__indicator" aria-hidden="true">›</span>
+                                </f:link.action>
+                            </f:then>
+                            <f:else>
+                                <div class="einsaetze__text">
+                                    <span class="einsaetze__date">
+                                        <f:format.date format="d.m.Y">{event.start}</f:format.date>
+                                    </span>
+                                    <span class="einsaetze__separator">:</span>
+                                    <span class="einsaetze__title">{event.title}</span>
+                                </div>
+                            </f:else>
+                        </f:if>
                     </li>
                 </f:for>
             </ul>

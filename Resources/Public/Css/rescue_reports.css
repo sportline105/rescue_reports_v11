@@ -2,98 +2,227 @@
     background: #f8f9fa;
     border-left: 4px solid #cc0000;
 }
+
 .rescue-brigade-title {
     font-weight: 600;
     font-size: 1.2rem;
 }
+
 .rescue-brigade-dot {
-    width:10px;
-    height:10px;
-    background:#cc0000;
-    border-radius:50%;
+    width: 10px;
+    height: 10px;
+    background: #cc0000;
+    border-radius: 50%;
 }
 
 .einsatzfahrzeug-card {
-    background:#f6f6f6;
-    border-radius:10px;
-    padding:10px;
+    background: #f6f6f6;
+    border-radius: 10px;
+    padding: 10px;
     transition: all .15s ease;
 }
 
 .einsatzfahrzeug-card:hover {
-    background:#ffffff;
-    box-shadow:0 4px 10px rgba(0,0,0,.08);
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
 }
+
 .vehicle-count {
-    font-size:.75rem;
-    background:#e9ecef;
-}
-/* Nummern links blau und groß */
-.enumber {
-  font-size: 2.5rem;       /* Größe anpassen */
-  font-weight: 700;
-  color: #5c91d3;          /* Bootstrap-Blau oder dein Farbwert blau #5c91d3 rot #E50B00*/
-  line-height: 1;
-}
-
-/* Datum: roter Unterstrich */
-.emeta a {
-  color: inherit;                /* Text bleibt schwarz/grau */
-  text-decoration: underline;    /* Unterstreichung aktiv */
-  text-decoration-color: red;    /* Unterstreichung rot */
-  text-underline-offset: 2px;    /* schöner Abstand */
-}
-
-/* jede gerade Zeile leicht hellblau hinterlegen */
-.list-striped .list-group-item:nth-child(even) {
-  background-color: #f5f8fc; /* hellblau, kannst du anpassen */
+    font-size: .75rem;
+    background: #e9ecef;
 }
 
 .text-bg-light-blue {
-  background-color: #f5f8fc;
-  border-color: #dfecfb;
+    background-color: #f5f8fc;
+    border-color: #dfecfb;
 }
-.card-panel-primary h1 {color:white !important;}
-.btn-primary  {color:white !important;}
+
+.card-panel-primary h1 {
+    color: white !important;
+}
+
+.btn-primary {
+    color: white !important;
+}
+
 ul.no-bullet li {
     background: none;
     margin: 0;
 }
+
 .card-group-element-item .card:hover {
-  background-color: #f5f8fc;
+    background-color: #f5f8fc;
 }
+
 .card-menu-item .card:hover {
-  background-color: #f5f8fc;
+    background-color: #f5f8fc;
 }
 
 /* Bild für sanften Zoom vorbereiten */
 .card .card-img-top picture,
 .card-group-element-item .card .card-img-top img {
-  display: block;                  /* vermeidet Lücken */
-  width: 100%;
-  height: auto;
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 .card-group-element-item .card .card-img-top img {
-  transform-origin: center center;
-  transition: transform .5s ease, filter .5s ease;
-  will-change: transform;
+    transform-origin: center center;
+    transition: transform .5s ease, filter .5s ease;
+    will-change: transform;
 }
 
 /* Hover/Fokus: Bild leicht einzoomen + minimal abdunkeln */
 .card-group-element-item .card:hover .card-img-top img,
 .card-group-element-item .card:focus-within .card-img-top img {
-  transform: scale(1.06);
-  filter: brightness(.96);
+    transform: scale(1.06);
+    filter: brightness(.96);
 }
 
 /* Optional: Card beim Hover leicht anheben */
 .card-group-element-item .card {
-  transition: box-shadow .3s ease, transform .3s ease;
-}
-.card-group-element-item .card:hover,
-.card-group-element-item .card:focus-within {
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-  transform: translateY(-2px);
+    transition: box-shadow .3s ease, transform .3s ease;
 }
 
+.card-group-element-item .card:hover,
+.card-group-element-item .card:focus-within {
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   Rescue Reports Listenansicht
+========================================================= */
+
+.panelsmall {
+    position: relative;
+    padding: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e5e9f2;
+}
+
+.panelsmall:nth-child(odd) {
+    background: #f5f8fc;
+}
+
+.panelsmall:nth-last-child(1) {
+    border-bottom: none;
+    margin-bottom: 20px;
+}
+
+.panelsmall__inner {
+    display: block;
+    padding: .5rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.panelsmall--clickable {
+    transition: background-color .2s ease;
+}
+
+.panelsmall--clickable:hover {
+    background: #eaf1fa;
+}
+
+.panelsmall__overlaylink {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    text-indent: -9999px;
+    overflow: hidden;
+}
+
+/* Nummern links */
+.enumber {
+    float: left;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #5c91d3;
+    line-height: 1;
+    padding: 6px 0;
+    margin: auto;
+}
+
+/* Datum / Meta */
+.emeta {
+    font-size: 0.9375rem;
+    color: #222222;
+    text-decoration: underline;
+    -moz-text-decoration-color: #ED2024;
+    text-decoration-color: #ED2024;
+}
+
+/* Falls in anderen Bereichen Meta-Zeilen Links enthalten */
+.emeta a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: red;
+    text-underline-offset: 2px;
+}
+
+/* Titelzeile */
+.etitle {
+    color: #505050;
+}
+
+/* Sicherstellen, dass Inhalt über dem Overlay sauber bleibt */
+.etitle b,
+.etitle em,
+.emeta,
+.enumber {
+    position: relative;
+    z-index: 3;
+}
+
+.einsatz {
+    clear: both;
+    margin: 4px;
+}
+
+.einsatz h2 {
+    clear: left;
+    margin: 0;
+}
+
+/* NewDesign-Liste: Streifenoptik nicht doppelt anwenden */
+.event-list-newdesign .panelsmall:nth-child(odd) {
+    background: #f5f8fc;
+}
+
+.event-list-newdesign .panelsmall:nth-child(even) {
+    background: transparent;
+}
+
+.einsaetze__item{color: #5c91d3;}
+
+.panelsmall--clickable::after {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 22px;
+    border: 2px solid rgba(92, 145, 211, 0.18);
+    border-radius: 2px;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.panelsmall--clickable::before {
+    content: "";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-6px);
+    width: 10px;
+    height: 2px;
+    background: rgba(92, 145, 211, 0.18);
+    box-shadow:
+        0 5px 0 rgba(92, 145, 211, 0.18),
+        0 10px 0 rgba(92, 145, 211, 0.18);
+    z-index: 0;
+    pointer-events: none;
+}
