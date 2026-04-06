@@ -29,14 +29,14 @@ class EventVehicleSelectionUtility
         $queryBuilder = $connection->createQueryBuilder();
 
         $vehicles = $queryBuilder
-            ->select('v.uid', 'v.name', 's.name AS station_name', 's.sorting AS station_sorting', 'b.name AS brigade_name', 'b.priority')
+            ->select('v.uid', 'v.name', 's.name AS station_name', 's.sorting AS station_sorting', 'b.name AS brigade_name', 'b.sorting AS brigade_sorting')
             ->from('tx_rescuereports_domain_model_vehicle', 'v')
             ->innerJoin('v', 'tx_rescuereports_domain_model_station', 's', 'v.station = s.uid')
             ->leftJoin('s', 'tx_rescuereports_domain_model_brigade', 'b', 's.brigade = b.uid')
             ->where(
                 $queryBuilder->expr()->in('v.station', $queryBuilder->createNamedParameter($stationIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY))
             )
-            ->orderBy('b.priority')
+            ->orderBy('b.sorting')
             ->addOrderBy('station_sorting')
             ->addOrderBy('v.name')
             ->executeQuery()
@@ -45,7 +45,7 @@ class EventVehicleSelectionUtility
         $grouped = [];
 
         foreach ($vehicles as $vehicle) {
-            $groupLabel = str_pad((int)$vehicle['priority'], 3, '0', STR_PAD_LEFT) . '_' . ($vehicle['brigade_name'] ?? 'Unbekannt');
+            $groupLabel = str_pad((int)$vehicle['brigade_sorting'], 6, '0', STR_PAD_LEFT) . '_' . ($vehicle['brigade_name'] ?? 'Unbekannt');
             $itemLabel = $vehicle['station_name'] . ' – ' . $vehicle['name'];
             $grouped[$groupLabel][] = [$itemLabel, (int)$vehicle['uid']];
         }
