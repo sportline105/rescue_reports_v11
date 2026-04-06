@@ -1,10 +1,10 @@
 <?php
-namespace In2code\RescueReports\Controller;
+namespace Nkfire\RescueReports\Controller;
 
-use In2code\RescueReports\Domain\Model\Event;
-use In2code\RescueReports\Domain\Repository\EventRepository;
-use In2code\RescueReports\Domain\Repository\StationRepository;
-use In2code\RescueReports\Domain\Repository\TypeRepository;
+use Nkfire\RescueReports\Domain\Model\Event;
+use Nkfire\RescueReports\Domain\Repository\EventRepository;
+use Nkfire\RescueReports\Domain\Repository\StationRepository;
+use Nkfire\RescueReports\Domain\Repository\TypeRepository;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -44,9 +44,8 @@ class EventController extends ActionController
         $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
         $selectedStationUid = $this->normalizeRecordUid($station);
         $activeStationUid = $selectedStationUid > 0 ? $selectedStationUid : $defaultStationUid;
-        
+
         if ($activeStationUid === 0) {
-            // Fallback: erste Station nehmen
             $firstStation = $this->stationRepository->findPrimaryBrigadeStations()->getFirst();
             if ($firstStation) {
                 $activeStationUid = (int)$firstStation->getUid();
@@ -66,7 +65,6 @@ class EventController extends ActionController
 
         $searchWord = trim((string)($searchWord ?? ''));
 
-        // Rohwerte aus FlexForm an Repository weitergeben
         $dateFrom = $dateFromValue;
         $dateTo = $dateToValue;
 
@@ -120,16 +118,75 @@ class EventController extends ActionController
     /**
      * Detailansicht eines einzelnen Einsatzes
      */
-    public function showAction(Event $event): ResponseInterface
+    public function showAction(Event $event, ?string $station = null): ResponseInterface
     {
         $event = $this->eventRepository->findByUid($event->getUid());
         $groupedVehicleData = $this->groupVehiclesByBrigadeAndStation($event);
+
+        $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
+        $selectedStationUid = $this->normalizeRecordUid($station);
+        $activeStationUid = $selectedStationUid > 0 ? $selectedStationUid : $defaultStationUid;
+
+        if ($activeStationUid === 0) {
+            $firstStation = $this->stationRepository->findPrimaryBrigadeStations()->getFirst();
+            if ($firstStation) {
+                $activeStationUid = (int)$firstStation->getUid();
+            }
+        }
+
+        $displayNumber = '';
+        $displayPlainNumber = '';
+        $displayStationName = '';
+
+        if ($event instanceof Event && $event->getStart() instanceof \DateTime) {
+            foreach ($event->getStations() as $stationObject) {
+                $stationUid = (int)$stationObject->getUid();
+
+                if ($stationUid <= 0) {
+                    continue;
+                }
+
+                $runningNumber = $this->eventRepository->countByStationAndYearUntil(
+                    $event->getStart(),
+                    $stationUid,
+                    (int)$event->getUid()
+                );
+
+                $plainNumber = str_pad((string)$runningNumber, 3, '0', STR_PAD_LEFT);
+
+                $prefix = '';
+                if (method_exists($stationObject, 'getPrefix')) {
+                    $prefix = trim((string)$stationObject->getPrefix());
+                }
+
+                $formattedNumber = $prefix !== ''
+                    ? $prefix . '/' . $plainNumber
+                    : $plainNumber;
+
+                if ($activeStationUid > 0 && $stationUid === $activeStationUid) {
+                    $displayNumber = $formattedNumber;
+                    $displayPlainNumber = $plainNumber;
+                    $displayStationName = $stationObject->getName();
+                    break;
+                }
+
+                if ($displayNumber === '') {
+                    $displayNumber = $formattedNumber;
+                    $displayPlainNumber = $plainNumber;
+                    $displayStationName = $stationObject->getName();
+                }
+            }
+        }
 
         $this->view->assignMultiple([
             'event' => $event,
             'groupedVehicleData' => $groupedVehicleData,
             'detailPageUid' => $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null),
-            'defaultStationUid' => (int)($this->settings['defaultStation'] ?? 0),
+            'defaultStationUid' => $defaultStationUid,
+            'activeStationUid' => $activeStationUid,
+            'displayNumber' => $displayNumber,
+            'displayPlainNumber' => $displayPlainNumber,
+            'displayStationName' => $displayStationName,
             'templateVariant' => (string)($this->settings['templateVariant'] ?? 'standard'),
             'settings' => $this->settings,
         ]);
@@ -139,9 +196,6 @@ class EventController extends ActionController
 
     /**
      * Baut View-Daten für dynamische Einsatznummern pro Station auf.
-     *
-     * Ein Einsatz kann mehrere Stationsnummern haben, z.B.:
-     * ZÖ/030 und STD/005
      */
     protected function buildEventItemsForStations(iterable $events, int $selectedStationUid = 0): array
     {
@@ -155,6 +209,7 @@ class EventController extends ActionController
             $start = $event->getStart();
             $stationNumbers = [];
             $primaryNumber = '';
+            $primaryPlainNumber = '';
             $primaryStationName = '';
 
             if ($start instanceof \DateTime) {
@@ -171,14 +226,16 @@ class EventController extends ActionController
                         (int)$event->getUid()
                     );
 
+                    $plainNumber = str_pad((string)$runningNumber, 3, '0', STR_PAD_LEFT);
+
                     $prefix = '';
                     if (method_exists($station, 'getPrefix')) {
                         $prefix = trim((string)$station->getPrefix());
                     }
 
                     $formattedNumber = $prefix !== ''
-                        ? $prefix . '/' . str_pad((string)$runningNumber, 3, '0', STR_PAD_LEFT)
-                        : str_pad((string)$runningNumber, 3, '0', STR_PAD_LEFT);
+                        ? $prefix . '/' . $plainNumber
+                        : $plainNumber;
 
                     $stationNumbers[] = [
                         'station' => $station,
@@ -187,16 +244,19 @@ class EventController extends ActionController
                         'prefix' => $prefix,
                         'runningNumber' => $runningNumber,
                         'formattedNumber' => $formattedNumber,
+                        'plainNumber' => $plainNumber,
                         'year' => $start->format('Y'),
                     ];
 
                     if ($selectedStationUid > 0 && $stationUid === $selectedStationUid) {
                         $primaryNumber = $formattedNumber;
+                        $primaryPlainNumber = $plainNumber;
                         $primaryStationName = $station->getName();
                     }
 
                     if ($primaryNumber === '') {
                         $primaryNumber = $formattedNumber;
+                        $primaryPlainNumber = $plainNumber;
                         $primaryStationName = $station->getName();
                     }
                 }
@@ -205,6 +265,7 @@ class EventController extends ActionController
             $items[] = [
                 'event' => $event,
                 'number' => $primaryNumber,
+                'plainNumber' => $primaryPlainNumber,
                 'stationName' => $primaryStationName,
                 'numbers' => $stationNumbers,
             ];
@@ -296,8 +357,6 @@ class EventController extends ActionController
 
     /**
      * Normalisiert das Seitenfeld aus der FlexForm
-     *
-     * Kann je nach Konfiguration als int, String oder Array kommen.
      */
     protected function normalizeDetailPageUid($value): ?int
     {

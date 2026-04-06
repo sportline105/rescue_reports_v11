@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace In2code\RescueReports\UserFunctions;
+namespace Nkfire\RescueReports\UserFunctions;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -14,6 +14,11 @@ class FlexFormStationItems
             ->getQueryBuilderForTable('tx_rescuereports_domain_model_station');
 
         $queryBuilder->getRestrictions()->removeAll();
+
+        $queryBuilder->expr()->eq(
+            'station.exclude_from_filter',
+            $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT)
+        );
 
         $rows = $queryBuilder
             ->select(

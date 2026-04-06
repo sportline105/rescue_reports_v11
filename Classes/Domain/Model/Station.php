@@ -1,6 +1,6 @@
 <?php
 
-namespace In2code\RescueReports\Domain\Model;
+namespace Nkfire\RescueReports\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
@@ -12,7 +12,7 @@ class Station extends AbstractEntity
     protected ?Brigade $brigade = null;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\In2code\RescueReports\Domain\Model\Vehicle>
+     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Nkfire\RescueReports\Domain\Model\Vehicle>
      * @TYPO3\CMS\Extbase\Annotation\ORM\Cascade("remove")
      * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
@@ -86,5 +86,14 @@ class Station extends AbstractEntity
     public function setPrefix(string $prefix): void
     {
         $this->prefix = $prefix;
+    }
+    protected bool $excludeFromFilter = false;
+    public function isExcludeFromFilter(): bool
+    {
+        return $this->excludeFromFilter;
+    }
+    public function setExcludeFromFilter(bool $excludeFromFilter): void
+    {
+        $this->excludeFromFilter = $excludeFromFilter;
     }
 }

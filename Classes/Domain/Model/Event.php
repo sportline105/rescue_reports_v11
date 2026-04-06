@@ -1,5 +1,5 @@
 <?php
-namespace In2code\RescueReports\Domain\Model;
+namespace Nkfire\RescueReports\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
@@ -15,13 +15,13 @@ class Event extends AbstractEntity
     protected string $location = '';
 
     /**
-    * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\In2code\RescueReports\Domain\Model\Vehicle>
+    * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Nkfire\RescueReports\Domain\Model\Vehicle>
     */
     protected ObjectStorage $vehicles;
 
 
     /**
-     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\In2code\RescueReports\Domain\Model\Station>
+     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Nkfire\RescueReports\Domain\Model\Station>
      * @TYPO3\CMS\Extbase\Annotation\ORM\Cascade("remove")
      * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
@@ -223,5 +223,14 @@ class Event extends AbstractEntity
     public function setSlug(string $slug): void
     {
         $this->slug = $slug;
+    }
+    protected bool $disableDetail = false;
+    public function isDisableDetail(): bool
+    {
+        return $this->disableDetail;
+    }
+    public function setDisableDetail(bool $disableDetail): void
+    {
+        $this->disableDetail = $disableDetail;
     }
 }

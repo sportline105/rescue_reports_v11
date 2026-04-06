@@ -19,11 +19,11 @@ return [
         ],
         'searchFields' => 'title,description',
         'iconfile' => 'EXT:rescue_reports/Resources/Public/Icons/tx_rescuereports_domain_model_event.png',
-        'default_sortby' => 'ORDER BY number DESC',
+        'default_sortby' => 'ORDER BY start DESC',
     ],
     'types' => [
         '1' => [
-            'showitem' => 'hidden, title, --palette--;;times, number, types, location, description, slug, --div--;Eingesetzte Einheiten, stations, --div--;Fahrzeuge, vehicles, --div--;Bilder, images'
+            'showitem' => 'hidden, title, --palette--;;times, number, types, location, disable_detail, description, slug, --div--;Eingesetzte Einheiten, stations, --div--;Fahrzeuge, vehicles, --div--;Bilder, images'
         ],
     ],
 
@@ -81,7 +81,7 @@ return [
         ],
         'number' => [
             'label' => 'Einsatznummer',
-            'config' => ['type' => 'input', 'eval' => 'trim,required', 'placeholder' => 'ZÖ/123', 'max' => 6, 'default' => 'ZÖ/'],
+            'config' => ['type' => 'input', 'eval' => 'trim', 'placeholder' => 'ZÖ/123', 'max' => 6, 'default' => 'ZÖ/'],
         ],
         'description' => [
             'label' => 'Einsatzbericht',
@@ -98,7 +98,7 @@ return [
                 'foreign_table_where' => '
                     ORDER BY tx_rescuereports_domain_model_type.title
                 ',
-                'itemsProcFunc' => \In2code\RescueReports\UserFunctions\TypeItemsProcFunc::class . '->filterDeprecatedTypes',
+                'itemsProcFunc' => \Nkfire\RescueReports\UserFunctions\TypeItemsProcFunc::class . '->filterDeprecatedTypes',
                 'MM' => 'tx_rescuereports_event_type_mm',
                 'minitems' => 0,
                 'maxitems' => 1,
@@ -111,7 +111,7 @@ return [
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectCheckBox',
-                'itemsProcFunc' => 'In2code\\RescueReports\\Utility\\StationLabelUtility->addGroupedStations',
+                'itemsProcFunc' => 'Nkfire\\RescueReports\\Utility\\StationLabelUtility->addGroupedStations',
                 'foreign_table' => 'tx_rescuereports_domain_model_station',
                 'foreign_table_where' => 'AND 1=0',
                 'MM' => 'tx_rescuereports_event_station_mm',
@@ -126,7 +126,7 @@ return [
                 'type' => 'select',
                 'renderType' => 'selectMultipleSideBySide',
                 //'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
-                'itemsProcFunc' => \In2code\RescueReports\Utility\EventVehicleSelectionUtility::class . '->getAvailableVehicles',
+                'itemsProcFunc' => \Nkfire\RescueReports\Utility\EventVehicleSelectionUtility::class . '->getAvailableVehicles',
                 //'foreign_table_where' => '', // ← wichtig, NICHT setzen!
                 'size' => 15,
                 'maxitems' => 999,
@@ -170,6 +170,16 @@ return [
                 ],
                 $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']
             ),
+        ],
+        'disable_detail' => [
+            'label' => 'Detailansicht deaktivieren',
+            'config' => [
+                'type' => 'check',
+                'items' => [
+                    ['Keinen Link zur Detailansicht anzeigen', 1],
+                ],
+                'default' => 0,
+            ],
         ],
     ],
 ];

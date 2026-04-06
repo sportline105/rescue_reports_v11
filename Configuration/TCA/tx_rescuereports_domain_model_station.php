@@ -22,7 +22,7 @@ return [
     ],
     'types' => [
         '1' => [
-            'showitem' => 'name, prefix, cars, vehicles, --div--;Access, hidden, starttime, endtime'
+            'showitem' => 'name, prefix, exclude_from_filter, cars, vehicles, --div--;Access, hidden, starttime, endtime'
         ],
     ],
     'columns' => [
@@ -84,7 +84,7 @@ return [
                 'type' => 'inline',
                 'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
                 'foreign_field' => 'station',
-                'foreign_label_userFunc' => \In2code\RescueReports\Utility\VehicleLabelUtility::class . '->getCustomLabel',
+                'foreign_label_userFunc' => \Nkfire\RescueReports\Utility\VehicleLabelUtility::class . '->getCustomLabel',
                 'foreign_table' => 'tx_rescuereports_domain_model_vehicle',
                 'foreign_table_where' => 'AND 1=1 ORDER BY name ASC',
                 'maxitems' => 9999,
@@ -111,6 +111,16 @@ return [
                 'eval' => 'trim',
                 'max' => 10,
                 'default' => '',
+            ],
+        ],
+        'exclude_from_filter' => [
+            'label' => 'Im Frontend-Filter ausblenden',
+            'config' => [
+                'type' => 'check',
+                'items' => [
+                    ['Diese Einheit nicht im Frontend-Dropdown anzeigen', 1],
+                ],
+                'default' => 0,
             ],
         ],
     ]
