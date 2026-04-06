@@ -119,12 +119,27 @@ class EventController extends ActionController
     }
 
     /**
-     * Jahresstatistik nach Kategorie und Einsatzart
+     * Jahresstatistik nach Kategorie, optional gefiltert nach Ortsfeuerwehr
      */
     public function statisticsAction(): ResponseInterface
     {
-        $statistics = $this->eventRepository->getYearlyStatistics();
-        $this->view->assign('statistics', $statistics);
+        $stationUid = (int)($this->settings['station'] ?? 0);
+        $statistics = $this->eventRepository->getYearlyStatistics($stationUid);
+
+        $stationName = '';
+        if ($stationUid > 0) {
+            $station = $this->stationRepository->findByUid($stationUid);
+            if ($station) {
+                $stationName = $station->getName();
+            }
+        }
+
+        $this->view->assignMultiple([
+            'statistics'  => $statistics,
+            'stationName' => $stationName,
+            'stationUid'  => $stationUid,
+        ]);
+
         return $this->htmlResponse();
     }
 

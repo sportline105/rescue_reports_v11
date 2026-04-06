@@ -398,49 +398,83 @@ class EventRepository extends Repository
     }
 
     /**
-     * Liefert Jahresstatistiken gruppiert nach Jahr, Kategorie und Einsatzart.
+     * Liefert Jahresstatistiken nach Kategorie.
+     *
+     * Optional: Filterung auf eine Ortsfeuerwehr (stationUid > 0).
      *
      * Rückgabe: [
      *   2025 => [
-     *     'Brand' => ['F1' => 12, 'F2' => 5, ...],
-     *     'TH'    => ['TH1' => 8, ...],
+     *     'total' => 150,
+     *     'categories' => [
+     *       ['uid' => 1, 'title' => 'Brand', 'color' => '#e74c3c', 'count' => 45, 'percent' => 30.0],
+     *       ...
+     *     ],
      *   ],
-     *   2024 => [...],
+     *   ...
      * ]
      */
-    public function getYearlyStatistics(): array
+    public function getYearlyStatistics(int $stationUid = 0): array
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
 
         $queryBuilder->getRestrictions()->removeAll();
 
-        $rows = $queryBuilder
-            ->select('t.title AS type_title', 't.category AS type_category')
-            ->addSelectLiteral('YEAR(e.start) AS year', 'COUNT(e.uid) AS cnt')
+        $queryBuilder
+            ->select('cat.uid AS cat_uid', 'cat.title AS cat_title', 'cat.color AS cat_color')
+            ->addSelectLiteral('YEAR(e.start) AS year', 'COUNT(DISTINCT e.uid) AS cnt')
             ->from('tx_rescuereports_domain_model_event', 'e')
-            ->leftJoin('e', 'tx_rescuereports_event_type_mm', 'mm', 'e.uid = mm.uid_local')
-            ->leftJoin('mm', 'tx_rescuereports_domain_model_type', 't', 'mm.uid_foreign = t.uid')
+            ->leftJoin('e', 'tx_rescuereports_event_type_mm', 'tmm', 'e.uid = tmm.uid_local')
+            ->leftJoin('tmm', 'tx_rescuereports_domain_model_type', 't', 'tmm.uid_foreign = t.uid')
+            ->leftJoin('t', 'tx_rescuereports_domain_model_category', 'cat', 't.category = cat.uid')
             ->where(
                 $queryBuilder->expr()->eq('e.deleted', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
                 $queryBuilder->expr()->eq('e.hidden', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
                 $queryBuilder->expr()->isNotNull('e.start')
-            )
-            ->groupBy('year', 't.category', 't.title')
+            );
+
+        if ($stationUid > 0) {
+            $queryBuilder
+                ->innerJoin('e', 'tx_rescuereports_event_station_mm', 'smm', 'e.uid = smm.uid_local')
+                ->andWhere(
+                    $queryBuilder->expr()->eq('smm.uid_foreign', $queryBuilder->createNamedParameter($stationUid, PDO::PARAM_INT))
+                );
+        }
+
+        $rows = $queryBuilder
+            ->groupBy('year', 'cat.uid')
             ->orderBy('year', 'DESC')
-            ->addOrderBy('t.category', 'ASC')
-            ->addOrderBy('t.title', 'ASC')
+            ->addOrderBy('cat.title', 'ASC')
             ->executeQuery()
             ->fetchAllAssociative();
 
-        $statistics = [];
+        // Aufbau: year -> categories[] + total
+        $raw = [];
         foreach ($rows as $row) {
-            $year     = (int)$row['year'];
-            $category = (string)($row['type_category'] ?: '–');
-            $type     = (string)($row['type_title']    ?: '(ohne Einsatzart)');
-            $count    = (int)$row['cnt'];
+            $year = (int)$row['year'];
+            if (!isset($raw[$year])) {
+                $raw[$year] = [];
+            }
+            $raw[$year][] = [
+                'uid'   => (int)$row['cat_uid'],
+                'title' => (string)($row['cat_title'] ?: '– ohne Kategorie –'),
+                'color' => (string)($row['cat_color'] ?: '#95a5a6'),
+                'count' => (int)$row['cnt'],
+            ];
+        }
 
-            $statistics[$year][$category][$type] = $count;
+        // Gesamtzahl + Prozentwerte berechnen
+        $statistics = [];
+        foreach ($raw as $year => $categories) {
+            $total = array_sum(array_column($categories, 'count'));
+            foreach ($categories as &$cat) {
+                $cat['percent'] = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
+            }
+            unset($cat);
+            $statistics[$year] = [
+                'total'      => $total,
+                'categories' => $categories,
+            ];
         }
 
         return $statistics;
