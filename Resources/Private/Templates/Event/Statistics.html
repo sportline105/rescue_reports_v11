@@ -24,10 +24,14 @@
                                 <f:for each="{yearData.svgPaths}" as="slice">
                                     <f:if condition="{slice.type} == 'circle'">
                                         <f:then>
-                                            <circle cx="110" cy="110" r="100" fill="{slice.color}" />
+                                            <circle cx="110" cy="110" r="100" fill="{slice.color}">
+                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
+                                            </circle>
                                         </f:then>
                                         <f:else>
-                                            <path d="{slice.d}" fill="{slice.color}" />
+                                            <path d="{slice.d}" fill="{slice.color}">
+                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
+                                            </path>
                                         </f:else>
                                     </f:if>
                                 </f:for>

@@ -477,7 +477,13 @@ class EventRepository extends Repository
             $cx = 110; $cy = 110; $r = 100;
             if (count($categories) === 1) {
                 // Einzelkategorie: Vollkreis
-                $svgPaths[] = ['type' => 'circle', 'color' => $categories[0]['color']];
+                $svgPaths[] = [
+                    'type'    => 'circle',
+                    'color'   => $categories[0]['color'],
+                    'title'   => $categories[0]['title'],
+                    'count'   => $categories[0]['count'],
+                    'percent' => $categories[0]['percent'],
+                ];
             } else {
                 $startAngle = -M_PI / 2; // Start bei 12 Uhr
                 foreach ($categories as $cat) {
@@ -489,10 +495,13 @@ class EventRepository extends Repository
                     $y2 = round($cy + $r * sin($endAngle), 3);
                     $largeArc   = $sliceAngle > M_PI ? 1 : 0;
                     $svgPaths[] = [
-                        'type'  => 'path',
-                        'color' => $cat['color'],
-                        'd'     => 'M ' . $cx . ' ' . $cy . ' L ' . $x1 . ' ' . $y1
-                                   . ' A ' . $r . ' ' . $r . ' 0 ' . $largeArc . ' 1 ' . $x2 . ' ' . $y2 . ' Z',
+                        'type'    => 'path',
+                        'color'   => $cat['color'],
+                        'd'       => 'M ' . $cx . ' ' . $cy . ' L ' . $x1 . ' ' . $y1
+                                     . ' A ' . $r . ' ' . $r . ' 0 ' . $largeArc . ' 1 ' . $x2 . ' ' . $y2 . ' Z',
+                        'title'   => $cat['title'],
+                        'count'   => $cat['count'],
+                        'percent' => $cat['percent'],
                     ];
                     $startAngle = $endAngle;
                 }
