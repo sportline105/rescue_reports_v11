@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use PDO;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class EventController extends ActionController
@@ -133,6 +134,14 @@ class EventController extends ActionController
                 $stationName = $station->getName();
             }
         }
+
+        GeneralUtility::makeInstance(PageRenderer::class)->addCssInlineBlock(
+            'rescueStatisticsPie',
+            '.rescue-statistics svg path,.rescue-statistics svg circle{'
+            . 'transition:transform .15s ease-out;cursor:pointer;transform-origin:110px 110px;}'
+            . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
+            . 'transform:scale(1.08);}'
+        );
 
         $this->view->assignMultiple([
             'statistics'  => $statistics,
