@@ -2,12 +2,6 @@
 
 <f:section name="main">
 
-    <f:if condition="{showStatistics}">
-        <f:if condition="{statisticsPosition} == 'above'">
-            <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
-        </f:if>
-    </f:if>
-
     <f:switch expression="{templateVariant}">
 
         <!-- =========================================================
@@ -43,6 +37,12 @@
                         </div>
                     </f:form>
                 </div>
+
+                <f:if condition="{showStatistics}">
+                    <f:if condition="{statisticsPosition} == 'above'">
+                        <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
+                    </f:if>
+                </f:if>
 
                 <f:if condition="{maxCount} > 0">
                     <f:then>
@@ -138,6 +138,12 @@
         ========================================================== -->
         <f:defaultCase>
             <h1 class="csc-firstHeader">Einsatzübersicht</h1>
+
+            <f:if condition="{showStatistics}">
+                <f:if condition="{statisticsPosition} == 'above'">
+                    <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
+                </f:if>
+            </f:if>
 
             <div class="filter-info" style="margin-bottom: 10px; font-size: 0.9em; color: #555;">
                 <f:if condition="{maxCount} > 0">
