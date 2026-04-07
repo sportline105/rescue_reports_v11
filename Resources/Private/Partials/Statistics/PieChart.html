@@ -37,6 +37,7 @@
                                         <th>Kategorie</th>
                                         <th class="rescue-statistics__num">Anzahl</th>
                                         <th class="rescue-statistics__num">Anteil</th>
+                                        <th class="rescue-statistics__num">Ø Dauer</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -46,6 +47,7 @@
                                             <td>{cat.title}</td>
                                             <td class="rescue-statistics__num">{cat.count}</td>
                                             <td class="rescue-statistics__num">{cat.percent} %</td>
+                                            <td class="rescue-statistics__num">{cat.avgDuration}</td>
                                         </tr>
                                     </f:for>
                                 </tbody>
@@ -54,6 +56,7 @@
                                         <td colspan="2"><strong>Gesamt</strong></td>
                                         <td class="rescue-statistics__num"><strong>{yearData.total}</strong></td>
                                         <td class="rescue-statistics__num"><strong>100 %</strong></td>
+                                        <td class="rescue-statistics__num">—</td>
                                     </tr>
                                 </tfoot>
                             </table>

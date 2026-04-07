@@ -422,7 +422,11 @@ class EventRepository extends Repository
 
         $queryBuilder
             ->select('cat.uid AS cat_uid', 'cat.title AS cat_title', 'cat.color AS cat_color')
-            ->addSelectLiteral('YEAR(e.start) AS year', 'COUNT(DISTINCT e.uid) AS cnt')
+            ->addSelectLiteral(
+                'YEAR(e.start) AS year',
+                'COUNT(DISTINCT e.uid) AS cnt',
+                'ROUND(AVG(TIMESTAMPDIFF(SECOND, e.start, e.end))) AS avg_dur_sec'
+            )
             ->from('tx_rescuereports_domain_model_event', 'e')
             ->leftJoin('e', 'tx_rescuereports_event_type_mm', 'tmm', 'e.uid = tmm.uid_local')
             ->leftJoin('tmm', 'tx_rescuereports_domain_model_type', 't', 'tmm.uid_foreign = t.uid')
@@ -459,7 +463,8 @@ class EventRepository extends Repository
                 'uid'   => (int)$row['cat_uid'],
                 'title' => (string)($row['cat_title'] ?: '– ohne Kategorie –'),
                 'color' => (string)($row['cat_color'] ?: '#95a5a6'),
-                'count' => (int)$row['cnt'],
+                'count'       => (int)$row['cnt'],
+                'avg_dur_sec' => isset($row['avg_dur_sec']) && $row['avg_dur_sec'] !== null ? (int)$row['avg_dur_sec'] : null,
             ];
         }
 
@@ -468,7 +473,8 @@ class EventRepository extends Repository
         foreach ($raw as $year => $categories) {
             $total = array_sum(array_column($categories, 'count'));
             foreach ($categories as &$cat) {
-                $cat['percent'] = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
+                $cat['percent']     = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
+                $cat['avgDuration'] = $this->formatDurationSeconds($cat['avg_dur_sec'] ?? null);
             }
             unset($cat);
 
@@ -515,5 +521,17 @@ class EventRepository extends Repository
         }
 
         return $statistics;
+    }
+
+    private function formatDurationSeconds(?int $seconds): string
+    {
+        if ($seconds === null || $seconds <= 0) {
+            return '—';
+        }
+        $hours   = (int)($seconds / 3600);
+        $minutes = (int)(($seconds % 3600) / 60);
+        return $hours > 0
+            ? sprintf('%d Std. %02d Min.', $hours, $minutes)
+            : sprintf('%d Min.', $minutes);
     }
 }
