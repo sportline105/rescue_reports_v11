@@ -4,7 +4,8 @@
 <div class="rescue-statistics">
 
     <f:if condition="{stationName}">
-        <h1 class="rescue-statistics__station">Einsatzstatistik {stationName}</h1>
+        <f:then><h1 class="rescue-statistics__station">Einsatzstatistik: {stationName}</h1></f:then>
+        <f:else><h1 class="rescue-statistics__station">Einsatzstatistik</h1></f:else>
     </f:if>
 
     <f:if condition="{statistics}">

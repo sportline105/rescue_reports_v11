@@ -22,6 +22,7 @@
                 <h1 class="element-header">Einsatzübersicht</h1>
 
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Ortsfeuerwehr</label>
                     <f:form action="list" method="post">
                         <div class="row g-2 align-items-stretch">
                             <div class="col-12 col-md-6">
@@ -40,7 +41,7 @@
 
                 <f:if condition="{showStatistics}">
                     <f:if condition="{statisticsPosition} == 'above'">
-                        <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
+                        <f:render partial="Statistics/PieChart" arguments="{statistics: statistics, title: 'Einsatzstatistik'}" />
                     </f:if>
                 </f:if>
 
@@ -76,9 +77,11 @@
                 <f:if condition="{enableSearch}">
                     <div class="card mb-1 border-0">
                         <div class="card-body">
+                            <h3 class="fs-6 fw-semibold text-muted mb-3">Einsätze suchen und filtern</h3>
                             <f:form action="list" method="post">
-                                <div class="row g-2 align-items-stretch">
+                                <div class="row g-2 align-items-end">
                                     <div class="col-12 col-md-4">
+                                        <label class="form-label small">Ortsfeuerwehr</label>
                                         <f:form.select
                                             name="station"
                                             options="{stations}"
@@ -89,6 +92,7 @@
                                     </div>
 
                                     <div class="col-12 col-md-4">
+                                        <label class="form-label small">Suchbegriff</label>
                                         <f:form.textfield
                                             name="searchWord"
                                             id="searchWordNewdesign"
@@ -141,7 +145,7 @@
 
             <f:if condition="{showStatistics}">
                 <f:if condition="{statisticsPosition} == 'above'">
-                    <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
+                    <f:render partial="Statistics/PieChart" arguments="{statistics: statistics, title: 'Einsatzstatistik'}" />
                 </f:if>
             </f:if>
 
@@ -202,7 +206,8 @@
 
     <f:if condition="{showStatistics}">
         <f:if condition="{statisticsPosition} != 'above'">
-            <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
+            <hr class="my-4">
+            <f:render partial="Statistics/PieChart" arguments="{statistics: statistics, title: 'Einsatzstatistik'}" />
         </f:if>
     </f:if>
 
