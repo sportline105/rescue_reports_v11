@@ -18,9 +18,20 @@
 
                     <div class="rescue-statistics__layout">
 
-                        <!-- Tortendiagramm via CSS conic-gradient (kein JavaScript nötig) -->
+                        <!-- Tortendiagramm als SVG -->
                         <div class="rescue-statistics__chart-wrap">
-                            <div class="rescue-statistics__pie rescue-statistics__pie-{year}"></div>
+                            <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+                                <f:for each="{yearData.svgPaths}" as="slice">
+                                    <f:if condition="{slice.type} == 'circle'">
+                                        <f:then>
+                                            <circle cx="110" cy="110" r="100" fill="{slice.color}" />
+                                        </f:then>
+                                        <f:else>
+                                            <path d="{slice.d}" fill="{slice.color}" />
+                                        </f:else>
+                                    </f:if>
+                                </f:for>
+                            </svg>
                         </div>
 
                         <!-- Tabelle -->
@@ -65,18 +76,9 @@
 
 </div>
 
-<f:if condition="{statistics}">
-    <style>
-        <f:for each="{statistics}" as="yearData" key="year">
-        .rescue-statistics__pie-{year} { background: <f:format.raw>{yearData.gradient}</f:format.raw>; }
-        </f:for>
-    </style>
-</f:if>
-
 <style>
 .rescue-statistics__layout      { display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap; margin:1rem 0 2rem; }
 .rescue-statistics__chart-wrap  { flex:0 0 220px; }
-.rescue-statistics__pie         { width:220px; height:220px; border-radius:50%; }
 .rescue-statistics__table-wrap  { flex:1 1 300px; }
 .rescue-statistics__table       { width:100%; border-collapse:collapse; }
 .rescue-statistics__table th,

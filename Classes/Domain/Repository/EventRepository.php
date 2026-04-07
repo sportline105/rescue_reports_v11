@@ -463,24 +463,45 @@ class EventRepository extends Repository
             ];
         }
 
-        // Gesamtzahl + Prozentwerte + conic-gradient berechnen
+        // Gesamtzahl + Prozentwerte + SVG-Tortendiagramm berechnen
         $statistics = [];
         foreach ($raw as $year => $categories) {
             $total = array_sum(array_column($categories, 'count'));
-            $cumulative = 0.0;
-            $gradientParts = [];
             foreach ($categories as &$cat) {
                 $cat['percent'] = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
-                $startDeg = round($cumulative, 2);
-                $cumulative += $total > 0 ? ($cat['count'] / $total * 360) : 0;
-                $endDeg = round($cumulative, 2);
-                $gradientParts[] = $cat['color'] . ' ' . $startDeg . 'deg ' . $endDeg . 'deg';
             }
             unset($cat);
+
+            // SVG-Pfade für Tortendiagramm (Kreis 220×220, Mittelpunkt 110/110, Radius 100)
+            $svgPaths = [];
+            $cx = 110; $cy = 110; $r = 100;
+            if (count($categories) === 1) {
+                // Einzelkategorie: Vollkreis
+                $svgPaths[] = ['type' => 'circle', 'color' => $categories[0]['color']];
+            } else {
+                $startAngle = -M_PI / 2; // Start bei 12 Uhr
+                foreach ($categories as $cat) {
+                    $sliceAngle = $total > 0 ? ($cat['count'] / $total * 2 * M_PI) : 0;
+                    $endAngle   = $startAngle + $sliceAngle;
+                    $x1 = round($cx + $r * cos($startAngle), 3);
+                    $y1 = round($cy + $r * sin($startAngle), 3);
+                    $x2 = round($cx + $r * cos($endAngle), 3);
+                    $y2 = round($cy + $r * sin($endAngle), 3);
+                    $largeArc   = $sliceAngle > M_PI ? 1 : 0;
+                    $svgPaths[] = [
+                        'type'  => 'path',
+                        'color' => $cat['color'],
+                        'd'     => 'M ' . $cx . ' ' . $cy . ' L ' . $x1 . ' ' . $y1
+                                   . ' A ' . $r . ' ' . $r . ' 0 ' . $largeArc . ' 1 ' . $x2 . ' ' . $y2 . ' Z',
+                    ];
+                    $startAngle = $endAngle;
+                }
+            }
+
             $statistics[$year] = [
                 'total'      => $total,
                 'categories' => $categories,
-                'gradient'   => 'conic-gradient(' . implode(', ', $gradientParts) . ')',
+                'svgPaths'   => $svgPaths,
             ];
         }
 
