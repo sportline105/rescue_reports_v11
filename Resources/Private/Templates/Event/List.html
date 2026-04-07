@@ -1,6 +1,13 @@
 <f:layout name="Default" />
 
 <f:section name="main">
+
+    <f:if condition="{showStatistics}">
+        <f:if condition="{statisticsPosition} == 'above'">
+            <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
+        </f:if>
+    </f:if>
+
     <f:switch expression="{templateVariant}">
 
         <!-- =========================================================
@@ -186,6 +193,13 @@
         </f:defaultCase>
 
     </f:switch>
+
+    <f:if condition="{showStatistics}">
+        <f:if condition="{statisticsPosition} != 'above'">
+            <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
+        </f:if>
+    </f:if>
+
 </f:section>
 
 <!-- =========================================================

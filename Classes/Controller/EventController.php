@@ -42,7 +42,9 @@ class EventController extends ActionController
         $dateFromValue = $this->settings['dateFrom'] ?? null;
         $dateToValue = $this->settings['dateTo'] ?? null;
         $enableSearch = (bool)($this->settings['enableSearch'] ?? false);
-        $templateVariant = (string)($this->settings['templateVariant'] ?? 'standard');
+        $templateVariant     = (string)($this->settings['templateVariant'] ?? 'standard');
+        $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
+        $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
         $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
 
         $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
@@ -100,6 +102,33 @@ class EventController extends ActionController
         $eventItems = $this->buildEventItemsForStations($events, $activeStationUid);
         $stations = $this->stationRepository->findPrimaryBrigadeStations();
 
+        $statistics = [];
+        if ($showStatistics && in_array($templateVariant, ['standard', 'newdesign'], true)) {
+            $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid);
+            if (!empty($statistics)) {
+                $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+                $pageRenderer->addCssInlineBlock(
+                    'rescueStatisticsLayout',
+                    '.rescue-statistics__layout{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin:1rem 0 2rem;}'
+                    . '.rescue-statistics__chart-wrap{flex:0 0 220px;}'
+                    . '.rescue-statistics__table-wrap{flex:1 1 300px;}'
+                    . '.rescue-statistics__table{width:100%;border-collapse:collapse;}'
+                    . '.rescue-statistics__table th,.rescue-statistics__table td{padding:.35rem .6rem;border-bottom:1px solid #ddd;vertical-align:middle;}'
+                    . '.rescue-statistics__num{text-align:right;white-space:nowrap;}'
+                    . '.rescue-statistics__dot{display:inline-block;width:14px;height:14px;border-radius:50%;}'
+                    . '.rescue-statistics__total{font-size:.85em;font-weight:normal;color:#666;margin-left:.5rem;}'
+                    . '.rescue-statistics__year-title{margin-bottom:.25rem;}'
+                );
+                $pageRenderer->addCssInlineBlock(
+                    'rescueStatisticsPie',
+                    '.rescue-statistics svg path,.rescue-statistics svg circle{'
+                    . 'transition:transform .15s ease-out;cursor:pointer;transform-origin:110px 110px;}'
+                    . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
+                    . 'transform:scale(1.08);}'
+                );
+            }
+        }
+
         $this->view->assignMultiple([
             'events' => $events,
             'eventItems' => $eventItems,
@@ -111,9 +140,12 @@ class EventController extends ActionController
             'dateTo' => $this->createDateTimeFromFlexFormValue($dateToValue),
             'templateVariant' => $templateVariant,
             'detailPageUid' => $detailPageUid,
-            'defaultStationUid' => $defaultStationUid,
-            'activeStationUid' => $activeStationUid,
-            'settings' => $this->settings,
+            'defaultStationUid'   => $defaultStationUid,
+            'activeStationUid'    => $activeStationUid,
+            'settings'            => $this->settings,
+            'statistics'          => $statistics,
+            'showStatistics'      => $showStatistics,
+            'statisticsPosition'  => $statisticsPosition,
         ]);
 
         return $this->htmlResponse();
@@ -135,13 +167,28 @@ class EventController extends ActionController
             }
         }
 
-        GeneralUtility::makeInstance(PageRenderer::class)->addCssInlineBlock(
-            'rescueStatisticsPie',
-            '.rescue-statistics svg path,.rescue-statistics svg circle{'
-            . 'transition:transform .15s ease-out;cursor:pointer;transform-origin:110px 110px;}'
-            . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
-            . 'transform:scale(1.08);}'
-        );
+        if (!empty($statistics)) {
+            $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+            $pageRenderer->addCssInlineBlock(
+                'rescueStatisticsLayout',
+                '.rescue-statistics__layout{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin:1rem 0 2rem;}'
+                . '.rescue-statistics__chart-wrap{flex:0 0 220px;}'
+                . '.rescue-statistics__table-wrap{flex:1 1 300px;}'
+                . '.rescue-statistics__table{width:100%;border-collapse:collapse;}'
+                . '.rescue-statistics__table th,.rescue-statistics__table td{padding:.35rem .6rem;border-bottom:1px solid #ddd;vertical-align:middle;}'
+                . '.rescue-statistics__num{text-align:right;white-space:nowrap;}'
+                . '.rescue-statistics__dot{display:inline-block;width:14px;height:14px;border-radius:50%;}'
+                . '.rescue-statistics__total{font-size:.85em;font-weight:normal;color:#666;margin-left:.5rem;}'
+                . '.rescue-statistics__year-title{margin-bottom:.25rem;}'
+            );
+            $pageRenderer->addCssInlineBlock(
+                'rescueStatisticsPie',
+                '.rescue-statistics svg path,.rescue-statistics svg circle{'
+                . 'transition:transform .15s ease-out;cursor:pointer;transform-origin:110px 110px;}'
+                . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
+                . 'transform:scale(1.08);}'
+            );
+        }
 
         $this->view->assignMultiple([
             'statistics'  => $statistics,

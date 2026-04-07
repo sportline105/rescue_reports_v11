@@ -120,6 +120,42 @@
                         </TCEforms>
                     </detailPageUid>
 
+                    <settings.showStatistics>
+                        <TCEforms>
+                            <label>Statistik anzeigen</label>
+                            <config>
+                                <type>check</type>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">Ja</numIndex>
+                                    </numIndex>
+                                </items>
+                                <default>0</default>
+                            </config>
+                        </TCEforms>
+                    </settings.showStatistics>
+
+                    <settings.statisticsPosition>
+                        <TCEforms>
+                            <label>Position der Statistik</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingle</renderType>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">Unterhalb der Einsatzliste</numIndex>
+                                        <numIndex index="1">below</numIndex>
+                                    </numIndex>
+                                    <numIndex index="1">
+                                        <numIndex index="0">Oberhalb der Einsatzliste</numIndex>
+                                        <numIndex index="1">above</numIndex>
+                                    </numIndex>
+                                </items>
+                                <default>below</default>
+                            </config>
+                        </TCEforms>
+                    </settings.statisticsPosition>
+
                 </el>
             </ROOT>
         </general>

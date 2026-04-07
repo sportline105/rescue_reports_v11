@@ -1,0 +1,66 @@
+<div class="rescue-statistics">
+    <f:if condition="{statistics}">
+        <f:then>
+            <f:for each="{statistics}" as="yearData" key="year">
+                <div class="rescue-statistics__year">
+                    <h3 class="rescue-statistics__year-title">
+                        {year}
+                        <span class="rescue-statistics__total">({yearData.total} Einsätze gesamt)</span>
+                    </h3>
+                    <div class="rescue-statistics__layout">
+                        <div class="rescue-statistics__chart-wrap">
+                            <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+                                <f:for each="{yearData.svgPaths}" as="slice">
+                                    <f:if condition="{slice.type} == 'circle'">
+                                        <f:then>
+                                            <circle cx="110" cy="110" r="100" fill="{slice.color}">
+                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
+                                            </circle>
+                                        </f:then>
+                                        <f:else>
+                                            <path d="{slice.d}" fill="{slice.color}">
+                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
+                                            </path>
+                                        </f:else>
+                                    </f:if>
+                                </f:for>
+                            </svg>
+                        </div>
+                        <div class="rescue-statistics__table-wrap">
+                            <table class="rescue-statistics__table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Kategorie</th>
+                                        <th class="rescue-statistics__num">Anzahl</th>
+                                        <th class="rescue-statistics__num">Anteil</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <f:for each="{yearData.categories}" as="cat">
+                                        <tr>
+                                            <td><span class="rescue-statistics__dot" style="background:{cat.color}"></span></td>
+                                            <td>{cat.title}</td>
+                                            <td class="rescue-statistics__num">{cat.count}</td>
+                                            <td class="rescue-statistics__num">{cat.percent} %</td>
+                                        </tr>
+                                    </f:for>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2"><strong>Gesamt</strong></td>
+                                        <td class="rescue-statistics__num"><strong>{yearData.total}</strong></td>
+                                        <td class="rescue-statistics__num"><strong>100 %</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </f:for>
+        </f:then>
+        <f:else>
+            <p class="rescue-statistics__empty">Keine Einsatzdaten vorhanden.</p>
+        </f:else>
+    </f:if>
+</div>
