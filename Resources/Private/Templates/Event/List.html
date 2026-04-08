@@ -1,6 +1,7 @@
 <f:layout name="Default" />
 
 <f:section name="main">
+
     <f:switch expression="{templateVariant}">
 
         <!-- =========================================================
@@ -8,9 +9,20 @@
              Keine Filter-Info, kein Suchformular
         ========================================================== -->
         <f:case value="sidebar">
-            <h1 class="element-header">Letzte Einsätze</h1>
+            <h1 class="element-header">
+                <f:if condition="{widgetTitle}">
+                    <f:then>{widgetTitle}</f:then>
+                    <f:else>Letzte Einsätze</f:else>
+                </f:if>
+            </h1>
 
             <f:render section="EventListContentSidebar" arguments="{_all}" />
+
+            <f:if condition="{listPageUid}">
+                <div class="einsaetze__more">
+                    <f:link.page pageUid="{listPageUid}" class="einsaetze__more-link">Alle Einsätze anzeigen ›</f:link.page>
+                </div>
+            </f:if>
         </f:case>
 
         <!-- =========================================================
@@ -21,7 +33,11 @@
                 <h1 class="element-header">Einsatzübersicht</h1>
 
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Ortsfeuerwehr</label>
                     <f:form action="list" method="post">
+                        <f:form.hidden name="year" value="{selectedYear}" />
+                        <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                        <f:form.hidden name="dateTo" value="{dateToStr}" />
                         <div class="row g-2 align-items-stretch">
                             <div class="col-12 col-md-6">
                                 <f:form.select
@@ -36,6 +52,37 @@
                         </div>
                     </f:form>
                 </div>
+
+                <f:if condition="{enableYearFilter}">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Jahr</label>
+                        <f:form action="list" method="post">
+                            <f:form.hidden name="station" value="{activeStationUid}" />
+                            <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                            <f:form.hidden name="dateTo" value="{dateToStr}" />
+                            <div class="row g-2 align-items-stretch">
+                                <div class="col-12 col-md-6">
+                                    <f:form.select
+                                        name="year"
+                                        value="{selectedYear}"
+                                        class="form-select"
+                                        additionalAttributes="{onchange: 'this.form.submit()}">
+                                        <f:form.select.option value="0">Alle Jahre</f:form.select.option>
+                                        <f:for each="{availableYears}" as="y">
+                                            <f:form.select.option value="{y}">{y}</f:form.select.option>
+                                        </f:for>
+                                    </f:form.select>
+                                </div>
+                            </div>
+                        </f:form>
+                    </div>
+                </f:if>
+
+                <f:if condition="{showStatistics}">
+                    <f:if condition="{statisticsPosition} == 'above'">
+                        <f:render partial="Statistics/PieChart" arguments="{statistics: statistics, title: 'Einsatzstatistik'}" />
+                    </f:if>
+                </f:if>
 
                 <f:if condition="{maxCount} > 0">
                     <f:then>
@@ -69,9 +116,11 @@
                 <f:if condition="{enableSearch}">
                     <div class="card mb-1 border-0">
                         <div class="card-body">
+                            <h3 class="fs-6 fw-semibold text-muted mb-3">Einsätze suchen und filtern</h3>
                             <f:form action="list" method="post">
-                                <div class="row g-2 align-items-stretch">
+                                <div class="row g-2 align-items-end">
                                     <div class="col-12 col-md-4">
+                                        <label class="form-label small">Ortsfeuerwehr</label>
                                         <f:form.select
                                             name="station"
                                             options="{stations}"
@@ -81,7 +130,42 @@
                                             class="form-select" />
                                     </div>
 
+                                    <f:if condition="{enableYearFilter}">
+                                        <div class="col-12 col-md-2">
+                                            <label class="form-label small">Jahr</label>
+                                            <f:form.select
+                                                name="year"
+                                                value="{selectedYear}"
+                                                class="form-select">
+                                                <f:form.select.option value="0">Alle</f:form.select.option>
+                                                <f:for each="{availableYears}" as="y">
+                                                    <f:form.select.option value="{y}">{y}</f:form.select.option>
+                                                </f:for>
+                                            </f:form.select>
+                                        </div>
+                                    </f:if>
+
+                                    <f:if condition="{enableDateFilter}">
+                                        <div class="col-12 col-md-2">
+                                            <label class="form-label small">Von</label>
+                                            <f:form.textfield
+                                                name="dateFrom"
+                                                type="date"
+                                                value="{dateFromStr}"
+                                                class="form-control" />
+                                        </div>
+                                        <div class="col-12 col-md-2">
+                                            <label class="form-label small">Bis</label>
+                                            <f:form.textfield
+                                                name="dateTo"
+                                                type="date"
+                                                value="{dateToStr}"
+                                                class="form-control" />
+                                        </div>
+                                    </f:if>
+
                                     <div class="col-12 col-md-4">
+                                        <label class="form-label small">Suchbegriff</label>
                                         <f:form.textfield
                                             name="searchWord"
                                             id="searchWordNewdesign"
@@ -100,7 +184,7 @@
                                     <div class="col-12 col-md-2">
                                         <f:link.action
                                             action="list"
-                                            arguments="{searchWord: '', station: 0}"
+                                            arguments="{searchWord: '', station: 0, year: 0}"
                                             class="btn btn-outline-secondary w-100">
                                             Reset
                                         </f:link.action>
@@ -121,8 +205,18 @@
         ========================================================== -->
         <f:case value="newdesignsidebar">
             <div class="rescue-reports rescue-reports--newdesignsidebar">
-                <h1 class="element-header">Letzte Einsätze</h1>
+                <h1 class="element-header">
+                    <f:if condition="{widgetTitle}">
+                        <f:then>{widgetTitle}</f:then>
+                        <f:else>Letzte Einsätze</f:else>
+                    </f:if>
+                </h1>
                 <f:render section="EventListContentSidebarNewDesign" arguments="{_all}" />
+                <f:if condition="{listPageUid}">
+                    <div class="einsaetze__more">
+                        <f:link.page pageUid="{listPageUid}" class="einsaetze__more-link">Alle Einsätze anzeigen ›</f:link.page>
+                    </div>
+                </f:if>
             </div>
         </f:case>
 
@@ -131,6 +225,12 @@
         ========================================================== -->
         <f:defaultCase>
             <h1 class="csc-firstHeader">Einsatzübersicht</h1>
+
+            <f:if condition="{showStatistics}">
+                <f:if condition="{statisticsPosition} == 'above'">
+                    <f:render partial="Statistics/PieChart" arguments="{statistics: statistics, title: 'Einsatzstatistik'}" />
+                </f:if>
+            </f:if>
 
             <div class="filter-info" style="margin-bottom: 10px; font-size: 0.9em; color: #555;">
                 <f:if condition="{maxCount} > 0">
@@ -147,13 +247,52 @@
                 </f:if>
             </div>
 
+            <f:if condition="{enableYearFilter}">
+                <div class="row" style="padding-top:10px; padding-bottom:5px;">
+                    <div class="small-12 columns">
+                        <f:form action="list" method="post">
+                            <f:form.hidden name="station" value="{activeStationUid}" />
+                            <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                            <f:form.hidden name="dateTo" value="{dateToStr}" />
+                            <f:form.select
+                                name="year"
+                                value="{selectedYear}"
+                                additionalAttributes="{onchange: 'this.form.submit()'}">
+                                <f:form.select.option value="0">Alle Jahre</f:form.select.option>
+                                <f:for each="{availableYears}" as="y">
+                                    <f:form.select.option value="{y}">{y}</f:form.select.option>
+                                </f:for>
+                            </f:form.select>
+                        </f:form>
+                    </div>
+                </div>
+            </f:if>
+
             <f:if condition="{enableSearch}">
                 <div class="row" style="padding-top:10px;">
                     <div class="small-12 columns">
                         <f:form action="list" method="post">
+                            <f:form.hidden name="year" value="{selectedYear}" />
                             <div class="row collapse">
 
-                                <div class="small-6 columns">
+                                <f:if condition="{enableDateFilter}">
+                                    <div class="small-3 columns">
+                                        <f:form.textfield
+                                            name="dateFrom"
+                                            type="date"
+                                            value="{dateFromStr}"
+                                            placeholder="Von" />
+                                    </div>
+                                    <div class="small-3 columns">
+                                        <f:form.textfield
+                                            name="dateTo"
+                                            type="date"
+                                            value="{dateToStr}"
+                                            placeholder="Bis" />
+                                    </div>
+                                </f:if>
+
+                                <div class="small-4 columns">
                                     <f:form.textfield
                                         name="searchWord"
                                         id="searchWord"
@@ -162,18 +301,18 @@
                                         placeholder="Suchbegriff eingeben…" />
                                 </div>
 
-                                <div class="small-3 columns">
+                                <div class="small-2 columns">
                                     <button type="submit" class="button postfix expand">
                                         Suchen
                                     </button>
                                 </div>
 
-                                <div class="small-3 columns">
+                                <div class="small-2 columns">
                                     <f:link.action
                                         action="list"
-                                        arguments="{searchWord: '', station: 0}"
+                                        arguments="{searchWord: '', station: 0, year: 0, dateFrom: '', dateTo: ''}"
                                         class="button postfix expand secondary">
-                                        Filter zurücksetzen
+                                        Reset
                                     </f:link.action>
                                 </div>
                             </div>
@@ -186,6 +325,14 @@
         </f:defaultCase>
 
     </f:switch>
+
+    <f:if condition="{showStatistics}">
+        <f:if condition="{statisticsPosition} != 'above'">
+            <hr class="my-4">
+            <f:render partial="Statistics/PieChart" arguments="{statistics: statistics, title: 'Einsatzstatistik'}" />
+        </f:if>
+    </f:if>
+
 </f:section>
 
 <!-- =========================================================

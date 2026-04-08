@@ -1,13 +1,7 @@
-<f:layout name="Default" />
-
-<f:section name="main">
+<f:if condition="{title}">
+    <h2 class="rescue-statistics__heading">{title}</h2>
+</f:if>
 <div class="rescue-statistics">
-
-    <f:if condition="{stationName}">
-        <f:then><h1 class="rescue-statistics__station">Einsatzstatistik: {stationName}</h1></f:then>
-        <f:else><h1 class="rescue-statistics__station">Einsatzstatistik</h1></f:else>
-    </f:if>
-
     <f:if condition="{statistics}">
         <f:then>
             <f:for each="{statistics}" as="yearData" key="year">
@@ -19,10 +13,7 @@
                             <span class="rescue-statistics__total">— Gesamtdauer: {yearData.yearTotalDuration}</span>
                         </f:if>
                     </h3>
-
                     <div class="rescue-statistics__layout">
-
-                        <!-- Tortendiagramm als SVG -->
                         <div class="rescue-statistics__chart-wrap">
                             <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
                                 <f:for each="{yearData.svgPaths}" as="slice">
@@ -41,8 +32,6 @@
                                 </f:for>
                             </svg>
                         </div>
-
-                        <!-- Tabelle -->
                         <div class="rescue-statistics__table-wrap">
                             <table class="rescue-statistics__table">
                                 <thead>
@@ -75,7 +64,6 @@
                                 </tfoot>
                             </table>
                         </div>
-
                     </div>
                     <f:if condition="{yearData.yearCompare}">
                         <p class="rescue-statistics__compare">Im Vergleich zum Vorjahr: {yearData.yearCompare}</p>
@@ -87,21 +75,4 @@
             <p class="rescue-statistics__empty">Keine Einsatzdaten vorhanden.</p>
         </f:else>
     </f:if>
-
 </div>
-
-<style>
-.rescue-statistics__layout      { display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap; margin:1rem 0 2rem; }
-.rescue-statistics__chart-wrap  { flex:0 0 220px; }
-.rescue-statistics__table-wrap  { flex:1 1 300px; }
-.rescue-statistics__table       { width:100%; border-collapse:collapse; }
-.rescue-statistics__table th,
-.rescue-statistics__table td    { padding:.35rem .6rem; border-bottom:1px solid #ddd; vertical-align:middle; }
-.rescue-statistics__num         { text-align:right; white-space:nowrap; }
-.rescue-statistics__dot         { display:inline-block; width:14px; height:14px; border-radius:50%; }
-.rescue-statistics__total       { font-size:.85em; font-weight:normal; color:#666; margin-left:.5rem; }
-.rescue-statistics__year-title  { margin-bottom:.25rem; }
-.rescue-statistics__compare     { font-size:.85em; color:#666; margin-top:.5rem; }
-</style>
-
-</f:section>

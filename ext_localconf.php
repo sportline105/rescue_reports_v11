@@ -44,6 +44,18 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         ]
     );
 
+    // RSS-Feed-Plugin
+    ExtensionUtility::configurePlugin(
+        'RescueReports',
+        'Rss',
+        [
+            EventController::class => 'rss',
+        ],
+        [
+            EventController::class => '',
+        ]
+    );
+
 })();
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][] = [

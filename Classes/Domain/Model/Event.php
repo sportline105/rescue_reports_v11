@@ -224,6 +224,18 @@ class Event extends AbstractEntity
     {
         $this->slug = $slug;
     }
+    protected string $internalNotes = '';
+
+    public function getInternalNotes(): string
+    {
+        return $this->internalNotes;
+    }
+
+    public function setInternalNotes(string $internalNotes): void
+    {
+        $this->internalNotes = $internalNotes;
+    }
+
     protected bool $disableDetail = false;
     public function isDisableDetail(): bool
     {

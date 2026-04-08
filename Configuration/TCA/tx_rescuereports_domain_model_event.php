@@ -23,7 +23,7 @@ return [
     ],
     'types' => [
         '1' => [
-            'showitem' => 'hidden, title, --palette--;;times, number, types, location, disable_detail, description, slug, --div--;Eingesetzte Einheiten, stations, --div--;Fahrzeuge, vehicles, --div--;Bilder, images'
+            'showitem' => 'hidden, title, --palette--;;times, number, types, location, disable_detail, description, slug, --div--;Eingesetzte Einheiten, stations, --div--;Fahrzeuge, vehicles, --div--;Bilder, images, --div--;Intern, internal_notes'
         ],
     ],
 
@@ -86,6 +86,16 @@ return [
         'description' => [
             'label' => 'Einsatzbericht',
             'config' => ['type' => 'text', 'enableRichtext' => true, 'richtextConfiguration' => 'firefighter', 'rows' => 5],
+        ],
+
+        'internal_notes' => [
+            'exclude' => true,
+            'label'   => 'Interne Notizen',
+            'config'  => [
+                'type' => 'text',
+                'rows' => 6,
+                'cols' => 48,
+            ],
         ],
 
         // Typen

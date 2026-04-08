@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+    <title><f:if condition="{feedTitle}"><f:then>{feedTitle}</f:then><f:else>Einsatzberichte<f:if condition="{stationName}"> – {stationName}</f:if></f:else></f:if></title>
+    <link>{f:uri.page(absolute: '1')}</link>
+    <description>Aktuelle Einsatzberichte der Feuerwehr</description>
+    <language>de</language>
+    <atom:link href="{f:uri.page(typeNum: 100, absolute: '1')}" rel="self" type="application/rss+xml" />
+    <f:for each="{events}" as="event">
+        <item>
+            <title>{event.title}</title>
+            <f:if condition="{detailPageUid}">
+                <link>{f:uri.action(action: 'show', arguments: {event: event}, pageUid: detailPageUid, absolute: '1')}</link>
+                <guid isPermaLink="true">{f:uri.action(action: 'show', arguments: {event: event}, pageUid: detailPageUid, absolute: '1')}</guid>
+            </f:if>
+            <f:if condition="!{detailPageUid}">
+                <guid isPermaLink="false">urn:rescuereports:event:{event.uid}</guid>
+            </f:if>
+            <pubDate><f:format.date format="D, d M Y H:i:s O">{event.start}</f:format.date></pubDate>
+            <f:if condition="{event.description}">
+                <description><![CDATA[{event.description -> f:format.raw()}]]></description>
+            </f:if>
+        </item>
+    </f:for>
+</channel>
+</rss>

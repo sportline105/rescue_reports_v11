@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use PDO;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class EventController extends ActionController
@@ -35,14 +36,44 @@ class EventController extends ActionController
     /**
      * Liste aller Einsätze (mit optionalen FlexForm-Filtern)
      */
-    public function listAction(?string $searchWord = null, ?string $station = null): ResponseInterface
-    {
+    public function listAction(
+        ?string $searchWord = null,
+        ?string $station = null,
+        ?string $year = null,
+        ?string $dateFrom = null,
+        ?string $dateTo = null
+    ): ResponseInterface {
         $maxCount = (int)($this->settings['maxCount'] ?? 0);
         $dateFromValue = $this->settings['dateFrom'] ?? null;
-        $dateToValue = $this->settings['dateTo'] ?? null;
+        $dateToValue   = $this->settings['dateTo'] ?? null;
         $enableSearch = (bool)($this->settings['enableSearch'] ?? false);
-        $templateVariant = (string)($this->settings['templateVariant'] ?? 'standard');
+        $templateVariant     = (string)($this->settings['templateVariant'] ?? 'standard');
+        $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
+        $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
+        $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
+        $enableYearFilter    = (bool)($this->settings['enableYearFilter'] ?? false);
+        $enableDateFilter    = (bool)($this->settings['enableDateFilter'] ?? false);
+        $selectedYear        = (int)($year ?? 0);
+
+        // Request-Datumswerte überschreiben FlexForm-Einstellung wenn Datumsfilter aktiv
+        if ($enableDateFilter) {
+            if ($dateFrom !== null && $dateFrom !== '') {
+                $dateFromValue = $dateFrom;
+            }
+            if ($dateTo !== null && $dateTo !== '') {
+                $dateToValue = $dateTo;
+            }
+        }
+
+        // DateTime-Objekte + HTML-Input-Strings (YYYY-MM-DD) für das Template
+        $dateFromDt  = $this->createDateTimeFromFlexFormValue($dateFromValue);
+        $dateToDt    = $this->createDateTimeFromFlexFormValue($dateToValue);
+        $dateFromStr = $dateFromDt instanceof \DateTime ? $dateFromDt->format('Y-m-d') : '';
+        $dateToStr   = $dateToDt instanceof \DateTime   ? $dateToDt->format('Y-m-d')   : '';
+
         $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
+        $listPageUid   = $this->normalizeDetailPageUid($this->settings['listPageUid'] ?? null);
+        $widgetTitle   = trim((string)($this->settings['widgetTitle'] ?? ''));
 
         $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
         $selectedStationUid = $this->normalizeRecordUid($station);
@@ -70,6 +101,16 @@ class EventController extends ActionController
 
         $dateFrom = $dateFromValue;
         $dateTo = $dateToValue;
+
+        // Jahresfilter überschreibt FlexForm-Datumsbereich wenn ein Jahr gewählt ist
+        if ($enableYearFilter && $selectedYear > 0) {
+            $dateFrom = $selectedYear . '-01-01';
+            $dateTo   = $selectedYear . '-12-31';
+        }
+
+        $availableYears = $enableYearFilter
+            ? $this->eventRepository->getAvailableYears($activeStationUid)
+            : [];
 
         if ($activeStationUid > 0) {
             if ($enableSearch && $searchWord !== '') {
@@ -99,6 +140,34 @@ class EventController extends ActionController
         $eventItems = $this->buildEventItemsForStations($events, $activeStationUid);
         $stations = $this->stationRepository->findPrimaryBrigadeStations();
 
+        $statistics = [];
+        if ($showStatistics && in_array($templateVariant, ['standard', 'newdesign'], true)) {
+            $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid, $statisticsYears);
+            if (!empty($statistics)) {
+                $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+                $pageRenderer->addCssInlineBlock(
+                    'rescueStatisticsLayout',
+                    '.rescue-statistics__layout{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin:1rem 0 2rem;}'
+                    . '.rescue-statistics__chart-wrap{flex:0 0 220px;}'
+                    . '.rescue-statistics__table-wrap{flex:1 1 300px;}'
+                    . '.rescue-statistics__table{width:100%;border-collapse:collapse;}'
+                    . '.rescue-statistics__table th,.rescue-statistics__table td{padding:.35rem .6rem;border-bottom:1px solid #ddd;vertical-align:middle;}'
+                    . '.rescue-statistics__num{text-align:right;white-space:nowrap;}'
+                    . '.rescue-statistics__dot{display:inline-block;width:14px;height:14px;border-radius:50%;}'
+                    . '.rescue-statistics__total{font-size:.85em;font-weight:normal;color:#666;margin-left:.5rem;}'
+                    . '.rescue-statistics__year-title{margin-bottom:.25rem;}'
+                    . '.rescue-statistics__compare{font-size:.85em;color:#666;margin-top:.5rem;}'
+                );
+                $pageRenderer->addCssInlineBlock(
+                    'rescueStatisticsPie',
+                    '.rescue-statistics svg path,.rescue-statistics svg circle{'
+                    . 'transition:transform .15s ease-out;cursor:pointer;transform-origin:110px 110px;}'
+                    . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
+                    . 'transform:scale(1.08);}'
+                );
+            }
+        }
+
         $this->view->assignMultiple([
             'events' => $events,
             'eventItems' => $eventItems,
@@ -106,25 +175,42 @@ class EventController extends ActionController
             'searchWord' => $searchWord,
             'enableSearch' => $enableSearch,
             'maxCount' => $maxCount,
-            'dateFrom' => $this->createDateTimeFromFlexFormValue($dateFromValue),
-            'dateTo' => $this->createDateTimeFromFlexFormValue($dateToValue),
+            'dateFrom' => $dateFromDt,
+            'dateTo'   => $dateToDt,
+            'dateFromStr'         => $dateFromStr,
+            'dateToStr'           => $dateToStr,
+            'enableDateFilter'    => $enableDateFilter,
             'templateVariant' => $templateVariant,
             'detailPageUid' => $detailPageUid,
-            'defaultStationUid' => $defaultStationUid,
-            'activeStationUid' => $activeStationUid,
-            'settings' => $this->settings,
+            'defaultStationUid'   => $defaultStationUid,
+            'activeStationUid'    => $activeStationUid,
+            'settings'            => $this->settings,
+            'statistics'          => $statistics,
+            'showStatistics'      => $showStatistics,
+            'statisticsPosition'  => $statisticsPosition,
+            'widgetTitle'         => $widgetTitle,
+            'listPageUid'         => $listPageUid,
+            'enableYearFilter'    => $enableYearFilter,
+            'availableYears'      => $availableYears,
+            'selectedYear'        => $selectedYear,
         ]);
 
         return $this->htmlResponse();
     }
 
     /**
-     * Jahresstatistik nach Kategorie, optional gefiltert nach Ortsfeuerwehr
+     * RSS 2.0-Feed der neuesten Einsätze, optional gefiltert nach Ortsfeuerwehr
      */
-    public function statisticsAction(): ResponseInterface
+    public function rssAction(): ResponseInterface
     {
-        $stationUid = (int)($this->settings['station'] ?? 0);
-        $statistics = $this->eventRepository->getYearlyStatistics($stationUid);
+        $stationUid    = (int)($this->settings['station'] ?? 0);
+        $maxCount      = (int)($this->settings['maxCount'] ?? 20);
+        $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
+        $feedTitle     = trim((string)($this->settings['feedTitle'] ?? ''));
+
+        $events = $stationUid > 0
+            ? $this->eventRepository->findFilteredByStation($stationUid, null, null, $maxCount)
+            : $this->eventRepository->findFiltered(null, null, $maxCount);
 
         $stationName = '';
         if ($stationUid > 0) {
@@ -132,6 +218,57 @@ class EventController extends ActionController
             if ($station) {
                 $stationName = $station->getName();
             }
+        }
+
+        $this->view->assignMultiple([
+            'events'        => $events,
+            'stationName'   => $stationName,
+            'feedTitle'     => $feedTitle,
+            'detailPageUid' => $detailPageUid,
+        ]);
+
+        return $this->htmlResponse()
+            ->withHeader('Content-Type', 'application/rss+xml; charset=utf-8');
+    }
+
+    /**
+     * Jahresstatistik nach Kategorie, optional gefiltert nach Ortsfeuerwehr
+     */
+    public function statisticsAction(): ResponseInterface
+    {
+        $stationUid      = (int)($this->settings['station'] ?? 0);
+        $statisticsYears = (int)($this->settings['statisticsYears'] ?? 0);
+        $statistics = $this->eventRepository->getYearlyStatistics($stationUid, $statisticsYears);
+
+        $stationName = '';
+        if ($stationUid > 0) {
+            $station = $this->stationRepository->findByUid($stationUid);
+            if ($station) {
+                $stationName = $station->getName();
+            }
+        }
+
+        if (!empty($statistics)) {
+            $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+            $pageRenderer->addCssInlineBlock(
+                'rescueStatisticsLayout',
+                '.rescue-statistics__layout{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin:1rem 0 2rem;}'
+                . '.rescue-statistics__chart-wrap{flex:0 0 220px;}'
+                . '.rescue-statistics__table-wrap{flex:1 1 300px;}'
+                . '.rescue-statistics__table{width:100%;border-collapse:collapse;}'
+                . '.rescue-statistics__table th,.rescue-statistics__table td{padding:.35rem .6rem;border-bottom:1px solid #ddd;vertical-align:middle;}'
+                . '.rescue-statistics__num{text-align:right;white-space:nowrap;}'
+                . '.rescue-statistics__dot{display:inline-block;width:14px;height:14px;border-radius:50%;}'
+                . '.rescue-statistics__total{font-size:.85em;font-weight:normal;color:#666;margin-left:.5rem;}'
+                . '.rescue-statistics__year-title{margin-bottom:.25rem;}'
+            );
+            $pageRenderer->addCssInlineBlock(
+                'rescueStatisticsPie',
+                '.rescue-statistics svg path,.rescue-statistics svg circle{'
+                . 'transition:transform .15s ease-out;cursor:pointer;transform-origin:110px 110px;}'
+                . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
+                . 'transform:scale(1.08);}'
+            );
         }
 
         $this->view->assignMultiple([

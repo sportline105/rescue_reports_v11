@@ -51,7 +51,22 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
     $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignatureSidebar] = 'pi_flexform';
     ExtensionManagementUtility::addPiFlexFormValue(
         $pluginSignatureSidebar,
-        'FILE:EXT:rescue_reports/Configuration/FlexForms/eventlist.xml'
+        'FILE:EXT:rescue_reports/Configuration/FlexForms/sidebar.xml'
+    );
+
+    // RSS-Feed-Plugin
+    ExtensionUtility::registerPlugin(
+        'RescueReports',
+        'Rss',
+        'Rescue Reports: RSS-Feed',
+        'rescue_reports_rss'
+    );
+
+    $pluginSignatureRss = 'rescuereports_rss';
+    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignatureRss] = 'pi_flexform';
+    ExtensionManagementUtility::addPiFlexFormValue(
+        $pluginSignatureRss,
+        'FILE:EXT:rescue_reports/Configuration/FlexForms/rss.xml'
     );
 
     ExtensionManagementUtility::addStaticFile(

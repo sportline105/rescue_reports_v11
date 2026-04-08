@@ -4,6 +4,7 @@ CREATE TABLE tx_rescuereports_domain_model_event (
   pid int(11) DEFAULT '0' NOT NULL,
   title varchar(255) DEFAULT '' NOT NULL,
   description text,
+  internal_notes text,
   start datetime DEFAULT NULL,
   end datetime DEFAULT NULL,
   location varchar(255) DEFAULT '' NOT NULL,

@@ -413,7 +413,7 @@ class EventRepository extends Repository
      *   ...
      * ]
      */
-    public function getYearlyStatistics(int $stationUid = 0): array
+    public function getYearlyStatistics(int $stationUid = 0, int $maxYears = 0): array
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
@@ -422,7 +422,11 @@ class EventRepository extends Repository
 
         $queryBuilder
             ->select('cat.uid AS cat_uid', 'cat.title AS cat_title', 'cat.color AS cat_color')
-            ->addSelectLiteral('YEAR(e.start) AS year', 'COUNT(DISTINCT e.uid) AS cnt')
+            ->addSelectLiteral(
+                'YEAR(e.start) AS year',
+                'COUNT(DISTINCT e.uid) AS cnt',
+                'ROUND(AVG(TIMESTAMPDIFF(SECOND, e.start, e.end))) AS avg_dur_sec'
+            )
             ->from('tx_rescuereports_domain_model_event', 'e')
             ->leftJoin('e', 'tx_rescuereports_event_type_mm', 'tmm', 'e.uid = tmm.uid_local')
             ->leftJoin('tmm', 'tx_rescuereports_domain_model_type', 't', 'tmm.uid_foreign = t.uid')
@@ -459,24 +463,200 @@ class EventRepository extends Repository
                 'uid'   => (int)$row['cat_uid'],
                 'title' => (string)($row['cat_title'] ?: '– ohne Kategorie –'),
                 'color' => (string)($row['cat_color'] ?: '#95a5a6'),
-                'count' => (int)$row['cnt'],
+                'count'       => (int)$row['cnt'],
+                'avg_dur_sec' => isset($row['avg_dur_sec']) && $row['avg_dur_sec'] !== null ? (int)$row['avg_dur_sec'] : null,
             ];
         }
 
-        // Gesamtzahl + Prozentwerte berechnen
+        // Gesamtzahl + Prozentwerte + SVG-Tortendiagramm berechnen
         $statistics = [];
         foreach ($raw as $year => $categories) {
             $total = array_sum(array_column($categories, 'count'));
             foreach ($categories as &$cat) {
-                $cat['percent'] = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
+                $cat['percent']     = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
+                $cat['avgDuration'] = $this->formatDurationSeconds($cat['avg_dur_sec'] ?? null);
             }
             unset($cat);
+
+            // SVG-Pfade für Tortendiagramm (Kreis 220×220, Mittelpunkt 110/110, Radius 100)
+            $svgPaths = [];
+            $cx = 110; $cy = 110; $r = 100;
+            if (count($categories) === 1) {
+                // Einzelkategorie: Vollkreis
+                $svgPaths[] = [
+                    'type'    => 'circle',
+                    'color'   => $categories[0]['color'],
+                    'title'   => $categories[0]['title'],
+                    'count'   => $categories[0]['count'],
+                    'percent' => $categories[0]['percent'],
+                ];
+            } else {
+                $startAngle = -M_PI / 2; // Start bei 12 Uhr
+                foreach ($categories as $cat) {
+                    $sliceAngle = $total > 0 ? ($cat['count'] / $total * 2 * M_PI) : 0;
+                    $endAngle   = $startAngle + $sliceAngle;
+                    $x1 = round($cx + $r * cos($startAngle), 3);
+                    $y1 = round($cy + $r * sin($startAngle), 3);
+                    $x2 = round($cx + $r * cos($endAngle), 3);
+                    $y2 = round($cy + $r * sin($endAngle), 3);
+                    $largeArc   = $sliceAngle > M_PI ? 1 : 0;
+                    $svgPaths[] = [
+                        'type'    => 'path',
+                        'color'   => $cat['color'],
+                        'd'       => 'M ' . $cx . ' ' . $cy . ' L ' . $x1 . ' ' . $y1
+                                     . ' A ' . $r . ' ' . $r . ' 0 ' . $largeArc . ' 1 ' . $x2 . ' ' . $y2 . ' Z',
+                        'title'   => $cat['title'],
+                        'count'   => $cat['count'],
+                        'percent' => $cat['percent'],
+                    ];
+                    $startAngle = $endAngle;
+                }
+            }
+
             $statistics[$year] = [
-                'total'      => $total,
-                'categories' => $categories,
+                'total'             => $total,
+                'categories'        => $categories,
+                'svgPaths'          => $svgPaths,
             ];
         }
 
+        // Gesamtdauer pro Jahr separat berechnen (kein Type-JOIN → kein double-counting)
+        $yearlyTotals = $this->getYearlyTotalDurations($stationUid);
+        foreach ($yearlyTotals as $year => $totalSec) {
+            if (isset($statistics[$year])) {
+                $statistics[$year]['yearTotalDuration'] = $this->formatDurationSeconds($totalSec);
+            }
+        }
+
+        // Vorjahresvergleich berechnen
+        foreach (array_keys($statistics) as $year) {
+            $prevYear = $year - 1;
+            if (!isset($statistics[$prevYear])) {
+                continue;
+            }
+            $current  = $statistics[$year]['total'];
+            $previous = $statistics[$prevYear]['total'];
+            if ($previous <= 0) {
+                continue;
+            }
+            $diff    = $current - $previous;
+            $percent = round(abs($diff) / $previous * 100, 1);
+            $percentFormatted = str_replace('.', ',', (string)$percent);
+            if ($diff > 0) {
+                $label = sprintf('+%s %% mehr als %d (%d Einsätze)', $percentFormatted, $prevYear, $previous);
+            } elseif ($diff < 0) {
+                $label = sprintf('−%s %% weniger als %d (%d Einsätze)', $percentFormatted, $prevYear, $previous);
+            } else {
+                $label = sprintf('gleich viele Einsätze wie %d', $prevYear);
+            }
+            $statistics[$year]['yearCompare'] = $label;
+        }
+
+        // Auf die gewünschte Anzahl Jahre begrenzen (nach Vorjahresvergleich, damit die Anzeige korrekt ist)
+        if ($maxYears > 0) {
+            $statistics = array_slice($statistics, 0, $maxYears, true);
+        }
+
         return $statistics;
+    }
+
+    /**
+     * Liefert die Summe der Einsatzdauern (in Sekunden) je Jahr.
+     * Kein JOIN auf die Typ-MM-Tabelle, damit Events mit mehreren Typen nicht mehrfach gezählt werden.
+     *
+     * @return array<int, int>  [$year => $totalSeconds]
+     */
+    private function getYearlyTotalDurations(int $stationUid = 0): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $queryBuilder
+            ->addSelectLiteral(
+                'YEAR(e.start) AS year',
+                'SUM(TIMESTAMPDIFF(SECOND, e.start, e.end)) AS total_sec'
+            )
+            ->from('tx_rescuereports_domain_model_event', 'e')
+            ->where(
+                $queryBuilder->expr()->eq('e.deleted', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('e.hidden', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->isNotNull('e.start'),
+                $queryBuilder->expr()->isNotNull('e.end')
+            );
+
+        if ($stationUid > 0) {
+            $queryBuilder
+                ->innerJoin('e', 'tx_rescuereports_event_station_mm', 'smm', 'e.uid = smm.uid_local')
+                ->andWhere(
+                    $queryBuilder->expr()->eq('smm.uid_foreign', $queryBuilder->createNamedParameter($stationUid, PDO::PARAM_INT))
+                );
+        }
+
+        $rows = $queryBuilder
+            ->groupBy('year')
+            ->orderBy('year', 'DESC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $year = (int)$row['year'];
+            $result[$year] = $row['total_sec'] !== null ? (int)$row['total_sec'] : null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Liefert alle Jahre (absteigend), in denen Einsätze vorhanden sind.
+     * Optional gefiltert nach Ortsfeuerwehr.
+     *
+     * @return int[]
+     */
+    public function getAvailableYears(int $stationUid = 0): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $queryBuilder
+            ->addSelectLiteral('YEAR(e.start) AS year')
+            ->from('tx_rescuereports_domain_model_event', 'e')
+            ->where(
+                $queryBuilder->expr()->eq('e.deleted', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('e.hidden', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->isNotNull('e.start')
+            );
+
+        if ($stationUid > 0) {
+            $queryBuilder
+                ->innerJoin('e', 'tx_rescuereports_event_station_mm', 'smm', 'e.uid = smm.uid_local')
+                ->andWhere(
+                    $queryBuilder->expr()->eq('smm.uid_foreign', $queryBuilder->createNamedParameter($stationUid, PDO::PARAM_INT))
+                );
+        }
+
+        $rows = $queryBuilder
+            ->groupBy('year')
+            ->orderBy('year', 'DESC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        return array_map(static fn(array $row): int => (int)$row['year'], $rows);
+    }
+
+    private function formatDurationSeconds(?int $seconds): string
+    {
+        if ($seconds === null || $seconds <= 0) {
+            return '—';
+        }
+        $hours   = (int)($seconds / 3600);
+        $minutes = (int)(($seconds % 3600) / 60);
+        return $hours > 0
+            ? sprintf('%d Std. %02d Min.', $hours, $minutes)
+            : sprintf('%d Min.', $minutes);
     }
 }
