@@ -16,6 +16,18 @@ plugin.tx_rescuereports_eventlist {
 }
 page.includeCSS.rescueReports = EXT:rescue_reports/Resources/Public/Css/rescue_reports.css
 
+# Leaflet.js (OpenStreetMap-Karte)
+page.includeCSS.leaflet = https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css
+page.includeCSS.leaflet.external = 1
+page.includeCSS.leaflet.disableCompression = 1
+page.includeCSS.leaflet.excludeFromConcatenation = 1
+page.includeJSFooter.leaflet = https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js
+page.includeJSFooter.leaflet.external = 1
+page.includeJSFooter.leaflet.disableCompression = 1
+page.includeJSFooter.leaflet.excludeFromConcatenation = 1
+page.includeJSFooter.rescueReportsMap = EXT:rescue_reports/Resources/Public/Js/map.js
+page.includeJSFooter.rescueReportsMap.excludeFromConcatenation = 1
+
 plugin.tx_rescuereports_rss {
     view {
         templateRootPaths.0 = EXT:rescue_reports/Resources/Private/Templates/

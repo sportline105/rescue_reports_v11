@@ -158,6 +158,15 @@
                                         {event.location}
                                     </p>
 
+                                    <f:if condition="{event.latitude} && {event.longitude}">
+                                        <div id="rr-event-map"
+                                             data-lat="{event.latitude}"
+                                             data-lon="{event.longitude}"
+                                             data-title="{event.title}"
+                                             class="mb-2 rounded overflow-hidden"
+                                             style="height:220px;"></div>
+                                    </f:if>
+
                                     <p class="mb-2">
                                         <strong>Einsatzbeginn:</strong><br>
                                         <f:format.date format="d.m.Y H:i">{event.start}</f:format.date> Uhr

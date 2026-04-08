@@ -8,6 +8,8 @@ CREATE TABLE tx_rescuereports_domain_model_event (
   start datetime DEFAULT NULL,
   end datetime DEFAULT NULL,
   location varchar(255) DEFAULT '' NOT NULL,
+  latitude decimal(10,8) DEFAULT NULL,
+  longitude decimal(11,8) DEFAULT NULL,
   disable_detail int(1) DEFAULT 0 NOT NULL,
   cars varchar(255) DEFAULT '' NOT NULL,
   vehicles TEXT NOT NULL,

@@ -113,6 +113,10 @@
                     </f:else>
                 </f:if>
 
+                <f:if condition="{showMapView}">
+                    <f:render partial="Map/EventList" arguments="{events: events, settings: settings}" />
+                </f:if>
+
                 <f:if condition="{enableSearch}">
                     <div class="card mb-1 border-0">
                         <div class="card-body">

@@ -13,6 +13,8 @@ class Event extends AbstractEntity
     protected ?\DateTime $end = null;
     protected string $number = '';
     protected string $location = '';
+    protected ?float $latitude = null;
+    protected ?float $longitude = null;
 
     /**
     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Nkfire\RescueReports\Domain\Model\Vehicle>
@@ -107,6 +109,31 @@ class Event extends AbstractEntity
     public function setLocation(string $location): void
     {
         $this->location = $location;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): void
+    {
+        $this->latitude = $latitude;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): void
+    {
+        $this->longitude = $longitude;
+    }
+
+    public function hasCoordinates(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
     }
 
     /** @return ObjectStorage<Vehicle> */

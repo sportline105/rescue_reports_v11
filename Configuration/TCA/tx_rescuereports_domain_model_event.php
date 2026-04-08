@@ -23,7 +23,7 @@ return [
     ],
     'types' => [
         '1' => [
-            'showitem' => 'hidden, title, --palette--;;times, number, types, location, disable_detail, description, slug, --div--;Eingesetzte Einheiten, stations, --div--;Fahrzeuge, vehicles, --div--;Bilder, images, --div--;Intern, internal_notes'
+            'showitem' => 'hidden, title, --palette--;;times, number, types, location, --palette--;;coordinates, disable_detail, description, slug, --div--;Eingesetzte Einheiten, stations, --div--;Fahrzeuge, vehicles, --div--;Bilder, images, --div--;Intern, internal_notes'
         ],
     ],
 
@@ -31,6 +31,10 @@ return [
         'times' => [
             'showitem' => 'start, end',
             'label' => 'Einsatzzeit',
+        ],
+        'coordinates' => [
+            'showitem' => 'latitude, longitude',
+            'label' => 'GPS-Koordinaten (optional)',
         ],
     ],
 
@@ -78,6 +82,26 @@ return [
         'location' => [
             'label' => 'Einsatzort',
             'config' => ['type' => 'input', 'eval' => 'trim', 'default' => "Stadt, Straße // BAB 9, Richtung ...",],
+        ],
+        'latitude' => [
+            'label' => 'Breitengrad (Latitude)',
+            'config' => [
+                'type'        => 'input',
+                'eval'        => 'trim',
+                'placeholder' => '51.12345678',
+                'size'        => 20,
+                'default'     => '',
+            ],
+        ],
+        'longitude' => [
+            'label' => 'Längengrad (Longitude)',
+            'config' => [
+                'type'        => 'input',
+                'eval'        => 'trim',
+                'placeholder' => '10.12345678',
+                'size'        => 20,
+                'default'     => '',
+            ],
         ],
         'number' => [
             'label' => 'Einsatznummer',
