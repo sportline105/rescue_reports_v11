@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<T3DataStructure>
+    <sheets>
+        <general>
+            <ROOT>
+                <TCEforms>
+                    <sheetTitle>RSS-Feed</sheetTitle>
+                </TCEforms>
+                <type>array</type>
+                <el>
+
+                    <settings.feedTitle>
+                        <TCEforms>
+                            <label>Feed-Titel (leer = Standard)</label>
+                            <config>
+                                <type>input</type>
+                                <eval>trim</eval>
+                                <placeholder>Einsatzberichte – Ortsfeuerwehr …</placeholder>
+                            </config>
+                        </TCEforms>
+                    </settings.feedTitle>
+
+                    <settings.station>
+                        <TCEforms>
+                            <label>Ortsfeuerwehr (Filter)</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingle</renderType>
+                                <itemsProcFunc>Nkfire\RescueReports\UserFunctions\FlexFormStationItems->addPrimaryStations</itemsProcFunc>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">– Alle Ortsfeuerwehren –</numIndex>
+                                        <numIndex index="1">0</numIndex>
+                                    </numIndex>
+                                </items>
+                                <minitems>0</minitems>
+                                <maxitems>1</maxitems>
+                                <size>1</size>
+                            </config>
+                        </TCEforms>
+                    </settings.station>
+
+                    <maxCount>
+                        <TCEforms>
+                            <label>Max. Anzahl Einträge</label>
+                            <config>
+                                <type>input</type>
+                                <eval>int</eval>
+                                <size>5</size>
+                                <default>20</default>
+                            </config>
+                        </TCEforms>
+                    </maxCount>
+
+                    <detailPageUid>
+                        <TCEforms>
+                            <label>Seite für Einsatz-Detailansicht</label>
+                            <config>
+                                <type>group</type>
+                                <internal_type>db</internal_type>
+                                <allowed>pages</allowed>
+                                <size>1</size>
+                                <minitems>0</minitems>
+                                <maxitems>1</maxitems>
+                            </config>
+                        </TCEforms>
+                    </detailPageUid>
+
+                </el>
+            </ROOT>
+        </general>
+    </sheets>
+</T3DataStructure>
