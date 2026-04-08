@@ -236,9 +236,13 @@ class EventController extends ActionController
      */
     public function statisticsAction(): ResponseInterface
     {
-        $stationUid      = (int)($this->settings['station'] ?? 0);
-        $statisticsYears = (int)($this->settings['statisticsYears'] ?? 0);
-        $statistics = $this->eventRepository->getYearlyStatistics($stationUid, $statisticsYears);
+        $stationUid       = (int)($this->settings['station'] ?? 0);
+        $statisticsYears  = (int)($this->settings['statisticsYears'] ?? 0);
+        $showMonthlyChart = (bool)($this->settings['showMonthlyChart'] ?? true);
+        $statistics       = $this->eventRepository->getYearlyStatistics($stationUid, $statisticsYears);
+        $monthlyStatistics = $showMonthlyChart
+            ? $this->eventRepository->getMonthlyStatistics($stationUid, $statisticsYears)
+            : [];
 
         $stationName = '';
         if ($stationUid > 0) {
@@ -269,12 +273,20 @@ class EventController extends ActionController
                 . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
                 . 'transform:scale(1.08);}'
             );
+            $pageRenderer->addCssInlineBlock(
+                'rescueStatisticsBar',
+                '.rescue-statistics__bar-chart{margin:2rem 0 1rem;}'
+                . '.rescue-statistics__bar-chart svg rect.bar{transition:opacity .15s;cursor:default;}'
+                . '.rescue-statistics__bar-chart svg rect.bar:hover{opacity:.8;}'
+            );
         }
 
         $this->view->assignMultiple([
-            'statistics'  => $statistics,
-            'stationName' => $stationName,
-            'stationUid'  => $stationUid,
+            'statistics'        => $statistics,
+            'monthlyStatistics' => $monthlyStatistics,
+            'showMonthlyChart'  => $showMonthlyChart,
+            'stationName'       => $stationName,
+            'stationUid'        => $stationUid,
         ]);
 
         return $this->htmlResponse();

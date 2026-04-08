@@ -561,6 +561,174 @@ class EventRepository extends Repository
     }
 
     /**
+     * Monatliche Einsatzzahlen für das Balkendiagramm (Mehrjahresvergleich).
+     *
+     * @return array{years:int[], monthCounts:array<int,array<int,int>>, maxCount:int, svgBarChart:array}
+     */
+    public function getMonthlyStatistics(int $stationUid = 0, int $maxYears = 0): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $queryBuilder
+            ->addSelectLiteral(
+                'YEAR(e.start) AS year',
+                'MONTH(e.start) AS month',
+                'COUNT(DISTINCT e.uid) AS cnt'
+            )
+            ->from('tx_rescuereports_domain_model_event', 'e')
+            ->where(
+                $queryBuilder->expr()->eq('e.deleted', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('e.hidden', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->isNotNull('e.start')
+            );
+
+        if ($stationUid > 0) {
+            $queryBuilder
+                ->innerJoin('e', 'tx_rescuereports_event_station_mm', 'smm', 'e.uid = smm.uid_local')
+                ->andWhere(
+                    $queryBuilder->expr()->eq('smm.uid_foreign', $queryBuilder->createNamedParameter($stationUid, PDO::PARAM_INT))
+                );
+        }
+
+        $rows = $queryBuilder
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'DESC')
+            ->addOrderBy('month', 'ASC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        // Rohdaten → [year => [month => count]]
+        $raw = [];
+        foreach ($rows as $row) {
+            $year  = (int)$row['year'];
+            $month = (int)$row['month'];
+            if (!isset($raw[$year])) {
+                $raw[$year] = [];
+            }
+            $raw[$year][$month] = (int)$row['cnt'];
+        }
+
+        if ($maxYears > 0) {
+            $raw = array_slice($raw, 0, $maxYears, true);
+        }
+
+        $years  = array_keys($raw);
+        $maxCnt = 0;
+        foreach ($raw as $months) {
+            if ($months) {
+                $maxCnt = max($maxCnt, max($months));
+            }
+        }
+
+        return [
+            'years'       => $years,
+            'monthCounts' => $raw,
+            'maxCount'    => $maxCnt,
+            'svgBarChart' => $this->buildMonthlyBarChartSvg($raw, $years, $maxCnt),
+        ];
+    }
+
+    /**
+     * Berechnet die SVG-Daten für das gruppierte Balkendiagramm (Monat × Jahr).
+     *
+     * @param array<int,array<int,int>> $raw    [year => [month => count]]
+     * @param int[]                     $years  Jahresliste (absteigende Reihenfolge)
+     * @param int                       $maxCnt Höchstwert über alle Monate/Jahre
+     * @return array
+     */
+    private function buildMonthlyBarChartSvg(array $raw, array $years, int $maxCnt): array
+    {
+        $W = 700; $H = 300;
+        $mL = 45; $mB = 55; $mT = 15; $mR = 15;
+        $plotW = $W - $mL - $mR;  // 640
+        $plotH = $H - $mB - $mT;  // 230
+
+        $yearColors = ['#3498db', '#e67e22', '#2ecc71', '#9b59b6', '#e74c3c', '#1abc9c', '#f39c12', '#34495e'];
+        $monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+        $nYears     = count($years);
+        $groupW     = $plotW / 12;
+        $barW       = $nYears > 0 ? max(3.0, ($groupW - 4) / $nYears - 1) : $groupW - 4;
+        $yScale     = $maxCnt > 0 ? $plotH / $maxCnt : 1.0;
+
+        // Gitterlinien (4–5 Stufen)
+        $step = $maxCnt > 0 ? (int)ceil($maxCnt / 5) : 1;
+        $gridLines = [];
+        for ($v = $step; $v <= $maxCnt; $v += $step) {
+            $y = round($mT + $plotH - $v * $yScale, 2);
+            $gridLines[] = [
+                'x1'     => $mL,
+                'y1'     => $y,
+                'x2'     => $mL + $plotW,
+                'y2'     => $y,
+                'label'  => $v,
+                'labelX' => $mL - 4,
+                'labelY' => $y + 4,
+            ];
+        }
+
+        // Balken
+        $bars = [];
+        foreach ($years as $yi => $year) {
+            $color = $yearColors[$yi % count($yearColors)];
+            for ($m = 1; $m <= 12; $m++) {
+                $cnt = $raw[$year][$m] ?? 0;
+                $bH  = round($cnt * $yScale, 2);
+                $x   = round($mL + ($m - 1) * $groupW + 2 + $yi * ($barW + 1), 2);
+                $y   = round($mT + $plotH - $bH, 2);
+                $bars[] = [
+                    'x'       => $x,
+                    'y'       => $y,
+                    'width'   => round($barW, 2),
+                    'height'  => max(0.5, $bH),
+                    'color'   => $color,
+                    'tooltip' => $monthNames[$m - 1] . ' ' . $year . ': ' . $cnt,
+                ];
+            }
+        }
+
+        // Monatsbeschriftungen
+        $monthLabels = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $monthLabels[] = [
+                'x'    => round($mL + ($m - 1) * $groupW + $groupW / 2, 2),
+                'y'    => $mT + $plotH + 14,
+                'text' => $monthNames[$m - 1],
+            ];
+        }
+
+        // Legende (zentriert unterhalb der Monatsnamen)
+        $legendTotalW = $nYears * 65;
+        $legendStartX = $mL + ($plotW - $legendTotalW) / 2;
+        $legend = [];
+        foreach ($years as $yi => $year) {
+            $lx = round($legendStartX + $yi * 65, 2);
+            $ly = $H - 14;
+            $legend[] = [
+                'rx'    => $lx,
+                'ry'    => $ly - 9,
+                'color' => $yearColors[$yi % count($yearColors)],
+                'tx'    => $lx + 13,
+                'ty'    => $ly,
+                'label' => (string)$year,
+            ];
+        }
+
+        return [
+            'viewBox'     => "0 0 $W $H",
+            'axisLeft'    => $mL,
+            'axisBottom'  => $mT + $plotH,
+            'axisRight'   => $mL + $plotW,
+            'gridLines'   => $gridLines,
+            'monthLabels' => $monthLabels,
+            'bars'        => $bars,
+            'legend'      => $legend,
+        ];
+    }
+
+    /**
      * Liefert die Summe der Einsatzdauern (in Sekunden) je Jahr.
      * Kein JOIN auf die Typ-MM-Tabelle, damit Events mit mehreren Typen nicht mehrfach gezählt werden.
      *
