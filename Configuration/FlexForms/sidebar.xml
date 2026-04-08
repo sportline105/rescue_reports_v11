@@ -40,7 +40,7 @@
                         </TCEforms>
                     </settings.defaultStation>
 
-                    <maxCount>
+                    <settings.maxCount>
                         <TCEforms>
                             <label>Anzahl der angezeigten Einsätze</label>
                             <config>
@@ -51,7 +51,7 @@
                                 <placeholder>5</placeholder>
                             </config>
                         </TCEforms>
-                    </maxCount>
+                    </settings.maxCount>
 
                     <settings.templateVariant>
                         <TCEforms>
@@ -74,7 +74,7 @@
                         </TCEforms>
                     </settings.templateVariant>
 
-                    <detailPageUid>
+                    <settings.detailPageUid>
                         <TCEforms>
                             <label>Seite für Einsatz-Detailansicht</label>
                             <config>
@@ -86,7 +86,7 @@
                                 <maxitems>1</maxitems>
                             </config>
                         </TCEforms>
-                    </detailPageUid>
+                    </settings.detailPageUid>
 
                     <settings.listPageUid>
                         <TCEforms>

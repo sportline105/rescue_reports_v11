@@ -58,7 +58,7 @@
                         </TCEforms>
                     </settings.defaultStation>
 
-                    <maxCount>
+                    <settings.maxCount>
                         <TCEforms>
                             <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:maxCount</label>
                             <config>
@@ -68,9 +68,9 @@
                                 <default>0</default>
                             </config>
                         </TCEforms>
-                    </maxCount>
+                    </settings.maxCount>
 
-                    <dateFrom>
+                    <settings.dateFrom>
                         <TCEforms>
                             <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:dateFrom</label>
                             <config>
@@ -79,9 +79,9 @@
                                 <eval>date</eval>
                             </config>
                         </TCEforms>
-                    </dateFrom>
+                    </settings.dateFrom>
 
-                    <dateTo>
+                    <settings.dateTo>
                         <TCEforms>
                             <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:dateTo</label>
                             <config>
@@ -90,9 +90,9 @@
                                 <eval>date</eval>
                             </config>
                         </TCEforms>
-                    </dateTo>
+                    </settings.dateTo>
 
-                    <enableSearch>
+                    <settings.enableSearch>
                         <TCEforms>
                             <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:enableSearch</label>
                             <config>
@@ -104,9 +104,9 @@
                                 </items>
                             </config>
                         </TCEforms>
-                    </enableSearch>
+                    </settings.enableSearch>
 
-                    <detailPageUid>
+                    <settings.detailPageUid>
                         <TCEforms>
                             <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:detailPageUid</label>
                             <config>
@@ -118,7 +118,7 @@
                                 <maxitems>1</maxitems>
                             </config>
                         </TCEforms>
-                    </detailPageUid>
+                    </settings.detailPageUid>
 
                     <settings.enableDateFilter>
                         <TCEforms>
