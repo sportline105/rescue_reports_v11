@@ -9,7 +9,7 @@
                 <type>array</type>
                 <el>
 
-                    <templateVariant>
+                    <settings.templateVariant>
                         <TCEforms>
                             <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:templateVariant</label>
                             <config>
@@ -36,7 +36,7 @@
                                 <default>standard</default>
                             </config>
                         </TCEforms>
-                    </templateVariant>
+                    </settings.templateVariant>
 
                     <settings.defaultStation>
                         <TCEforms>
