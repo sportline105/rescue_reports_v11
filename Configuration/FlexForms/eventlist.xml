@@ -199,6 +199,46 @@
                         </TCEforms>
                     </settings.statisticsPosition>
 
+                    <settings.showMapView>
+                        <TCEforms>
+                            <label>Kartenansicht anzeigen</label>
+                            <config>
+                                <type>check</type>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">Ja</numIndex>
+                                    </numIndex>
+                                </items>
+                                <default>0</default>
+                            </config>
+                        </TCEforms>
+                    </settings.showMapView>
+
+                    <settings.mapHeight>
+                        <TCEforms>
+                            <label>Kartenhöhe in Pixeln</label>
+                            <config>
+                                <type>input</type>
+                                <eval>int</eval>
+                                <size>6</size>
+                                <default>400</default>
+                                <placeholder>400</placeholder>
+                            </config>
+                        </TCEforms>
+                    </settings.mapHeight>
+
+                    <settings.mapZoom>
+                        <TCEforms>
+                            <label>Standard-Zoomstufe (1–19)</label>
+                            <config>
+                                <type>input</type>
+                                <eval>int</eval>
+                                <size>4</size>
+                                <default>11</default>
+                            </config>
+                        </TCEforms>
+                    </settings.mapZoom>
+
                 </el>
             </ROOT>
         </general>

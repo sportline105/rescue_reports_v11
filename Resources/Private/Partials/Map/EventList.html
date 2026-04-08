@@ -1,0 +1,14 @@
+<div id="rr-list-map"
+     data-zoom="{settings.mapZoom}"
+     class="mb-4 rounded overflow-hidden"
+     style="height:{settings.mapHeight}px;">
+    <f:for each="{events}" as="ev">
+        <f:if condition="{ev.latitude} && {ev.longitude}">
+            <span class="rr-map-event"
+                  data-lat="{ev.latitude}"
+                  data-lon="{ev.longitude}"
+                  data-title="{ev.title}"
+                  data-url="{f:uri.action(action: 'show', arguments: {event: ev}, pageUid: settings.detailPageUid, absolute: '1')}"></span>
+        </f:if>
+    </f:for>
+</div>

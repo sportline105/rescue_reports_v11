@@ -42,6 +42,22 @@
                         </TCEforms>
                     </settings.statisticsYears>
 
+                    <settings.showMonthlyChart>
+                        <TCEforms>
+                            <label>Monatsdiagramm anzeigen (Mehrjahresvergleich)</label>
+                            <config>
+                                <type>check</type>
+                                <default>1</default>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">Ja</numIndex>
+                                        <numIndex index="1">1</numIndex>
+                                    </numIndex>
+                                </items>
+                            </config>
+                        </TCEforms>
+                    </settings.showMonthlyChart>
+
                 </el>
             </ROOT>
         </general>
