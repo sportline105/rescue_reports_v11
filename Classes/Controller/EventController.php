@@ -199,6 +199,39 @@ class EventController extends ActionController
     }
 
     /**
+     * RSS 2.0-Feed der neuesten Einsätze, optional gefiltert nach Ortsfeuerwehr
+     */
+    public function rssAction(): ResponseInterface
+    {
+        $stationUid    = (int)($this->settings['station'] ?? 0);
+        $maxCount      = (int)($this->settings['maxCount'] ?? 20);
+        $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
+        $feedTitle     = trim((string)($this->settings['feedTitle'] ?? ''));
+
+        $events = $stationUid > 0
+            ? $this->eventRepository->findFilteredByStation($stationUid, null, null, $maxCount)
+            : $this->eventRepository->findFiltered(null, null, $maxCount);
+
+        $stationName = '';
+        if ($stationUid > 0) {
+            $station = $this->stationRepository->findByUid($stationUid);
+            if ($station) {
+                $stationName = $station->getName();
+            }
+        }
+
+        $this->view->assignMultiple([
+            'events'        => $events,
+            'stationName'   => $stationName,
+            'feedTitle'     => $feedTitle,
+            'detailPageUid' => $detailPageUid,
+        ]);
+
+        return $this->htmlResponse()
+            ->withHeader('Content-Type', 'application/rss+xml; charset=utf-8');
+    }
+
+    /**
      * Jahresstatistik nach Kategorie, optional gefiltert nach Ortsfeuerwehr
      */
     public function statisticsAction(): ResponseInterface

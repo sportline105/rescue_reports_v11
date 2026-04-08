@@ -15,3 +15,32 @@ plugin.tx_rescuereports_eventlist {
   }
 }
 page.includeCSS.rescueReports = EXT:rescue_reports/Resources/Public/Css/rescue_reports.css
+
+plugin.tx_rescuereports_rss {
+    view {
+        templateRootPaths.0 = EXT:rescue_reports/Resources/Private/Templates/
+        layoutRootPaths.0 = EXT:rescue_reports/Resources/Private/Layouts/
+        partialRootPaths.0 = EXT:rescue_reports/Resources/Private/Partials/
+    }
+    persistence < plugin.tx_rescuereports_eventlist.persistence
+}
+
+# RSS-Feed-Seitentyp: seite?type=100 liefert reines XML ohne HTML-Rahmen
+rescueReportsRss = PAGE
+rescueReportsRss {
+    typeNum = 100
+    config {
+        disableAllHeaderCode = 1
+        xhtml_cleaning = 0
+        admPanel = 0
+        additionalHeaders.10.header = Content-Type: application/rss+xml; charset=utf-8
+    }
+    10 = CONTENT
+    10 {
+        table = tt_content
+        select {
+            orderBy = sorting
+            where = colPos = 0
+        }
+    }
+}
