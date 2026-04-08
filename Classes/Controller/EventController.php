@@ -53,7 +53,11 @@ class EventController extends ActionController
         $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
         $enableYearFilter    = (bool)($this->settings['enableYearFilter'] ?? false);
         $enableDateFilter    = (bool)($this->settings['enableDateFilter'] ?? false);
-        $selectedYear        = (int)($year ?? 0);
+        // $year === null  → erster Aufruf (kein Submit) → aktuelles Jahr vorauswählen
+        // $year === '0'   → Nutzer hat explizit „Alle Jahre" gewählt → 0 behalten
+        $selectedYear = ($year === null && $enableYearFilter)
+            ? (int)date('Y')
+            : (int)($year ?? 0);
 
         // Request-Datumswerte überschreiben FlexForm-Einstellung wenn Datumsfilter aktiv
         if ($enableDateFilter) {
