@@ -609,6 +609,45 @@ class EventRepository extends Repository
         return $result;
     }
 
+    /**
+     * Liefert alle Jahre (absteigend), in denen Einsätze vorhanden sind.
+     * Optional gefiltert nach Ortsfeuerwehr.
+     *
+     * @return int[]
+     */
+    public function getAvailableYears(int $stationUid = 0): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $queryBuilder
+            ->addSelectLiteral('YEAR(e.start) AS year')
+            ->from('tx_rescuereports_domain_model_event', 'e')
+            ->where(
+                $queryBuilder->expr()->eq('e.deleted', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('e.hidden', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->isNotNull('e.start')
+            );
+
+        if ($stationUid > 0) {
+            $queryBuilder
+                ->innerJoin('e', 'tx_rescuereports_event_station_mm', 'smm', 'e.uid = smm.uid_local')
+                ->andWhere(
+                    $queryBuilder->expr()->eq('smm.uid_foreign', $queryBuilder->createNamedParameter($stationUid, PDO::PARAM_INT))
+                );
+        }
+
+        $rows = $queryBuilder
+            ->groupBy('year')
+            ->orderBy('year', 'DESC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        return array_map(static fn(array $row): int => (int)$row['year'], $rows);
+    }
+
     private function formatDurationSeconds(?int $seconds): string
     {
         if ($seconds === null || $seconds <= 0) {

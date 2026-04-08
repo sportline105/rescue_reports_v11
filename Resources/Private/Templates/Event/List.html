@@ -35,6 +35,7 @@
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Ortsfeuerwehr</label>
                     <f:form action="list" method="post">
+                        <f:form.hidden name="year" value="{selectedYear}" />
                         <div class="row g-2 align-items-stretch">
                             <div class="col-12 col-md-6">
                                 <f:form.select
@@ -49,6 +50,29 @@
                         </div>
                     </f:form>
                 </div>
+
+                <f:if condition="{enableYearFilter}">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Jahr</label>
+                        <f:form action="list" method="post">
+                            <f:form.hidden name="station" value="{activeStationUid}" />
+                            <div class="row g-2 align-items-stretch">
+                                <div class="col-12 col-md-6">
+                                    <f:form.select
+                                        name="year"
+                                        value="{selectedYear}"
+                                        class="form-select"
+                                        additionalAttributes="{onchange: 'this.form.submit()}">
+                                        <f:form.select.option value="0">Alle Jahre</f:form.select.option>
+                                        <f:for each="{availableYears}" as="y">
+                                            <f:form.select.option value="{y}">{y}</f:form.select.option>
+                                        </f:for>
+                                    </f:form.select>
+                                </div>
+                            </div>
+                        </f:form>
+                    </div>
+                </f:if>
 
                 <f:if condition="{showStatistics}">
                     <f:if condition="{statisticsPosition} == 'above'">
@@ -102,6 +126,21 @@
                                             class="form-select" />
                                     </div>
 
+                                    <f:if condition="{enableYearFilter}">
+                                        <div class="col-12 col-md-2">
+                                            <label class="form-label small">Jahr</label>
+                                            <f:form.select
+                                                name="year"
+                                                value="{selectedYear}"
+                                                class="form-select">
+                                                <f:form.select.option value="0">Alle</f:form.select.option>
+                                                <f:for each="{availableYears}" as="y">
+                                                    <f:form.select.option value="{y}">{y}</f:form.select.option>
+                                                </f:for>
+                                            </f:form.select>
+                                        </div>
+                                    </f:if>
+
                                     <div class="col-12 col-md-4">
                                         <label class="form-label small">Suchbegriff</label>
                                         <f:form.textfield
@@ -122,7 +161,7 @@
                                     <div class="col-12 col-md-2">
                                         <f:link.action
                                             action="list"
-                                            arguments="{searchWord: '', station: 0}"
+                                            arguments="{searchWord: '', station: 0, year: 0}"
                                             class="btn btn-outline-secondary w-100">
                                             Reset
                                         </f:link.action>
@@ -185,10 +224,30 @@
                 </f:if>
             </div>
 
+            <f:if condition="{enableYearFilter}">
+                <div class="row" style="padding-top:10px; padding-bottom:5px;">
+                    <div class="small-12 columns">
+                        <f:form action="list" method="post">
+                            <f:form.hidden name="station" value="{activeStationUid}" />
+                            <f:form.select
+                                name="year"
+                                value="{selectedYear}"
+                                additionalAttributes="{onchange: 'this.form.submit()'}">
+                                <f:form.select.option value="0">Alle Jahre</f:form.select.option>
+                                <f:for each="{availableYears}" as="y">
+                                    <f:form.select.option value="{y}">{y}</f:form.select.option>
+                                </f:for>
+                            </f:form.select>
+                        </f:form>
+                    </div>
+                </div>
+            </f:if>
+
             <f:if condition="{enableSearch}">
                 <div class="row" style="padding-top:10px;">
                     <div class="small-12 columns">
                         <f:form action="list" method="post">
+                            <f:form.hidden name="year" value="{selectedYear}" />
                             <div class="row collapse">
 
                                 <div class="small-6 columns">
@@ -209,7 +268,7 @@
                                 <div class="small-3 columns">
                                     <f:link.action
                                         action="list"
-                                        arguments="{searchWord: '', station: 0}"
+                                        arguments="{searchWord: '', station: 0, year: 0}"
                                         class="button postfix expand secondary">
                                         Filter zurücksetzen
                                     </f:link.action>

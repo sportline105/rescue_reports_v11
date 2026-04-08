@@ -36,7 +36,7 @@ class EventController extends ActionController
     /**
      * Liste aller Einsätze (mit optionalen FlexForm-Filtern)
      */
-    public function listAction(?string $searchWord = null, ?string $station = null): ResponseInterface
+    public function listAction(?string $searchWord = null, ?string $station = null, ?string $year = null): ResponseInterface
     {
         $maxCount = (int)($this->settings['maxCount'] ?? 0);
         $dateFromValue = $this->settings['dateFrom'] ?? null;
@@ -46,6 +46,8 @@ class EventController extends ActionController
         $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
         $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
         $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
+        $enableYearFilter    = (bool)($this->settings['enableYearFilter'] ?? false);
+        $selectedYear        = (int)($year ?? 0);
         $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
         $listPageUid   = $this->normalizeDetailPageUid($this->settings['listPageUid'] ?? null);
         $widgetTitle   = trim((string)($this->settings['widgetTitle'] ?? ''));
@@ -76,6 +78,16 @@ class EventController extends ActionController
 
         $dateFrom = $dateFromValue;
         $dateTo = $dateToValue;
+
+        // Jahresfilter überschreibt FlexForm-Datumsbereich wenn ein Jahr gewählt ist
+        if ($enableYearFilter && $selectedYear > 0) {
+            $dateFrom = $selectedYear . '-01-01';
+            $dateTo   = $selectedYear . '-12-31';
+        }
+
+        $availableYears = $enableYearFilter
+            ? $this->eventRepository->getAvailableYears($activeStationUid)
+            : [];
 
         if ($activeStationUid > 0) {
             if ($enableSearch && $searchWord !== '') {
@@ -152,6 +164,9 @@ class EventController extends ActionController
             'statisticsPosition'  => $statisticsPosition,
             'widgetTitle'         => $widgetTitle,
             'listPageUid'         => $listPageUid,
+            'enableYearFilter'    => $enableYearFilter,
+            'availableYears'      => $availableYears,
+            'selectedYear'        => $selectedYear,
         ]);
 
         return $this->htmlResponse();
