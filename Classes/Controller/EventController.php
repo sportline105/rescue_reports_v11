@@ -45,6 +45,7 @@ class EventController extends ActionController
         $templateVariant     = (string)($this->settings['templateVariant'] ?? 'standard');
         $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
         $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
+        $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
         $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
         $listPageUid   = $this->normalizeDetailPageUid($this->settings['listPageUid'] ?? null);
         $widgetTitle   = trim((string)($this->settings['widgetTitle'] ?? ''));
@@ -106,7 +107,7 @@ class EventController extends ActionController
 
         $statistics = [];
         if ($showStatistics && in_array($templateVariant, ['standard', 'newdesign'], true)) {
-            $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid);
+            $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid, $statisticsYears);
             if (!empty($statistics)) {
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
                 $pageRenderer->addCssInlineBlock(
@@ -161,8 +162,9 @@ class EventController extends ActionController
      */
     public function statisticsAction(): ResponseInterface
     {
-        $stationUid = (int)($this->settings['station'] ?? 0);
-        $statistics = $this->eventRepository->getYearlyStatistics($stationUid);
+        $stationUid      = (int)($this->settings['station'] ?? 0);
+        $statisticsYears = (int)($this->settings['statisticsYears'] ?? 0);
+        $statistics = $this->eventRepository->getYearlyStatistics($stationUid, $statisticsYears);
 
         $stationName = '';
         if ($stationUid > 0) {

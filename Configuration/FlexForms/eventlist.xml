@@ -120,6 +120,19 @@
                         </TCEforms>
                     </detailPageUid>
 
+                    <settings.statisticsYears>
+                        <TCEforms>
+                            <label>Statistik: Anzahl angezeigter Jahre (0 = alle)</label>
+                            <config>
+                                <type>input</type>
+                                <eval>int</eval>
+                                <size>5</size>
+                                <default>0</default>
+                                <placeholder>0 = alle Jahre</placeholder>
+                            </config>
+                        </TCEforms>
+                    </settings.statisticsYears>
+
                     <settings.showStatistics>
                         <TCEforms>
                             <label>Statistik anzeigen</label>

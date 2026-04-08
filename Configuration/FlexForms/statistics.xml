@@ -29,6 +29,19 @@
                         </TCEforms>
                     </settings.station>
 
+                    <settings.statisticsYears>
+                        <TCEforms>
+                            <label>Anzahl angezeigter Jahre (0 = alle)</label>
+                            <config>
+                                <type>input</type>
+                                <eval>int</eval>
+                                <size>5</size>
+                                <default>0</default>
+                                <placeholder>0 = alle Jahre</placeholder>
+                            </config>
+                        </TCEforms>
+                    </settings.statisticsYears>
+
                 </el>
             </ROOT>
         </general>

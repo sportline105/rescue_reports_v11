@@ -413,7 +413,7 @@ class EventRepository extends Repository
      *   ...
      * ]
      */
-    public function getYearlyStatistics(int $stationUid = 0): array
+    public function getYearlyStatistics(int $stationUid = 0, int $maxYears = 0): array
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
@@ -550,6 +550,11 @@ class EventRepository extends Repository
                 $label = sprintf('gleich viele Einsätze wie %d', $prevYear);
             }
             $statistics[$year]['yearCompare'] = $label;
+        }
+
+        // Auf die gewünschte Anzahl Jahre begrenzen (nach Vorjahresvergleich, damit die Anzeige korrekt ist)
+        if ($maxYears > 0) {
+            $statistics = array_slice($statistics, 0, $maxYears, true);
         }
 
         return $statistics;
