@@ -87,10 +87,9 @@ return [
             'label' => 'Breitengrad (Latitude)',
             'config' => [
                 'type' => 'input',
-                'eval' => 'trim',
+                'eval' => 'trim,null',
                 'placeholder' => '51.12345678',
                 'size' => 20,
-                'nullable' => true,
                 'default' => null,
             ],
         ],
@@ -98,10 +97,9 @@ return [
             'label' => 'Längengrad (Longitude)',
             'config' => [
                 'type' => 'input',
-                'eval' => 'trim',
+                'eval' => 'trim,null',
                 'placeholder' => '10.12345678',
                 'size' => 20,
-                'nullable' => true,
                 'default' => null,
             ],
         ],
