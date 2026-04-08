@@ -36,6 +36,8 @@
                     <label class="form-label fw-semibold">Ortsfeuerwehr</label>
                     <f:form action="list" method="post">
                         <f:form.hidden name="year" value="{selectedYear}" />
+                        <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                        <f:form.hidden name="dateTo" value="{dateToStr}" />
                         <div class="row g-2 align-items-stretch">
                             <div class="col-12 col-md-6">
                                 <f:form.select
@@ -56,6 +58,8 @@
                         <label class="form-label fw-semibold">Jahr</label>
                         <f:form action="list" method="post">
                             <f:form.hidden name="station" value="{activeStationUid}" />
+                            <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                            <f:form.hidden name="dateTo" value="{dateToStr}" />
                             <div class="row g-2 align-items-stretch">
                                 <div class="col-12 col-md-6">
                                     <f:form.select
@@ -138,6 +142,25 @@
                                                     <f:form.select.option value="{y}">{y}</f:form.select.option>
                                                 </f:for>
                                             </f:form.select>
+                                        </div>
+                                    </f:if>
+
+                                    <f:if condition="{enableDateFilter}">
+                                        <div class="col-12 col-md-2">
+                                            <label class="form-label small">Von</label>
+                                            <f:form.textfield
+                                                name="dateFrom"
+                                                type="date"
+                                                value="{dateFromStr}"
+                                                class="form-control" />
+                                        </div>
+                                        <div class="col-12 col-md-2">
+                                            <label class="form-label small">Bis</label>
+                                            <f:form.textfield
+                                                name="dateTo"
+                                                type="date"
+                                                value="{dateToStr}"
+                                                class="form-control" />
                                         </div>
                                     </f:if>
 
@@ -229,6 +252,8 @@
                     <div class="small-12 columns">
                         <f:form action="list" method="post">
                             <f:form.hidden name="station" value="{activeStationUid}" />
+                            <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                            <f:form.hidden name="dateTo" value="{dateToStr}" />
                             <f:form.select
                                 name="year"
                                 value="{selectedYear}"
@@ -250,7 +275,24 @@
                             <f:form.hidden name="year" value="{selectedYear}" />
                             <div class="row collapse">
 
-                                <div class="small-6 columns">
+                                <f:if condition="{enableDateFilter}">
+                                    <div class="small-3 columns">
+                                        <f:form.textfield
+                                            name="dateFrom"
+                                            type="date"
+                                            value="{dateFromStr}"
+                                            placeholder="Von" />
+                                    </div>
+                                    <div class="small-3 columns">
+                                        <f:form.textfield
+                                            name="dateTo"
+                                            type="date"
+                                            value="{dateToStr}"
+                                            placeholder="Bis" />
+                                    </div>
+                                </f:if>
+
+                                <div class="small-4 columns">
                                     <f:form.textfield
                                         name="searchWord"
                                         id="searchWord"
@@ -259,18 +301,18 @@
                                         placeholder="Suchbegriff eingeben…" />
                                 </div>
 
-                                <div class="small-3 columns">
+                                <div class="small-2 columns">
                                     <button type="submit" class="button postfix expand">
                                         Suchen
                                     </button>
                                 </div>
 
-                                <div class="small-3 columns">
+                                <div class="small-2 columns">
                                     <f:link.action
                                         action="list"
-                                        arguments="{searchWord: '', station: 0, year: 0}"
+                                        arguments="{searchWord: '', station: 0, year: 0, dateFrom: '', dateTo: ''}"
                                         class="button postfix expand secondary">
-                                        Filter zurücksetzen
+                                        Reset
                                     </f:link.action>
                                 </div>
                             </div>

@@ -36,18 +36,41 @@ class EventController extends ActionController
     /**
      * Liste aller Einsätze (mit optionalen FlexForm-Filtern)
      */
-    public function listAction(?string $searchWord = null, ?string $station = null, ?string $year = null): ResponseInterface
-    {
+    public function listAction(
+        ?string $searchWord = null,
+        ?string $station = null,
+        ?string $year = null,
+        ?string $dateFrom = null,
+        ?string $dateTo = null
+    ): ResponseInterface {
         $maxCount = (int)($this->settings['maxCount'] ?? 0);
         $dateFromValue = $this->settings['dateFrom'] ?? null;
-        $dateToValue = $this->settings['dateTo'] ?? null;
+        $dateToValue   = $this->settings['dateTo'] ?? null;
         $enableSearch = (bool)($this->settings['enableSearch'] ?? false);
         $templateVariant     = (string)($this->settings['templateVariant'] ?? 'standard');
         $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
         $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
         $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
         $enableYearFilter    = (bool)($this->settings['enableYearFilter'] ?? false);
+        $enableDateFilter    = (bool)($this->settings['enableDateFilter'] ?? false);
         $selectedYear        = (int)($year ?? 0);
+
+        // Request-Datumswerte überschreiben FlexForm-Einstellung wenn Datumsfilter aktiv
+        if ($enableDateFilter) {
+            if ($dateFrom !== null && $dateFrom !== '') {
+                $dateFromValue = $dateFrom;
+            }
+            if ($dateTo !== null && $dateTo !== '') {
+                $dateToValue = $dateTo;
+            }
+        }
+
+        // DateTime-Objekte + HTML-Input-Strings (YYYY-MM-DD) für das Template
+        $dateFromDt  = $this->createDateTimeFromFlexFormValue($dateFromValue);
+        $dateToDt    = $this->createDateTimeFromFlexFormValue($dateToValue);
+        $dateFromStr = $dateFromDt instanceof \DateTime ? $dateFromDt->format('Y-m-d') : '';
+        $dateToStr   = $dateToDt instanceof \DateTime   ? $dateToDt->format('Y-m-d')   : '';
+
         $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
         $listPageUid   = $this->normalizeDetailPageUid($this->settings['listPageUid'] ?? null);
         $widgetTitle   = trim((string)($this->settings['widgetTitle'] ?? ''));
@@ -152,8 +175,11 @@ class EventController extends ActionController
             'searchWord' => $searchWord,
             'enableSearch' => $enableSearch,
             'maxCount' => $maxCount,
-            'dateFrom' => $this->createDateTimeFromFlexFormValue($dateFromValue),
-            'dateTo' => $this->createDateTimeFromFlexFormValue($dateToValue),
+            'dateFrom' => $dateFromDt,
+            'dateTo'   => $dateToDt,
+            'dateFromStr'         => $dateFromStr,
+            'dateToStr'           => $dateToStr,
+            'enableDateFilter'    => $enableDateFilter,
             'templateVariant' => $templateVariant,
             'detailPageUid' => $detailPageUid,
             'defaultStationUid'   => $defaultStationUid,
