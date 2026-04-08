@@ -86,21 +86,23 @@ return [
         'latitude' => [
             'label' => 'Breitengrad (Latitude)',
             'config' => [
-                'type'        => 'input',
-                'eval'        => 'trim',
+                'type' => 'input',
+                'eval' => 'trim',
                 'placeholder' => '51.12345678',
-                'size'        => 20,
-                'default'     => '',
+                'size' => 20,
+                'nullable' => true,
+                'default' => null,
             ],
         ],
         'longitude' => [
             'label' => 'Längengrad (Longitude)',
             'config' => [
-                'type'        => 'input',
-                'eval'        => 'trim',
+                'type' => 'input',
+                'eval' => 'trim',
                 'placeholder' => '10.12345678',
-                'size'        => 20,
-                'default'     => '',
+                'size' => 20,
+                'nullable' => true,
+                'default' => null,
             ],
         ],
         'number' => [
