@@ -528,6 +528,30 @@ class EventRepository extends Repository
             }
         }
 
+        // Vorjahresvergleich berechnen
+        foreach (array_keys($statistics) as $year) {
+            $prevYear = $year - 1;
+            if (!isset($statistics[$prevYear])) {
+                continue;
+            }
+            $current  = $statistics[$year]['total'];
+            $previous = $statistics[$prevYear]['total'];
+            if ($previous <= 0) {
+                continue;
+            }
+            $diff    = $current - $previous;
+            $percent = round(abs($diff) / $previous * 100, 1);
+            $percentFormatted = str_replace('.', ',', (string)$percent);
+            if ($diff > 0) {
+                $label = sprintf('+%s %% mehr als %d (%d Einsätze)', $percentFormatted, $prevYear, $previous);
+            } elseif ($diff < 0) {
+                $label = sprintf('−%s %% weniger als %d (%d Einsätze)', $percentFormatted, $prevYear, $previous);
+            } else {
+                $label = sprintf('gleich viele Einsätze wie %d', $prevYear);
+            }
+            $statistics[$year]['yearCompare'] = $label;
+        }
+
         return $statistics;
     }
 

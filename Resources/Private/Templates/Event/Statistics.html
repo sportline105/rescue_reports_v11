@@ -77,6 +77,9 @@
                         </div>
 
                     </div>
+                    <f:if condition="{yearData.yearCompare}">
+                        <p class="rescue-statistics__compare">Im Vergleich zum Vorjahr: {yearData.yearCompare}</p>
+                    </f:if>
                 </div>
             </f:for>
         </f:then>
@@ -98,6 +101,7 @@
 .rescue-statistics__dot         { display:inline-block; width:14px; height:14px; border-radius:50%; }
 .rescue-statistics__total       { font-size:.85em; font-weight:normal; color:#666; margin-left:.5rem; }
 .rescue-statistics__year-title  { margin-bottom:.25rem; }
+.rescue-statistics__compare     { font-size:.85em; color:#666; margin-top:.5rem; }
 </style>
 
 </f:section>

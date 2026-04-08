@@ -65,6 +65,9 @@
                             </table>
                         </div>
                     </div>
+                    <f:if condition="{yearData.yearCompare}">
+                        <p class="rescue-statistics__compare">Im Vergleich zum Vorjahr: {yearData.yearCompare}</p>
+                    </f:if>
                 </div>
             </f:for>
         </f:then>

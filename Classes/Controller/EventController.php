@@ -120,6 +120,7 @@ class EventController extends ActionController
                     . '.rescue-statistics__dot{display:inline-block;width:14px;height:14px;border-radius:50%;}'
                     . '.rescue-statistics__total{font-size:.85em;font-weight:normal;color:#666;margin-left:.5rem;}'
                     . '.rescue-statistics__year-title{margin-bottom:.25rem;}'
+                    . '.rescue-statistics__compare{font-size:.85em;color:#666;margin-top:.5rem;}'
                 );
                 $pageRenderer->addCssInlineBlock(
                     'rescueStatisticsPie',
