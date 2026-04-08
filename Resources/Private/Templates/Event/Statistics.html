@@ -15,6 +15,9 @@
                     <h3 class="rescue-statistics__year-title">
                         {year}
                         <span class="rescue-statistics__total">({yearData.total} Einsätze gesamt)</span>
+                        <f:if condition="{yearData.yearTotalDuration}">
+                            <span class="rescue-statistics__total">— Gesamtdauer: {yearData.yearTotalDuration}</span>
+                        </f:if>
                     </h3>
 
                     <div class="rescue-statistics__layout">

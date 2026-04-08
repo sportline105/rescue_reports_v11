@@ -514,13 +514,70 @@ class EventRepository extends Repository
             }
 
             $statistics[$year] = [
-                'total'      => $total,
-                'categories' => $categories,
-                'svgPaths'   => $svgPaths,
+                'total'             => $total,
+                'categories'        => $categories,
+                'svgPaths'          => $svgPaths,
             ];
         }
 
+        // Gesamtdauer pro Jahr separat berechnen (kein Type-JOIN → kein double-counting)
+        $yearlyTotals = $this->getYearlyTotalDurations($stationUid);
+        foreach ($yearlyTotals as $year => $totalSec) {
+            if (isset($statistics[$year])) {
+                $statistics[$year]['yearTotalDuration'] = $this->formatDurationSeconds($totalSec);
+            }
+        }
+
         return $statistics;
+    }
+
+    /**
+     * Liefert die Summe der Einsatzdauern (in Sekunden) je Jahr.
+     * Kein JOIN auf die Typ-MM-Tabelle, damit Events mit mehreren Typen nicht mehrfach gezählt werden.
+     *
+     * @return array<int, int>  [$year => $totalSeconds]
+     */
+    private function getYearlyTotalDurations(int $stationUid = 0): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
+
+        $queryBuilder->getRestrictions()->removeAll();
+
+        $queryBuilder
+            ->addSelectLiteral(
+                'YEAR(e.start) AS year',
+                'SUM(TIMESTAMPDIFF(SECOND, e.start, e.end)) AS total_sec'
+            )
+            ->from('tx_rescuereports_domain_model_event', 'e')
+            ->where(
+                $queryBuilder->expr()->eq('e.deleted', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('e.hidden', $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)),
+                $queryBuilder->expr()->isNotNull('e.start'),
+                $queryBuilder->expr()->isNotNull('e.end')
+            );
+
+        if ($stationUid > 0) {
+            $queryBuilder
+                ->innerJoin('e', 'tx_rescuereports_event_station_mm', 'smm', 'e.uid = smm.uid_local')
+                ->andWhere(
+                    $queryBuilder->expr()->eq('smm.uid_foreign', $queryBuilder->createNamedParameter($stationUid, PDO::PARAM_INT))
+                );
+        }
+
+        $rows = $queryBuilder
+            ->groupBy('year')
+            ->orderBy('year', 'DESC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $year = (int)$row['year'];
+            $result[$year] = $row['total_sec'] !== null ? (int)$row['total_sec'] : null;
+        }
+
+        return $result;
     }
 
     private function formatDurationSeconds(?int $seconds): string
