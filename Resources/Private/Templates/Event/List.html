@@ -9,9 +9,20 @@
              Keine Filter-Info, kein Suchformular
         ========================================================== -->
         <f:case value="sidebar">
-            <h1 class="element-header">Letzte Einsätze</h1>
+            <h1 class="element-header">
+                <f:if condition="{widgetTitle}">
+                    <f:then>{widgetTitle}</f:then>
+                    <f:else>Letzte Einsätze</f:else>
+                </f:if>
+            </h1>
 
             <f:render section="EventListContentSidebar" arguments="{_all}" />
+
+            <f:if condition="{listPageUid}">
+                <div class="einsaetze__more">
+                    <f:link.page pageUid="{listPageUid}" class="einsaetze__more-link">Alle Einsätze anzeigen ›</f:link.page>
+                </div>
+            </f:if>
         </f:case>
 
         <!-- =========================================================
@@ -132,8 +143,18 @@
         ========================================================== -->
         <f:case value="newdesignsidebar">
             <div class="rescue-reports rescue-reports--newdesignsidebar">
-                <h1 class="element-header">Letzte Einsätze</h1>
+                <h1 class="element-header">
+                    <f:if condition="{widgetTitle}">
+                        <f:then>{widgetTitle}</f:then>
+                        <f:else>Letzte Einsätze</f:else>
+                    </f:if>
+                </h1>
                 <f:render section="EventListContentSidebarNewDesign" arguments="{_all}" />
+                <f:if condition="{listPageUid}">
+                    <div class="einsaetze__more">
+                        <f:link.page pageUid="{listPageUid}" class="einsaetze__more-link">Alle Einsätze anzeigen ›</f:link.page>
+                    </div>
+                </f:if>
             </div>
         </f:case>
 

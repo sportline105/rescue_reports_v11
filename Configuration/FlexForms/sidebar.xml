@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<T3DataStructure>
+    <sheets>
+        <general>
+            <ROOT>
+                <TCEforms>
+                    <sheetTitle>Sidebar-Widget</sheetTitle>
+                </TCEforms>
+                <type>array</type>
+                <el>
+
+                    <settings.widgetTitle>
+                        <TCEforms>
+                            <label>Widget-Überschrift</label>
+                            <config>
+                                <type>input</type>
+                                <eval>trim</eval>
+                                <placeholder>Letzte Einsätze</placeholder>
+                            </config>
+                        </TCEforms>
+                    </settings.widgetTitle>
+
+                    <settings.defaultStation>
+                        <TCEforms>
+                            <label>Standard-Ortsfeuerwehr</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingle</renderType>
+                                <itemsProcFunc>Nkfire\RescueReports\UserFunctions\FlexFormStationItems->addPrimaryStations</itemsProcFunc>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">-- alle Ortsfeuerwehren --</numIndex>
+                                        <numIndex index="1">0</numIndex>
+                                    </numIndex>
+                                </items>
+                                <minitems>0</minitems>
+                                <maxitems>1</maxitems>
+                                <size>1</size>
+                            </config>
+                        </TCEforms>
+                    </settings.defaultStation>
+
+                    <maxCount>
+                        <TCEforms>
+                            <label>Anzahl der angezeigten Einsätze</label>
+                            <config>
+                                <type>input</type>
+                                <eval>int</eval>
+                                <size>5</size>
+                                <default>5</default>
+                                <placeholder>5</placeholder>
+                            </config>
+                        </TCEforms>
+                    </maxCount>
+
+                    <templateVariant>
+                        <TCEforms>
+                            <label>Design</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingle</renderType>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">NewDesign (Bootstrap)</numIndex>
+                                        <numIndex index="1">newdesignsidebar</numIndex>
+                                    </numIndex>
+                                    <numIndex index="1">
+                                        <numIndex index="0">Standard</numIndex>
+                                        <numIndex index="1">sidebar</numIndex>
+                                    </numIndex>
+                                </items>
+                                <default>newdesignsidebar</default>
+                            </config>
+                        </TCEforms>
+                    </templateVariant>
+
+                    <detailPageUid>
+                        <TCEforms>
+                            <label>Seite für Einsatz-Detailansicht</label>
+                            <config>
+                                <type>group</type>
+                                <internal_type>db</internal_type>
+                                <allowed>pages</allowed>
+                                <size>1</size>
+                                <minitems>0</minitems>
+                                <maxitems>1</maxitems>
+                            </config>
+                        </TCEforms>
+                    </detailPageUid>
+
+                    <settings.listPageUid>
+                        <TCEforms>
+                            <label>Seite der vollständigen Einsatzliste (für „Alle Einsätze"-Link)</label>
+                            <config>
+                                <type>group</type>
+                                <internal_type>db</internal_type>
+                                <allowed>pages</allowed>
+                                <size>1</size>
+                                <minitems>0</minitems>
+                                <maxitems>1</maxitems>
+                            </config>
+                        </TCEforms>
+                    </settings.listPageUid>
+
+                </el>
+            </ROOT>
+        </general>
+    </sheets>
+</T3DataStructure>

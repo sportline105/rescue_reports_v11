@@ -51,7 +51,7 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
     $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignatureSidebar] = 'pi_flexform';
     ExtensionManagementUtility::addPiFlexFormValue(
         $pluginSignatureSidebar,
-        'FILE:EXT:rescue_reports/Configuration/FlexForms/eventlist.xml'
+        'FILE:EXT:rescue_reports/Configuration/FlexForms/sidebar.xml'
     );
 
     ExtensionManagementUtility::addStaticFile(

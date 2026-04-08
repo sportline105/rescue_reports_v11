@@ -46,6 +46,8 @@ class EventController extends ActionController
         $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
         $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
         $detailPageUid = $this->normalizeDetailPageUid($this->settings['detailPageUid'] ?? null);
+        $listPageUid   = $this->normalizeDetailPageUid($this->settings['listPageUid'] ?? null);
+        $widgetTitle   = trim((string)($this->settings['widgetTitle'] ?? ''));
 
         $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
         $selectedStationUid = $this->normalizeRecordUid($station);
@@ -146,6 +148,8 @@ class EventController extends ActionController
             'statistics'          => $statistics,
             'showStatistics'      => $showStatistics,
             'statisticsPosition'  => $statisticsPosition,
+            'widgetTitle'         => $widgetTitle,
+            'listPageUid'         => $listPageUid,
         ]);
 
         return $this->htmlResponse();
