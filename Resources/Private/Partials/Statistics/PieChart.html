@@ -15,22 +15,37 @@
                     </h3>
                     <div class="rescue-statistics__layout">
                         <div class="rescue-statistics__chart-wrap">
-                            <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
-                                <f:for each="{yearData.svgPaths}" as="slice">
-                                    <f:if condition="{slice.type} == 'circle'">
-                                        <f:then>
-                                            <circle cx="110" cy="110" r="100" fill="{slice.color}">
-                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
-                                            </circle>
-                                        </f:then>
-                                        <f:else>
-                                            <path d="{slice.d}" fill="{slice.color}">
-                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
-                                            </path>
-                                        </f:else>
-                                    </f:if>
+                            <div class="pie-wrap">
+                                <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+                                    <f:for each="{yearData.svgPaths}" as="slice">
+                                        <f:if condition="{slice.type} == 'circle'">
+                                            <f:then>
+                                                <circle cx="110" cy="110" r="100" fill="{slice.color}" class="pie-slice pie-slice--{slice.categoryUid}">
+                                                    <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
+                                                </circle>
+                                            </f:then>
+                                            <f:else>
+                                                <path d="{slice.d}" fill="{slice.color}" class="pie-slice pie-slice--{slice.categoryUid}">
+                                                    <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
+                                                </path>
+                                            </f:else>
+                                        </f:if>
+                                    </f:for>
+                                </svg>
+                                <f:for each="{yearData.categories}" as="cat">
+                                    <div class="pie-tooltip pie-tooltip--{cat.uid}">
+                                        <strong>{cat.title}</strong>
+                                        <f:if condition="{cat.types}">
+                                            <ul class="pie-tooltip__types">
+                                                <f:for each="{cat.types}" as="typeName">
+                                                    <li>{typeName}</li>
+                                                </f:for>
+                                            </ul>
+                                        </f:if>
+                                        <span class="pie-tooltip__meta">{cat.count} Einsätze · {cat.percent} %</span>
+                                    </div>
                                 </f:for>
-                            </svg>
+                            </div>
                         </div>
                         <div class="rescue-statistics__table-wrap">
                             <table class="rescue-statistics__table">

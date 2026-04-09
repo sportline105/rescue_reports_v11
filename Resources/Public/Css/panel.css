@@ -1,0 +1,8 @@
+/* Styles für das CKEditor-Dropdown-Panel (wird in Panel-Iframe geladen) */
+.cke_combopanel {
+    min-width: 260px !important;
+}
+
+.cke_combopanel li {
+    white-space: nowrap;
+}

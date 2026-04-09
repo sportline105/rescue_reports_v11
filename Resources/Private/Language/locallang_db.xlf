@@ -75,7 +75,19 @@
       <trans-unit id="plugin.eventlist">
         <source>Detaillierte Einsatzberichte für Feuerwehren und BOS</source>
       </trans-unit>
-      
+      <trans-unit id="tx_rescuereports_domain_model_snippet" xml:space="preserve">
+        <source>Textbaustein</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_snippet.title" xml:space="preserve">
+        <source>Bezeichnung</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_snippet.category" xml:space="preserve">
+        <source>Kategorie</source>
+      </trans-unit>
+      <trans-unit id="tx_rescuereports_domain_model_snippet.content" xml:space="preserve">
+        <source>Inhalt</source>
+      </trans-unit>
+
     </body>
   </file>
 </xliff>

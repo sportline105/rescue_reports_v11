@@ -1,0 +1,20 @@
+imports:
+  - { resource: "EXT:rte_ckeditor/Configuration/RTE/Processing.yaml" }
+  - { resource: "EXT:rte_ckeditor/Configuration/RTE/Editor/Base.yaml" }
+  - { resource: "EXT:rte_ckeditor/Configuration/RTE/Editor/Plugins.yaml" }
+
+editor:
+  externalPlugins:
+    textSnippets:
+      resource: "EXT:rescue_reports/Resources/Public/JavaScript/Plugins/textsnippets/plugin.js"
+
+  config:
+    toolbar:
+      - [ 'Format', 'Bold', 'Italic', 'Link', 'BulletedList', 'NumberedList', 'Blockquote', 'RemoveFormat' ]
+      - [ 'TextSnippets', 'Undo', 'Redo', 'Source' ]
+
+    contentsCss:
+      - "EXT:rte_ckeditor/Resources/Public/Css/contents.css"
+      - "EXT:rescue_reports/Resources/Public/Css/rte.css"
+
+    format_tags: "p;h2"

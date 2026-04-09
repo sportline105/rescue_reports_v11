@@ -109,7 +109,7 @@ return [
         ],
         'description' => [
             'label' => 'Einsatzbericht',
-            'config' => ['type' => 'text', 'enableRichtext' => true, 'richtextConfiguration' => 'firefighter', 'rows' => 5],
+            'config' => ['type' => 'text', 'enableRichtext' => true, 'richtextConfiguration' => 'rescue_reports', 'rows' => 5],
         ],
 
         'internal_notes' => [
