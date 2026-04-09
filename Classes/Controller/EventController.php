@@ -111,10 +111,16 @@ class EventController extends ActionController
         $dateFrom = $dateFromValue;
         $dateTo = $dateToValue;
 
-        // Jahresfilter überschreibt FlexForm-Datumsbereich wenn ein Jahr gewählt ist
-        if ($enableYearFilter && $selectedYear > 0) {
-            $dateFrom = $selectedYear . '-01-01';
-            $dateTo   = $selectedYear . '-12-31';
+        // Jahresfilter überschreibt FlexForm-Datumsbereich
+        if ($enableYearFilter) {
+            if ($selectedYear > 0) {
+                $dateFrom = $selectedYear . '-01-01';
+                $dateTo   = $selectedYear . '-12-31';
+            } else {
+                // "Alle Jahre": FlexForm-Datumseinschränkungen aufheben
+                $dateFrom = null;
+                $dateTo   = null;
+            }
         }
 
         $availableYears = $enableYearFilter
