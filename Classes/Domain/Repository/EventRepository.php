@@ -468,15 +468,21 @@ class EventRepository extends Repository
             ];
         }
 
+        // Einsatzarten je Jahr/Kategorie aus tatsächlich vorkommenden Datensätzen ermitteln
+        $typesByYearAndCategory = $this->getTypeStatsByYearAndCategory($stationUid);
+
         // Gesamtzahl + Prozentwerte + SVG-Tortendiagramm berechnen
-        $typesByCategory = $this->getTypesByCategory();
         $statistics = [];
         foreach ($raw as $year => $categories) {
             $total = array_sum(array_column($categories, 'count'));
             foreach ($categories as &$cat) {
                 $cat['percent']     = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
                 $cat['avgDuration'] = $this->formatDurationSeconds($cat['avg_dur_sec'] ?? null);
-                $cat['types']       = $typesByCategory[$cat['uid']] ?? [];
+                $cat['types']       = $typesByYearAndCategory[$year][$cat['uid']] ?? [];
+                foreach ($cat['types'] as &$type) {
+                    $type['percent'] = $cat['count'] > 0 ? round($type['count'] / $cat['count'] * 100, 1) : 0.0;
+                }
+                unset($type);
             }
             unset($cat);
 
@@ -567,10 +573,20 @@ class EventRepository extends Repository
     /**
      * Monatliche Einsatzzahlen für das Balkendiagramm (Mehrjahresvergleich).
      *
-     * @return array{years:int[], monthCounts:array<int,array<int,int>>, maxCount:int, svgBarChart:array}
+     * @return array{
+     *   years:int[],
+     *   monthNames:string[],
+     *   monthCounts:array<int,array<int,int>>,
+     *   maxCount:int,
+     *   mobileRows:array<int,array{month:string,values:array<int,array{year:int,count:int,percent:float,color:string}>>>,
+     *   svgBarChart:array
+     * }
      */
     public function getMonthlyStatistics(int $stationUid = 0, int $maxYears = 0): array
     {
+        $monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+        $yearColors = ['#3498db', '#e67e22', '#2ecc71', '#9b59b6', '#e74c3c', '#1abc9c', '#f39c12', '#34495e'];
+
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
 
@@ -627,10 +643,30 @@ class EventRepository extends Repository
             }
         }
 
+        $mobileRows = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $values = [];
+            foreach ($years as $yi => $year) {
+                $count = (int)($raw[$year][$m] ?? 0);
+                $values[] = [
+                    'year'    => $year,
+                    'count'   => $count,
+                    'percent' => $maxCnt > 0 ? round($count / $maxCnt * 100, 1) : 0.0,
+                    'color'   => $yearColors[$yi % count($yearColors)],
+                ];
+            }
+            $mobileRows[] = [
+                'month'  => $monthNames[$m - 1],
+                'values' => $values,
+            ];
+        }
+
         return [
             'years'       => $years,
+            'monthNames'  => $monthNames,
             'monthCounts' => $raw,
             'maxCount'    => $maxCnt,
+            'mobileRows'  => $mobileRows,
             'svgBarChart' => $this->buildMonthlyBarChartSvg($raw, $years, $maxCnt),
         ];
     }
@@ -833,32 +869,59 @@ class EventRepository extends Repository
     }
 
     /**
-     * Gibt alle aktiven Einsatzarten (Types) gruppiert nach ihrer Kategorie-UID zurück.
+     * Liefert pro Jahr und Kategorie nur die Einsatzarten, die in den gefilterten Datensätzen vorkommen.
      *
-     * @return array<int, string[]>  [catUid => ['Titel A', 'Titel B', ...]]
+     * @return array<int,array<int,array<int,array{title:string,count:int}>>> [year => [catUid => [['title' => string, 'count' => int], ...]]]
      */
-    private function getTypesByCategory(): array
+    private function getTypeStatsByYearAndCategory(int $stationUid = 0): array
     {
         $qb = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('tx_rescuereports_domain_model_type');
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
         $qb->getRestrictions()->removeAll();
-        $rows = $qb->select('uid', 'title', 'category')
-            ->from('tx_rescuereports_domain_model_type')
+
+        $qb->select('cat.uid AS cat_uid', 't.title AS type_title')
+            ->addSelectLiteral('YEAR(e.start) AS year', 'COUNT(DISTINCT e.uid) AS cnt')
+            ->from('tx_rescuereports_domain_model_event', 'e')
+            ->innerJoin('e', 'tx_rescuereports_event_type_mm', 'tmm', 'e.uid = tmm.uid_local')
+            ->innerJoin('tmm', 'tx_rescuereports_domain_model_type', 't', 'tmm.uid_foreign = t.uid')
+            ->leftJoin('t', 'tx_rescuereports_domain_model_category', 'cat', 't.category = cat.uid')
             ->where(
-                $qb->expr()->eq('deleted', $qb->createNamedParameter(0, \PDO::PARAM_INT)),
-                $qb->expr()->eq('hidden', $qb->createNamedParameter(0, \PDO::PARAM_INT))
+                $qb->expr()->eq('e.deleted', $qb->createNamedParameter(0, \PDO::PARAM_INT)),
+                $qb->expr()->eq('e.hidden', $qb->createNamedParameter(0, \PDO::PARAM_INT)),
+                $qb->expr()->eq('t.deleted', $qb->createNamedParameter(0, \PDO::PARAM_INT)),
+                $qb->expr()->eq('t.hidden', $qb->createNamedParameter(0, \PDO::PARAM_INT)),
+                $qb->expr()->isNotNull('e.start')
             )
-            ->orderBy('title', 'ASC')
-            ->executeQuery()
-            ->fetchAllAssociative();
+            ->groupBy('year', 'cat.uid', 't.uid', 't.title')
+            ->orderBy('year', 'DESC')
+            ->addOrderBy('cat.title', 'ASC')
+            ->addOrderBy('cnt', 'DESC')
+            ->addOrderBy('t.title', 'ASC');
+
+        if ($stationUid > 0) {
+            $qb->innerJoin('e', 'tx_rescuereports_event_station_mm', 'smm', 'e.uid = smm.uid_local')
+                ->andWhere(
+                    $qb->expr()->eq('smm.uid_foreign', $qb->createNamedParameter($stationUid, \PDO::PARAM_INT))
+                );
+        }
+
+        // query after optional station filter
+        $rows = $qb->executeQuery()->fetchAllAssociative();
 
         $result = [];
         foreach ($rows as $row) {
-            $catUid = (int)$row['category'];
-            if ($catUid > 0) {
-                $result[$catUid][] = (string)$row['title'];
+            $year = (int)$row['year'];
+            $catUid = (int)$row['cat_uid'];
+            $count = (int)$row['cnt'];
+            if ($year <= 0 || $catUid <= 0 || $count <= 0) {
+                continue;
             }
+            $result[$year][$catUid][] = [
+                'title' => (string)$row['type_title'],
+                'count' => $count,
+            ];
         }
+
         return $result;
     }
 }
