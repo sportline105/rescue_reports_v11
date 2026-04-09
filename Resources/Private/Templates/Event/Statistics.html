@@ -4,8 +4,8 @@
 <div class="rescue-statistics">
 
     <f:if condition="{stations}">
-        <f:form action="statistics" method="post" class="rescue-statistics__station-filter">
-            <label for="statistics-station" class="rescue-statistics__station-label form-label fw-semibold">Ortsfeuerwehr</label>
+        <f:form action="statistics" method="get" class="rescue-statistics__station-filter">
+            <label for="statistics-station" class="rescue-statistics__station-label">Ortsfeuerwehr</label>
             <f:form.select
                 id="statistics-station"
                 name="station"
@@ -13,7 +13,6 @@
                 optionValueField="uid"
                 optionLabelField="name"
                 value="{activeStationUid}"
-                class="form-select"
                 prependOptionLabel="Bitte wählen"
                 prependOptionValue="0"
                 additionalAttributes="{onchange: 'this.form.submit()'}" />
