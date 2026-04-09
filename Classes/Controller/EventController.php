@@ -142,6 +142,9 @@ class EventController extends ActionController
         }
 
         $eventItems = $this->buildEventItemsForStations($events, $activeStationUid);
+        $eventItemsByYear = ($enableYearFilter && $selectedYear === 0)
+            ? $this->groupEventItemsByYear($eventItems)
+            : [];
         $stations = $this->stationRepository->findPrimaryBrigadeStations();
 
         $statistics = [];
@@ -238,6 +241,7 @@ class EventController extends ActionController
         $this->view->assignMultiple([
             'events' => $events,
             'eventItems' => $eventItems,
+            'eventItemsByYear' => $eventItemsByYear,
             'stations' => $stations,
             'searchWord' => $searchWord,
             'enableSearch' => $enableSearch,
@@ -615,6 +619,36 @@ class EventController extends ActionController
         }
 
         return $items;
+    }
+
+    /**
+     * Gruppiert Event-Items nach Einsatzjahr (absteigend), für die Ansicht "Alle Jahre".
+     *
+     * @param array<int,array<string,mixed>> $eventItems
+     * @return array<string,array<int,array<string,mixed>>>
+     */
+    protected function groupEventItemsByYear(array $eventItems): array
+    {
+        $grouped = [];
+
+        foreach ($eventItems as $item) {
+            $event = $item['event'] ?? null;
+            if (!$event instanceof Event) {
+                continue;
+            }
+
+            $start = $event->getStart();
+            $year = $start instanceof \DateTimeInterface ? $start->format('Y') : 'Unbekannt';
+            $grouped[$year][] = $item;
+        }
+
+        if (isset($grouped['Unbekannt'])) {
+            $unknown = $grouped['Unbekannt'];
+            unset($grouped['Unbekannt']);
+            $grouped['Unbekannt'] = $unknown;
+        }
+
+        return $grouped;
     }
 
     /**
