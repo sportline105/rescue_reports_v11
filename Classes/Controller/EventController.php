@@ -4,7 +4,6 @@ namespace Nkfire\RescueReports\Controller;
 use Nkfire\RescueReports\Domain\Model\Event;
 use Nkfire\RescueReports\Domain\Repository\EventRepository;
 use Nkfire\RescueReports\Domain\Repository\StationRepository;
-use Nkfire\RescueReports\Domain\Repository\TypeRepository;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use PDO;
@@ -15,17 +14,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class EventController extends ActionController
 {
     protected EventRepository $eventRepository;
-    protected TypeRepository $typeRepository;
     protected StationRepository $stationRepository;
 
     public function __construct(EventRepository $eventRepository)
     {
         $this->eventRepository = $eventRepository;
-    }
-
-    public function injectTypeRepository(TypeRepository $typeRepository): void
-    {
-        $this->typeRepository = $typeRepository;
     }
 
     public function injectStationRepository(StationRepository $stationRepository): void
@@ -357,6 +350,7 @@ class EventController extends ActionController
                 . '.rescue-statistics__dot{display:inline-block;width:14px;height:14px;border-radius:50%;}'
                 . '.rescue-statistics__total{font-size:.85em;font-weight:normal;color:#666;margin-left:.5rem;}'
                 . '.rescue-statistics__year-title{margin-bottom:.25rem;}'
+                . '.rescue-statistics__compare{font-size:.85em;color:#666;margin-top:.5rem;}'
             );
             $pageRenderer->addCssInlineBlock(
                 'rescueStatisticsPie',
