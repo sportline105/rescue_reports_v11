@@ -339,8 +339,7 @@ class EventController extends ActionController
             $pageRenderer->addCssInlineBlock(
                 'rescueStatisticsLayout',
                 '.rescue-statistics__station-filter{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.25rem 0 1rem;}'
-                . '.rescue-statistics__station-label{font-weight:600;margin:0;}'
-                . '.rescue-statistics__station-filter select{min-width:220px;}'
+                . '.rescue-statistics__station-filter .form-select{min-width:220px;}'
                 . '.rescue-statistics__layout{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin:1rem 0 2rem;}'
                 . '.rescue-statistics__chart-wrap{flex:0 0 220px;}'
                 . '.rescue-statistics__table-wrap{flex:1 1 300px;}'
