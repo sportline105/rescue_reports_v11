@@ -469,12 +469,14 @@ class EventRepository extends Repository
         }
 
         // Gesamtzahl + Prozentwerte + SVG-Tortendiagramm berechnen
+        $typesByCategory = $this->getTypesByCategory();
         $statistics = [];
         foreach ($raw as $year => $categories) {
             $total = array_sum(array_column($categories, 'count'));
             foreach ($categories as &$cat) {
                 $cat['percent']     = $total > 0 ? round($cat['count'] / $total * 100, 1) : 0.0;
                 $cat['avgDuration'] = $this->formatDurationSeconds($cat['avg_dur_sec'] ?? null);
+                $cat['types']       = $typesByCategory[$cat['uid']] ?? [];
             }
             unset($cat);
 
@@ -484,11 +486,12 @@ class EventRepository extends Repository
             if (count($categories) === 1) {
                 // Einzelkategorie: Vollkreis
                 $svgPaths[] = [
-                    'type'    => 'circle',
-                    'color'   => $categories[0]['color'],
-                    'title'   => $categories[0]['title'],
-                    'count'   => $categories[0]['count'],
-                    'percent' => $categories[0]['percent'],
+                    'type'        => 'circle',
+                    'color'       => $categories[0]['color'],
+                    'title'       => $categories[0]['title'],
+                    'count'       => $categories[0]['count'],
+                    'percent'     => $categories[0]['percent'],
+                    'categoryUid' => $categories[0]['uid'],
                 ];
             } else {
                 $startAngle = -M_PI / 2; // Start bei 12 Uhr
@@ -501,13 +504,14 @@ class EventRepository extends Repository
                     $y2 = round($cy + $r * sin($endAngle), 3);
                     $largeArc   = $sliceAngle > M_PI ? 1 : 0;
                     $svgPaths[] = [
-                        'type'    => 'path',
-                        'color'   => $cat['color'],
-                        'd'       => 'M ' . $cx . ' ' . $cy . ' L ' . $x1 . ' ' . $y1
-                                     . ' A ' . $r . ' ' . $r . ' 0 ' . $largeArc . ' 1 ' . $x2 . ' ' . $y2 . ' Z',
-                        'title'   => $cat['title'],
-                        'count'   => $cat['count'],
-                        'percent' => $cat['percent'],
+                        'type'        => 'path',
+                        'color'       => $cat['color'],
+                        'd'           => 'M ' . $cx . ' ' . $cy . ' L ' . $x1 . ' ' . $y1
+                                         . ' A ' . $r . ' ' . $r . ' 0 ' . $largeArc . ' 1 ' . $x2 . ' ' . $y2 . ' Z',
+                        'title'       => $cat['title'],
+                        'count'       => $cat['count'],
+                        'percent'     => $cat['percent'],
+                        'categoryUid' => $cat['uid'],
                     ];
                     $startAngle = $endAngle;
                 }
@@ -826,5 +830,35 @@ class EventRepository extends Repository
         return $hours > 0
             ? sprintf('%d Std. %02d Min.', $hours, $minutes)
             : sprintf('%d Min.', $minutes);
+    }
+
+    /**
+     * Gibt alle aktiven Einsatzarten (Types) gruppiert nach ihrer Kategorie-UID zurück.
+     *
+     * @return array<int, string[]>  [catUid => ['Titel A', 'Titel B', ...]]
+     */
+    private function getTypesByCategory(): array
+    {
+        $qb = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_rescuereports_domain_model_type');
+        $qb->getRestrictions()->removeAll();
+        $rows = $qb->select('uid', 'title', 'category')
+            ->from('tx_rescuereports_domain_model_type')
+            ->where(
+                $qb->expr()->eq('deleted', $qb->createNamedParameter(0, \PDO::PARAM_INT)),
+                $qb->expr()->eq('hidden', $qb->createNamedParameter(0, \PDO::PARAM_INT))
+            )
+            ->orderBy('title', 'ASC')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $catUid = (int)$row['category'];
+            if ($catUid > 0) {
+                $result[$catUid][] = (string)$row['title'];
+            }
+        }
+        return $result;
     }
 }

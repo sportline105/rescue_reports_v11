@@ -169,6 +169,31 @@ class EventController extends ActionController
                     . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
                     . 'transform:scale(1.08);}'
                 );
+                $pageRenderer->addCssInlineBlock(
+                    'rescueStatisticsPieTooltip',
+                    '.pie-wrap{position:relative;display:inline-block;}'
+                    . '.pie-tooltip{display:none;position:absolute;top:calc(100% + 6px);left:50%;'
+                    .   'transform:translateX(-50%);min-width:160px;max-width:240px;'
+                    .   'background:rgba(255,255,255,.97);border:1px solid #ddd;border-radius:4px;'
+                    .   'padding:6px 10px;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,.15);'
+                    .   'pointer-events:none;font-size:.82em;line-height:1.4;}'
+                    . '.pie-tooltip strong{display:block;margin-bottom:3px;}'
+                    . '.pie-tooltip__types{margin:2px 0 4px;padding-left:14px;}'
+                    . '.pie-tooltip__meta{color:#666;font-size:.9em;}'
+                );
+                $seenTooltipUids = [];
+                foreach ($statistics as $yearData) {
+                    foreach ($yearData['categories'] as $cat) {
+                        $uid = (int)$cat['uid'];
+                        if ($uid > 0 && !in_array($uid, $seenTooltipUids, true)) {
+                            $seenTooltipUids[] = $uid;
+                            $pageRenderer->addCssInlineBlock(
+                                'rescueStatisticsPieTooltip' . $uid,
+                                ".pie-wrap:has(.pie-slice--{$uid}:hover) .pie-tooltip--{$uid}{display:block;}"
+                            );
+                        }
+                    }
+                }
             }
         }
 
@@ -277,6 +302,31 @@ class EventController extends ActionController
                 . '.rescue-statistics svg path:hover,.rescue-statistics svg circle:hover{'
                 . 'transform:scale(1.08);}'
             );
+            $pageRenderer->addCssInlineBlock(
+                'rescueStatisticsPieTooltip',
+                '.pie-wrap{position:relative;display:inline-block;}'
+                . '.pie-tooltip{display:none;position:absolute;top:calc(100% + 6px);left:50%;'
+                .   'transform:translateX(-50%);min-width:160px;max-width:240px;'
+                .   'background:rgba(255,255,255,.97);border:1px solid #ddd;border-radius:4px;'
+                .   'padding:6px 10px;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,.15);'
+                .   'pointer-events:none;font-size:.82em;line-height:1.4;}'
+                . '.pie-tooltip strong{display:block;margin-bottom:3px;}'
+                . '.pie-tooltip__types{margin:2px 0 4px;padding-left:14px;}'
+                . '.pie-tooltip__meta{color:#666;font-size:.9em;}'
+            );
+            $seenTooltipUids = [];
+            foreach ($statistics as $yearData) {
+                foreach ($yearData['categories'] as $cat) {
+                    $uid = (int)$cat['uid'];
+                    if ($uid > 0 && !in_array($uid, $seenTooltipUids, true)) {
+                        $seenTooltipUids[] = $uid;
+                        $pageRenderer->addCssInlineBlock(
+                            'rescueStatisticsPieTooltip' . $uid,
+                            ".pie-wrap:has(.pie-slice--{$uid}:hover) .pie-tooltip--{$uid}{display:block;}"
+                        );
+                    }
+                }
+            }
             $pageRenderer->addCssInlineBlock(
                 'rescueStatisticsBar',
                 '.rescue-statistics__bar-chart{margin:2rem 0 1rem;}'
