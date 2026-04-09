@@ -849,8 +849,8 @@ class EventRepository extends Repository
             ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
         $qb->getRestrictions()->removeAll();
 
-        $qb->select('YEAR(e.start) AS year', 'cat.uid AS cat_uid', 't.title AS type_title')
-            ->addSelectLiteral('COUNT(DISTINCT e.uid) AS cnt')
+        $qb->select('cat.uid AS cat_uid', 't.title AS type_title')
+            ->addSelectLiteral('YEAR(e.start) AS year', 'COUNT(DISTINCT e.uid) AS cnt')
             ->from('tx_rescuereports_domain_model_event', 'e')
             ->innerJoin('e', 'tx_rescuereports_event_type_mm', 'tmm', 'e.uid = tmm.uid_local')
             ->innerJoin('tmm', 'tx_rescuereports_domain_model_type', 't', 'tmm.uid_foreign = t.uid')
