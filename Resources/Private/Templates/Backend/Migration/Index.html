@@ -1,9 +1,38 @@
-// === Resources/Private/Templates/Backend/Migration/Index.html ===
 <f:layout name="Default" />
 <f:section name="main">
-    <h1>Firefighter Migration</h1>
-    <p>Mit einem Klick werden die Relationen aus der alten Tabelle migriert.</p>
+    <h1>Rescue Reports – Migration &amp; Setup</h1>
     <f:flashMessages />
+
+    <h2>Setup-Wizard (Neuinstallation)</h2>
+    <p>Der Wizard legt Organisationen und Fahrzeugtypen an. Pro Zeile ein Eintrag, Felder mit <code>|</code> trennen.</p>
+    <p>
+        Aktueller Bestand: <strong>{organisationCount}</strong> Organisationen,
+        <strong>{carCount}</strong> Fahrzeugtypen.
+    </p>
+
+    <f:form action="setup">
+        <div class="form-group" style="margin-bottom: 12px;">
+            <label for="pid">Speicherordner (PID)</label>
+            <f:form.textfield id="pid" name="pid" value="0" class="form-control" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+            <label for="organisations">Organisationen (Format: Name|Abkürzung|Icon)</label>
+            <f:form.textarea id="organisations" name="organisations" rows="6" value="{defaultOrganisations}" class="form-control" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+            <label for="cars">Fahrzeugtypen (Format: Name|Organisation (Name oder Kürzel))</label>
+            <f:form.textarea id="cars" name="cars" rows="8" value="{defaultCars}" class="form-control" />
+        </div>
+
+        <f:form.submit value="Setup ausführen" class="btn btn-success" />
+    </f:form>
+
+    <hr />
+
+    <h2>Alt-Datenmigration</h2>
+    <p>Mit einem Klick werden die Relationen aus der alten Tabelle migriert.</p>
     <f:form action="run">
         <f:form.submit value="Migration starten" class="btn btn-primary" />
     </f:form>
