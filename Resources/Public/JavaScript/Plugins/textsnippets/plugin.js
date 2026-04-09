@@ -1,14 +1,15 @@
 /**
  * CKEditor 4 Plugin: textSnippets
  *
- * Fügt ein Dropdown-Combo in die Toolbar ein, über das Textbausteine
- * per AJAX aus der Datenbank geladen und in den Editor eingefügt werden.
+ * Lädt Textbausteine per AJAX und fügt sie als Dropdown-Combo in die Toolbar ein.
  *
- * Lade-Strategie:
- *   Items werden beim ersten onOpen geladen (nicht in init), weil CKEditor 4
- *   das Panel-Iframe lazy rendert. Items die in init() per Promise hinzugefügt
- *   werden, könnten zu spät kommen falls der Browser das Micro-Task-Timing
- *   anders behandelt. onOpen ist der sichere Zeitpunkt.
+ * Timing-Strategie:
+ *   CKEditor 4 ruft richcombo.init() LAZILY beim ersten open() auf.
+ *   Da der Pre-Fetch schon beim Plugin-Load startet, ist loadedItems in aller
+ *   Regel bereits gesetzt, wenn init() aufgerufen wird – und kann synchron
+ *   übergeben werden (identisch zum Original-Ansatz mit config-Items).
+ *   onOpen dient als Fallback für den unwahrscheinlichen Fall, dass der Request
+ *   noch läuft.
  */
 CKEDITOR.plugins.add('textSnippets', {
     requires: 'richcombo',
@@ -18,11 +19,9 @@ CKEDITOR.plugins.add('textSnippets', {
         var groupTitle = config.groupTitle || 'Textbausteine';
         var pluginPath = CKEDITOR.plugins.get('textSnippets').path;
 
-        // loadedItems: null = noch nicht geladen, Array = bereits geladen (auch leer)
+        // null = wird noch geladen, Array = fertig (auch leer)
         var loadedItems = null;
-        var isLoading = false;
 
-        // AJAX-URL aus TYPO3-Backend-Settings lesen
         var ajaxUrl = (typeof TYPO3 !== 'undefined' &&
                        TYPO3.settings &&
                        TYPO3.settings.ajaxUrls &&
@@ -30,16 +29,18 @@ CKEDITOR.plugins.add('textSnippets', {
             ? TYPO3.settings.ajaxUrls['rescue_reports_snippets']
             : null;
 
-        // Sofortiger Pre-Fetch im Hintergrund (optional, verbessert Latenz)
         if (ajaxUrl) {
-            isLoading = true;
+            // Pre-Fetch sofort starten – init() wird erst beim ersten Klick aufgerufen,
+            // daher ist der Request meistens schon fertig.
             fetch(ajaxUrl)
                 .then(function (r) { return r.json(); })
-                .then(function (items) { loadedItems = items; isLoading = false; })
-                .catch(function () { loadedItems = []; isLoading = false; });
+                .then(function (items) { loadedItems = items; })
+                .catch(function () { loadedItems = []; });
+        } else {
+            loadedItems = [];
         }
 
-        // CSS-Injection für Toolbar-Button-Breite
+        // Toolbar-Button-Breite (Skin setzt .cke_combo_text auf 60px fix)
         editor.on('instanceReady', function () {
             if (document.querySelector('style[data-plugin="textSnippets"]')) {
                 return;
@@ -48,14 +49,25 @@ CKEDITOR.plugins.add('textSnippets', {
             style.setAttribute('data-plugin', 'textSnippets');
             style.textContent =
                 '.cke_combo__textsnippets .cke_combo_text {' +
-                '    width: auto !important;' +
-                '    min-width: 150px !important;' +
+                '    width: auto !important; min-width: 150px !important;' +
                 '}' +
-                '.cke_combopanel {' +
-                '    min-width: 260px !important;' +
-                '}';
+                '.cke_combopanel { min-width: 260px !important; }';
             (document.head || document.getElementsByTagName('head')[0]).appendChild(style);
         });
+
+        function fillCombo(combo, items) {
+            if (!items || items.length === 0) {
+                combo.add(
+                    '_empty',
+                    '<span style="color:#999;font-style:italic">(keine Textbausteine vorhanden)</span>',
+                    '(keine Textbausteine vorhanden)'
+                );
+            } else {
+                for (var i = 0; i < items.length; i++) {
+                    combo.add(items[i].id, items[i].title, items[i].title);
+                }
+            }
+        }
 
         editor.ui.add('TextSnippets', CKEDITOR.UI_RICHCOMBO, {
             label: groupTitle,
@@ -70,8 +82,15 @@ CKEDITOR.plugins.add('textSnippets', {
                 multiSelect: false
             },
 
-            // init() bleibt leer – Items werden in onOpen geladen
-            init: function () {},
+            init: function () {
+                // init() wird LAZY beim ersten open() aufgerufen – Pre-Fetch ist
+                // zu diesem Zeitpunkt normalerweise bereits abgeschlossen.
+                var combo = this;
+                if (loadedItems !== null) {
+                    fillCombo(combo, loadedItems);
+                }
+                // Falls noch nicht fertig: onOpen greift als Fallback
+            },
 
             onOpen: function () {
                 var combo = this;
@@ -81,70 +100,44 @@ CKEDITOR.plugins.add('textSnippets', {
                 setTimeout(function () {
                     if (panel && panel._.element) {
                         var el = panel._.element;
-                        var currentWidth = parseInt(el.getStyle('width'), 10) || 0;
-                        if (currentWidth < 260) {
+                        var w = parseInt(el.getStyle('width'), 10) || 0;
+                        if (w < 260) {
                             el.setStyle('width', '260px');
                         }
                     }
                 }, 0);
 
-                // Schon Items im Combo? Dann nichts tun (Cache)
-                if (combo._.items && Object.keys(combo._.items).length > 0) {
-                    return;
-                }
-
-                function populateCombo(items) {
-                    if (!items || items.length === 0) {
+                // Fallback: init() hatte keine Items (Pre-Fetch war noch nicht fertig)
+                var hasItems = combo._.items && Object.keys(combo._.items).length > 0;
+                if (!hasItems) {
+                    if (loadedItems !== null) {
+                        // Inzwischen fertig
+                        fillCombo(combo, loadedItems);
+                    } else if (ajaxUrl) {
+                        // Noch am Laden – jetzt synchron nachladen und Panel neu öffnen
                         combo.add(
-                            '_empty',
-                            '<span style="color:#999;font-style:italic">(keine Textbausteine vorhanden)</span>',
-                            '(keine Textbausteine vorhanden)'
+                            '_loading',
+                            '<span style="color:#999;font-style:italic">Wird geladen\u2026</span>',
+                            'Wird geladen\u2026'
                         );
-                    } else {
-                        for (var i = 0; i < items.length; i++) {
-                            combo.add(items[i].id, items[i].title, items[i].title);
-                        }
+                        fetch(ajaxUrl)
+                            .then(function (r) { return r.json(); })
+                            .then(function (items) {
+                                loadedItems = items;
+                                // Panel schließen, Items zurücksetzen, neu öffnen
+                                combo.close();
+                                combo._.items = {};
+                                fillCombo(combo, items);
+                                combo.open();
+                            })
+                            .catch(function () {
+                                loadedItems = [];
+                                combo.close();
+                                combo._.items = {};
+                                fillCombo(combo, []);
+                                combo.open();
+                            });
                     }
-                }
-
-                if (loadedItems !== null) {
-                    // Bereits durch Pre-Fetch verfügbar
-                    populateCombo(loadedItems);
-                } else if (!ajaxUrl) {
-                    // Keine AJAX-URL konfiguriert
-                    loadedItems = [];
-                    populateCombo([]);
-                } else {
-                    // Pre-Fetch noch nicht fertig oder fehlgeschlagen – jetzt laden
-                    combo.add(
-                        '_loading',
-                        '<span style="color:#999;font-style:italic">Wird geladen...</span>',
-                        'Wird geladen...'
-                    );
-                    fetch(ajaxUrl)
-                        .then(function (r) { return r.json(); })
-                        .then(function (items) {
-                            loadedItems = items;
-                            // Combo schließen und mit echten Items erneut öffnen
-                            combo.close();
-                            // Items zurücksetzen
-                            combo._.items = {};
-                            if (combo._.list && combo._.list._.items) {
-                                combo._.list._.items = {};
-                            }
-                            populateCombo(items);
-                            combo.open();
-                        })
-                        .catch(function () {
-                            loadedItems = [];
-                            combo.close();
-                            combo._.items = {};
-                            if (combo._.list && combo._.list._.items) {
-                                combo._.list._.items = {};
-                            }
-                            populateCombo([]);
-                            combo.open();
-                        });
                 }
             },
 
