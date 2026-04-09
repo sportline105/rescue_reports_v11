@@ -406,8 +406,21 @@ class EventController extends ActionController
             $pageRenderer->addCssInlineBlock(
                 'rescueStatisticsBar',
                 '.rescue-statistics__bar-chart{margin:2rem 0 1rem;}'
+                . '.rescue-statistics__bar-chart-desktop{display:block;}'
+                . '.rescue-statistics__bar-chart-mobile{display:none;}'
                 . '.rescue-statistics__bar-chart svg rect.bar{transition:opacity .15s;cursor:default;}'
                 . '.rescue-statistics__bar-chart svg rect.bar:hover{opacity:.8;}'
+                . '.rescue-statistics__mobile-row{margin:0 0 .75rem;padding:.5rem .6rem;border:1px solid #e5e5e5;border-radius:6px;}'
+                . '.rescue-statistics__mobile-month{font-weight:600;margin-bottom:.35rem;}'
+                . '.rescue-statistics__mobile-line{display:flex;align-items:center;gap:.45rem;margin:.2rem 0;}'
+                . '.rescue-statistics__mobile-year{flex:0 0 2.8rem;font-size:.9em;color:#555;}'
+                . '.rescue-statistics__mobile-track{flex:1;height:10px;background:#f1f1f1;border-radius:999px;overflow:hidden;}'
+                . '.rescue-statistics__mobile-fill{display:block;height:100%;min-width:2px;border-radius:999px;}'
+                . '.rescue-statistics__mobile-count{flex:0 0 1.8rem;text-align:right;font-variant-numeric:tabular-nums;}'
+                . '@media (max-width:720px){'
+                . '.rescue-statistics__bar-chart-desktop{display:none;}'
+                . '.rescue-statistics__bar-chart-mobile{display:block;}'
+                . '}'
             );
         }
 

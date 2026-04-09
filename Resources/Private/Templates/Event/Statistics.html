@@ -13,48 +13,67 @@
     <f:if condition="{showMonthlyChart} && {monthlyStatistics.svgBarChart}">
         <div class="rescue-statistics__bar-chart">
             <h3>Monatliche Einsätze im Jahresvergleich</h3>
-            <svg viewBox="{monthlyStatistics.svgBarChart.viewBox}"
-                 xmlns="http://www.w3.org/2000/svg"
-                 style="width:100%;max-width:700px;height:auto;display:block;">
+            <div class="rescue-statistics__bar-chart-desktop">
+                <svg viewBox="{monthlyStatistics.svgBarChart.viewBox}"
+                     xmlns="http://www.w3.org/2000/svg"
+                     style="width:100%;max-width:700px;height:auto;display:block;">
 
-                <!-- Gitterlinien + Y-Achsenbeschriftung -->
-                <f:for each="{monthlyStatistics.svgBarChart.gridLines}" as="gl">
-                    <line x1="{gl.x1}" y1="{gl.y1}" x2="{gl.x2}" y2="{gl.y2}"
-                          stroke="#e0e0e0" stroke-width="1"/>
-                    <text x="{gl.labelX}" y="{gl.labelY}"
-                          text-anchor="end" font-size="10" fill="#888">{gl.label}</text>
+                    <!-- Gitterlinien + Y-Achsenbeschriftung -->
+                    <f:for each="{monthlyStatistics.svgBarChart.gridLines}" as="gl">
+                        <line x1="{gl.x1}" y1="{gl.y1}" x2="{gl.x2}" y2="{gl.y2}"
+                              stroke="#e0e0e0" stroke-width="1"/>
+                        <text x="{gl.labelX}" y="{gl.labelY}"
+                              text-anchor="end" font-size="10" fill="#888">{gl.label}</text>
+                    </f:for>
+
+                    <!-- X-Achse -->
+                    <line x1="{monthlyStatistics.svgBarChart.axisLeft}"
+                          y1="{monthlyStatistics.svgBarChart.axisBottom}"
+                          x2="{monthlyStatistics.svgBarChart.axisRight}"
+                          y2="{monthlyStatistics.svgBarChart.axisBottom}"
+                          stroke="#ccc" stroke-width="1"/>
+
+                    <!-- Balken -->
+                    <f:for each="{monthlyStatistics.svgBarChart.bars}" as="bar">
+                        <rect class="bar"
+                              x="{bar.x}" y="{bar.y}"
+                              width="{bar.width}" height="{bar.height}"
+                              fill="{bar.color}">
+                            <title>{bar.tooltip}</title>
+                        </rect>
+                    </f:for>
+
+                    <!-- Monatsbeschriftungen -->
+                    <f:for each="{monthlyStatistics.svgBarChart.monthLabels}" as="ml">
+                        <text x="{ml.x}" y="{ml.y}"
+                              text-anchor="middle" font-size="10" fill="#555">{ml.text}</text>
+                    </f:for>
+
+                    <!-- Legende -->
+                    <f:for each="{monthlyStatistics.svgBarChart.legend}" as="lg">
+                        <rect x="{lg.rx}" y="{lg.ry}" width="10" height="10" fill="{lg.color}"/>
+                        <text x="{lg.tx}" y="{lg.ty}" font-size="11" fill="#333">{lg.label}</text>
+                    </f:for>
+                </svg>
+            </div>
+
+            <div class="rescue-statistics__bar-chart-mobile">
+                <f:for each="{monthlyStatistics.mobileRows}" as="row">
+                    <div class="rescue-statistics__mobile-row">
+                        <div class="rescue-statistics__mobile-month">{row.month}</div>
+                        <f:for each="{row.values}" as="value">
+                            <div class="rescue-statistics__mobile-line">
+                                <span class="rescue-statistics__mobile-year">{value.year}</span>
+                                <div class="rescue-statistics__mobile-track">
+                                    <span class="rescue-statistics__mobile-fill"
+                                          style="width:{value.percent}%;background:{value.color};"></span>
+                                </div>
+                                <span class="rescue-statistics__mobile-count">{value.count}</span>
+                            </div>
+                        </f:for>
+                    </div>
                 </f:for>
-
-                <!-- X-Achse -->
-                <line x1="{monthlyStatistics.svgBarChart.axisLeft}"
-                      y1="{monthlyStatistics.svgBarChart.axisBottom}"
-                      x2="{monthlyStatistics.svgBarChart.axisRight}"
-                      y2="{monthlyStatistics.svgBarChart.axisBottom}"
-                      stroke="#ccc" stroke-width="1"/>
-
-                <!-- Balken -->
-                <f:for each="{monthlyStatistics.svgBarChart.bars}" as="bar">
-                    <rect class="bar"
-                          x="{bar.x}" y="{bar.y}"
-                          width="{bar.width}" height="{bar.height}"
-                          fill="{bar.color}">
-                        <title>{bar.tooltip}</title>
-                    </rect>
-                </f:for>
-
-                <!-- Monatsbeschriftungen -->
-                <f:for each="{monthlyStatistics.svgBarChart.monthLabels}" as="ml">
-                    <text x="{ml.x}" y="{ml.y}"
-                          text-anchor="middle" font-size="10" fill="#555">{ml.text}</text>
-                </f:for>
-
-                <!-- Legende -->
-                <f:for each="{monthlyStatistics.svgBarChart.legend}" as="lg">
-                    <rect x="{lg.rx}" y="{lg.ry}" width="10" height="10" fill="{lg.color}"/>
-                    <text x="{lg.tx}" y="{lg.ty}" font-size="11" fill="#333">{lg.label}</text>
-                </f:for>
-
-            </svg>
+            </div>
         </div>
     </f:if>
 

@@ -573,10 +573,20 @@ class EventRepository extends Repository
     /**
      * Monatliche Einsatzzahlen für das Balkendiagramm (Mehrjahresvergleich).
      *
-     * @return array{years:int[], monthCounts:array<int,array<int,int>>, maxCount:int, svgBarChart:array}
+     * @return array{
+     *   years:int[],
+     *   monthNames:string[],
+     *   monthCounts:array<int,array<int,int>>,
+     *   maxCount:int,
+     *   mobileRows:array<int,array{month:string,values:array<int,array{year:int,count:int,percent:float,color:string}>>>,
+     *   svgBarChart:array
+     * }
      */
     public function getMonthlyStatistics(int $stationUid = 0, int $maxYears = 0): array
     {
+        $monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+        $yearColors = ['#3498db', '#e67e22', '#2ecc71', '#9b59b6', '#e74c3c', '#1abc9c', '#f39c12', '#34495e'];
+
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('tx_rescuereports_domain_model_event');
 
@@ -633,10 +643,30 @@ class EventRepository extends Repository
             }
         }
 
+        $mobileRows = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $values = [];
+            foreach ($years as $yi => $year) {
+                $count = (int)($raw[$year][$m] ?? 0);
+                $values[] = [
+                    'year'    => $year,
+                    'count'   => $count,
+                    'percent' => $maxCnt > 0 ? round($count / $maxCnt * 100, 1) : 0.0,
+                    'color'   => $yearColors[$yi % count($yearColors)],
+                ];
+            }
+            $mobileRows[] = [
+                'month'  => $monthNames[$m - 1],
+                'values' => $values,
+            ];
+        }
+
         return [
             'years'       => $years,
+            'monthNames'  => $monthNames,
             'monthCounts' => $raw,
             'maxCount'    => $maxCnt,
+            'mobileRows'  => $mobileRows,
             'svgBarChart' => $this->buildMonthlyBarChartSvg($raw, $years, $maxCnt),
         ];
     }
