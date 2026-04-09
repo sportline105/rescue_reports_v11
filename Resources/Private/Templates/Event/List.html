@@ -30,28 +30,35 @@
         ========================================================== -->
         <f:case value="newdesign">
             <div class="rescue-reports rescue-reports--newdesign">
-                <h1 class="element-header">Einsatzübersicht</h1>
+                <h1 class="element-header">
+                    Einsatzübersicht
+                    <f:if condition="{activeStationName}">
+                        <f:then>: {activeStationName}</f:then>
+                    </f:if>
+                </h1>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Ortsfeuerwehr</label>
-                    <f:form action="list" method="post">
-                        <f:form.hidden name="year" value="{selectedYear}" />
-                        <f:form.hidden name="dateFrom" value="{dateFromStr}" />
-                        <f:form.hidden name="dateTo" value="{dateToStr}" />
-                        <div class="row g-2 align-items-stretch">
-                            <div class="col-12 col-md-6">
-                                <f:form.select
-                                    name="station"
-                                    options="{stations}"
-                                    optionLabelField="name"
-                                    optionValueField="uid"
-                                    value="{activeStationUid}"
-                                    class="form-select"
-                                    additionalAttributes="{onchange: 'this.form.submit()'}" />
+                <f:if condition="{showStationFilter}">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ortsfeuerwehr</label>
+                        <f:form action="list" method="post">
+                            <f:form.hidden name="year" value="{selectedYear}" />
+                            <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                            <f:form.hidden name="dateTo" value="{dateToStr}" />
+                            <div class="row g-2 align-items-stretch">
+                                <div class="col-12 col-md-6">
+                                    <f:form.select
+                                        name="station"
+                                        options="{stations}"
+                                        optionLabelField="name"
+                                        optionValueField="uid"
+                                        value="{activeStationUid}"
+                                        class="form-select"
+                                        additionalAttributes="{onchange: 'this.form.submit()'}" />
+                                </div>
                             </div>
-                        </div>
-                    </f:form>
-                </div>
+                        </f:form>
+                    </div>
+                </f:if>
 
                 <f:if condition="{enableYearFilter}">
                     <div class="mb-3">
@@ -234,7 +241,12 @@
              Standard
         ========================================================== -->
         <f:defaultCase>
-            <h1 class="csc-firstHeader">Einsatzübersicht</h1>
+            <h1 class="csc-firstHeader">
+                Einsatzübersicht
+                <f:if condition="{activeStationName}">
+                    <f:then>: {activeStationName}</f:then>
+                </f:if>
+            </h1>
 
             <f:if condition="{showStatistics}">
                 <f:if condition="{statisticsPosition} == 'above'">
@@ -262,6 +274,25 @@
                     </div>
                 </f:if>
             </div>
+
+            <f:if condition="{showStationFilter}">
+                <div class="row" style="padding-top:10px; padding-bottom:5px;">
+                    <div class="small-12 columns">
+                        <f:form action="list" method="post">
+                            <f:form.hidden name="year" value="{selectedYear}" />
+                            <f:form.hidden name="dateFrom" value="{dateFromStr}" />
+                            <f:form.hidden name="dateTo" value="{dateToStr}" />
+                            <f:form.select
+                                name="station"
+                                options="{stations}"
+                                optionLabelField="name"
+                                optionValueField="uid"
+                                value="{activeStationUid}"
+                                additionalAttributes="{onchange: 'this.form.submit()'}" />
+                        </f:form>
+                    </div>
+                </div>
+            </f:if>
 
             <f:if condition="{enableYearFilter}">
                 <div class="row" style="padding-top:10px; padding-bottom:5px;">

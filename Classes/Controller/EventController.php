@@ -46,6 +46,7 @@ class EventController extends ActionController
         $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
         $enableYearFilter    = (bool)($this->settings['enableYearFilter'] ?? false);
         $enableDateFilter    = (bool)($this->settings['enableDateFilter'] ?? false);
+        $showStationFilter   = (bool)($this->settings['showStationFilter'] ?? true);
         $showMapView         = (bool)($this->settings['showMapView'] ?? false);
         $mapPosition         = (string)($this->settings['mapPosition'] ?? 'below');
         $yearFilterDefault   = (string)($this->settings['yearFilterDefault'] ?? 'current');
@@ -83,6 +84,14 @@ class EventController extends ActionController
             $firstStation = $this->stationRepository->findPrimaryBrigadeStations()->getFirst();
             if ($firstStation) {
                 $activeStationUid = (int)$firstStation->getUid();
+            }
+        }
+
+        $activeStationName = '';
+        if ($activeStationUid > 0) {
+            $activeStation = $this->stationRepository->findByUid($activeStationUid);
+            if ($activeStation) {
+                $activeStationName = $activeStation->getName();
             }
         }
 
@@ -260,6 +269,8 @@ class EventController extends ActionController
             'enableYearFilter'    => $enableYearFilter,
             'availableYears'      => $availableYears,
             'selectedYear'        => $selectedYear,
+            'showStationFilter'   => $showStationFilter,
+            'activeStationName'   => $activeStationName,
             'showMapView'         => $showMapView,
             'mapPosition'         => $mapPosition,
         ]);
