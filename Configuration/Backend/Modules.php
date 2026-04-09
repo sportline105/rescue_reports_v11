@@ -8,7 +8,7 @@ ExtensionUtility::registerModule(
     'migration',
     '',
     [
-        \Nkfire\RescueReports\Controller\Backend\MigrationController::class => 'index,run,resetConfirm,reset',
+        \Nkfire\RescueReports\Controller\Backend\MigrationController::class => 'index,setup,run,resetConfirm,reset',
     ],
     [
         'access' => 'admin',

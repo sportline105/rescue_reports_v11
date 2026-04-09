@@ -88,6 +88,16 @@
         <source>Inhalt</source>
       </trans-unit>
 
+      <trans-unit id="wizard.initialData.title" xml:space="preserve">
+        <source>Rescue Reports Initialdaten</source>
+      </trans-unit>
+      <trans-unit id="wizard.initialData.description" xml:space="preserve">
+        <source>Legt einen Daten-SysOrdner an und befüllt Standard-Organisationen sowie Fahrzeugtypen.</source>
+      </trans-unit>
+      <trans-unit id="wizard.initialData.sysfolderTitle" xml:space="preserve">
+        <source>Rescue Reports Daten</source>
+      </trans-unit>
+
     </body>
   </file>
 </xliff>
