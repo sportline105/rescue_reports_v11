@@ -73,3 +73,6 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['proc
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][] =
     \Nkfire\RescueReports\Hooks\DataHandlerHook::class;
+
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['rescueReportsInitialData'] =
+    \Nkfire\RescueReports\Updates\InitialDataWizard::class;
