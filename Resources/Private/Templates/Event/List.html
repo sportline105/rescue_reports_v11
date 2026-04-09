@@ -361,48 +361,104 @@
                 </div>
             </f:if>
 
-            <f:for each="{eventItems}" as="item">
-                <f:variable name="event" value="{item.event}" />
+            <f:if condition="{eventItemsByYear}">
+                <div class="year-jump-nav" style="margin: 0 0 10px;">
+                    <strong>Sprungmarken:</strong>
+                    <f:for each="{eventItemsByYear}" as="yearItems" key="year" iteration="i">
+                        <a href="#event-year-{year}" style="margin-left:8px;">{year}</a><f:if condition="{!i.isLast}"> ·</f:if>
+                    </f:for>
+                </div>
 
-                <div class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>">
-                    <div class="panelsmall__inner">
-                        <div class="row">
-                            <div class="small-2 medium-1 columns enumber text-center">
-                                {item.plainNumber}
-                            </div>
+                <f:for each="{eventItemsByYear}" as="yearItems" key="year">
+                    <h2 id="event-year-{year}" style="margin:16px 0 8px;">{year}</h2>
+                    <f:for each="{yearItems}" as="item">
+                        <f:variable name="event" value="{item.event}" />
 
-                            <div class="small-10 medium-11 column">
+                        <div class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>">
+                            <div class="panelsmall__inner">
                                 <div class="row">
-                                    <div class="small-12 column emeta">
-                                        <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
-                                        <f:if condition="{event.end}">
-                                            -
-                                            <f:format.date format="H:i">{event.end}</f:format.date> Uhr
-                                        </f:if>
+                                    <div class="small-2 medium-1 columns enumber text-center">
+                                        {item.plainNumber}
                                     </div>
 
-                                    <div class="small-12 column etitle">
-                                        <b>{event.title}</b>
-                                        <f:if condition="{event.location}">
-                                            – <em>{event.location}</em>
-                                        </f:if>
+                                    <div class="small-10 medium-11 column">
+                                        <div class="row">
+                                            <div class="small-12 column emeta">
+                                                <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
+                                                <f:if condition="{event.end}">
+                                                    -
+                                                    <f:format.date format="H:i">{event.end}</f:format.date> Uhr
+                                                </f:if>
+                                            </div>
+
+                                            <div class="small-12 column etitle">
+                                                <b>{event.title}</b>
+                                                <f:if condition="{event.location}">
+                                                    – <em>{event.location}</em>
+                                                </f:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <f:if condition="!{event.disableDetail}">
+                                <f:link.action
+                                    action="show"
+                                    arguments="{event: event, station: activeStationUid}"
+                                    pageUid="{detailPageUid}"
+                                    class="panelsmall__overlaylink">
+                                    Zum Einsatz {event.title}
+                                </f:link.action>
+                            </f:if>
+                        </div>
+                    </f:for>
+                </f:for>
+            </f:if>
+            <f:if condition="!{eventItemsByYear}">
+                <f:for each="{eventItems}" as="item">
+                    <f:variable name="event" value="{item.event}" />
+
+                    <div class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>">
+                        <div class="panelsmall__inner">
+                            <div class="row">
+                                <div class="small-2 medium-1 columns enumber text-center">
+                                    {item.plainNumber}
+                                </div>
+
+                                <div class="small-10 medium-11 column">
+                                    <div class="row">
+                                        <div class="small-12 column emeta">
+                                            <f:format.date format="d.m.Y, H:i">{event.start}</f:format.date>
+                                            <f:if condition="{event.end}">
+                                                -
+                                                <f:format.date format="H:i">{event.end}</f:format.date> Uhr
+                                            </f:if>
+                                        </div>
+
+                                        <div class="small-12 column etitle">
+                                            <b>{event.title}</b>
+                                            <f:if condition="{event.location}">
+                                                – <em>{event.location}</em>
+                                            </f:if>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <f:if condition="!{event.disableDetail}">
-                        <f:link.action
-                            action="show"
-                            arguments="{event: event, station: activeStationUid}"
-                            pageUid="{detailPageUid}"
-                            class="panelsmall__overlaylink">
-                            Zum Einsatz {event.title}
-                        </f:link.action>
-                    </f:if>
-                </div>
-            </f:for>
+                        <f:if condition="!{event.disableDetail}">
+                            <f:link.action
+                                action="show"
+                                arguments="{event: event, station: activeStationUid}"
+                                pageUid="{detailPageUid}"
+                                class="panelsmall__overlaylink">
+                                Zum Einsatz {event.title}
+                            </f:link.action>
+                        </f:if>
+                    </div>
+                </f:for>
+            </f:if>
         </f:then>
 
         <f:else>
@@ -478,57 +534,102 @@
                 </div>
             </f:if>
 
-            <ul class="list-group list-group-flush no-bullet event-list-newdesign"
-                style="margin:0; padding:0; list-style:none;">
+            <f:if condition="{eventItemsByYear}">
+                <div class="year-jump-nav mb-2 small">
+                    <strong>Sprungmarken:</strong>
+                    <f:for each="{eventItemsByYear}" as="yearItems" key="year" iteration="i">
+                        <a href="#event-year-nd-{year}" class="ms-2">{year}</a><f:if condition="{!i.isLast}"> ·</f:if>
+                    </f:for>
+                </div>
+                <f:for each="{eventItemsByYear}" as="yearItems" key="year">
+                    <h3 id="event-year-nd-{year}" class="mt-3 mb-2">{year}</h3>
+                    <ul class="list-group list-group-flush no-bullet event-list-newdesign"
+                        style="margin:0; padding:0; list-style:none;">
+                        <f:for each="{yearItems}" as="item">
+                            <f:variable name="event" value="{item.event}" />
 
-                <f:for each="{eventItems}" as="item">
-                    <f:variable name="event" value="{item.event}" />
-
-                    <li class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>" style="padding:12px 10px; border-bottom:1px solid #e5e9f2; position:relative;">
-
-                        <div class="row g-2 align-items-center">
-
-                            <div class="col-auto enumber" style="font-weight:600; opacity: 0.8; color:#5b8fd9; min-width:60px;">
-                                {item.plainNumber}
-                            </div>
-
-                            <div class="col">
-                                <div style="font-size:1.1rem; font-weight:700; color:#111; line-height:1.2;">
-                                    {event.title}
-                                    <f:if condition="{event.location}">
-                                        <span style="font-style:italic; font-weight:500; color:#444;">
-                                            – {event.location}
-                                        </span>
-                                    </f:if>
+                            <li class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>" style="padding:12px 10px; border-bottom:1px solid #e5e9f2; position:relative;">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-auto enumber" style="font-weight:600; opacity: 0.8; color:#5b8fd9; min-width:60px;">
+                                        {item.plainNumber}
+                                    </div>
+                                    <div class="col">
+                                        <div style="font-size:1.1rem; font-weight:700; color:#111; line-height:1.2;">
+                                            {event.title}
+                                            <f:if condition="{event.location}">
+                                                <span style="font-style:italic; font-weight:500; color:#444;">
+                                                    – {event.location}
+                                                </span>
+                                            </f:if>
+                                        </div>
+                                        <div style="font-size:0.85rem; color:#6c757d;">
+                                            <f:format.date format="d.m.Y">{event.start}</f:format.date>
+                                            ·
+                                            <f:format.date format="H:i">{event.start}</f:format.date>
+                                            <f:if condition="{event.end}">
+                                                – <f:format.date format="H:i">{event.end}</f:format.date>
+                                            </f:if>
+                                            Uhr
+                                        </div>
+                                        <f:if condition="!{event.disableDetail}">
+                                            <f:link.action
+                                                action="show"
+                                                arguments="{event: event, station: activeStationUid}"
+                                                pageUid="{detailPageUid}"
+                                                class="stretched-link">
+                                                <span class="visually-hidden">Zum Einsatz {event.title}</span>
+                                            </f:link.action>
+                                        </f:if>
+                                    </div>
                                 </div>
-
-                                <div style="font-size:0.85rem; color:#6c757d;">
-                                    <f:format.date format="d.m.Y">{event.start}</f:format.date>
-                                    ·
-                                    <f:format.date format="H:i">{event.start}</f:format.date>
-                                    <f:if condition="{event.end}">
-                                        – <f:format.date format="H:i">{event.end}</f:format.date>
-                                    </f:if>
-                                    Uhr
-                                </div>
-
-                                <f:if condition="!{event.disableDetail}">
-                                    <f:link.action
-                                        action="show"
-                                        arguments="{event: event, station: activeStationUid}"
-                                        pageUid="{detailPageUid}"
-                                        class="stretched-link">
-                                        <span class="visually-hidden">Zum Einsatz {event.title}</span>
-                                    </f:link.action>
-                                </f:if>
-
-                            </div>
-                        </div>
-
-                    </li>
-
+                            </li>
+                        </f:for>
+                    </ul>
                 </f:for>
-            </ul>
+            </f:if>
+            <f:if condition="!{eventItemsByYear}">
+                <ul class="list-group list-group-flush no-bullet event-list-newdesign"
+                    style="margin:0; padding:0; list-style:none;">
+                    <f:for each="{eventItems}" as="item">
+                        <f:variable name="event" value="{item.event}" />
+                        <li class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>" style="padding:12px 10px; border-bottom:1px solid #e5e9f2; position:relative;">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-auto enumber" style="font-weight:600; opacity: 0.8; color:#5b8fd9; min-width:60px;">
+                                    {item.plainNumber}
+                                </div>
+                                <div class="col">
+                                    <div style="font-size:1.1rem; font-weight:700; color:#111; line-height:1.2;">
+                                        {event.title}
+                                        <f:if condition="{event.location}">
+                                            <span style="font-style:italic; font-weight:500; color:#444;">
+                                                – {event.location}
+                                            </span>
+                                        </f:if>
+                                    </div>
+                                    <div style="font-size:0.85rem; color:#6c757d;">
+                                        <f:format.date format="d.m.Y">{event.start}</f:format.date>
+                                        ·
+                                        <f:format.date format="H:i">{event.start}</f:format.date>
+                                        <f:if condition="{event.end}">
+                                            – <f:format.date format="H:i">{event.end}</f:format.date>
+                                        </f:if>
+                                        Uhr
+                                    </div>
+                                    <f:if condition="!{event.disableDetail}">
+                                        <f:link.action
+                                            action="show"
+                                            arguments="{event: event, station: activeStationUid}"
+                                            pageUid="{detailPageUid}"
+                                            class="stretched-link">
+                                            <span class="visually-hidden">Zum Einsatz {event.title}</span>
+                                        </f:link.action>
+                                    </f:if>
+                                </div>
+                            </div>
+                        </li>
+                    </f:for>
+                </ul>
+            </f:if>
         </f:then>
 
         <f:else>
