@@ -58,6 +58,21 @@
                         </TCEforms>
                     </settings.defaultStation>
 
+                    <settings.showStationFilter>
+                        <TCEforms>
+                            <label>Auswahl der Ortsfeuerwehr im Frontend anzeigen</label>
+                            <config>
+                                <type>check</type>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">Ja</numIndex>
+                                    </numIndex>
+                                </items>
+                                <default>1</default>
+                            </config>
+                        </TCEforms>
+                    </settings.showStationFilter>
+
                     <settings.maxCount>
                         <TCEforms>
                             <label>LLL:EXT:rescue_reports/Resources/Private/Language/locallang_db.xlf:maxCount</label>
