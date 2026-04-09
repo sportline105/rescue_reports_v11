@@ -8,148 +8,75 @@
         <f:else><h1 class="rescue-statistics__station">Einsatzstatistik</h1></f:else>
     </f:if>
 
-    <f:if condition="{statistics}">
-        <f:then>
-            <f:for each="{statistics}" as="yearData" key="year">
-                <div class="rescue-statistics__year">
-                    <h3 class="rescue-statistics__year-title">
-                        {year}
-                        <span class="rescue-statistics__total">({yearData.total} Einsätze gesamt)</span>
-                        <f:if condition="{yearData.yearTotalDuration}">
-                            <span class="rescue-statistics__total">— Gesamtdauer: {yearData.yearTotalDuration}</span>
-                        </f:if>
-                    </h3>
-
-                    <div class="rescue-statistics__layout">
-
-                        <!-- Tortendiagramm als SVG -->
-                        <div class="rescue-statistics__chart-wrap">
-                            <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
-                                <f:for each="{yearData.svgPaths}" as="slice">
-                                    <f:if condition="{slice.type} == 'circle'">
-                                        <f:then>
-                                            <circle cx="110" cy="110" r="100" fill="{slice.color}">
-                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
-                                            </circle>
-                                        </f:then>
-                                        <f:else>
-                                            <path d="{slice.d}" fill="{slice.color}">
-                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
-                                            </path>
-                                        </f:else>
-                                    </f:if>
-                                </f:for>
-                            </svg>
-                        </div>
-
-                        <!-- Tabelle -->
-                        <div class="rescue-statistics__table-wrap">
-                            <table class="rescue-statistics__table">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Kategorie</th>
-                                        <th class="rescue-statistics__num">Anzahl</th>
-                                        <th class="rescue-statistics__num">Anteil</th>
-                                        <th class="rescue-statistics__num">Ø Dauer</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <f:for each="{yearData.categories}" as="cat">
-                                        <tr>
-                                            <td><span class="rescue-statistics__dot" style="background:{cat.color}"></span></td>
-                                            <td>{cat.title}</td>
-                                            <td class="rescue-statistics__num">{cat.count}</td>
-                                            <td class="rescue-statistics__num">{cat.percent} %</td>
-                                            <td class="rescue-statistics__num">{cat.avgDuration}</td>
-                                        </tr>
-                                    </f:for>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="2"><strong>Gesamt</strong></td>
-                                        <td class="rescue-statistics__num"><strong>{yearData.total}</strong></td>
-                                        <td class="rescue-statistics__num"><strong>100 %</strong></td>
-                                        <td class="rescue-statistics__num">—</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-
-                    </div>
-                    <f:if condition="{yearData.yearCompare}">
-                        <p class="rescue-statistics__compare">Im Vergleich zum Vorjahr: {yearData.yearCompare}</p>
-                    </f:if>
-                </div>
-            </f:for>
-        </f:then>
-        <f:else>
-            <p class="rescue-statistics__empty">Keine Einsatzdaten vorhanden.</p>
-        </f:else>
-    </f:if>
+    <f:render partial="Statistics/PieChart" arguments="{statistics: statistics}" />
 
     <f:if condition="{showMonthlyChart} && {monthlyStatistics.svgBarChart}">
         <div class="rescue-statistics__bar-chart">
             <h3>Monatliche Einsätze im Jahresvergleich</h3>
-            <svg viewBox="{monthlyStatistics.svgBarChart.viewBox}"
-                 xmlns="http://www.w3.org/2000/svg"
-                 style="width:100%;max-width:700px;height:auto;display:block;">
+            <div class="rescue-statistics__bar-chart-desktop">
+                <svg viewBox="{monthlyStatistics.svgBarChart.viewBox}"
+                     xmlns="http://www.w3.org/2000/svg"
+                     style="width:100%;max-width:700px;height:auto;display:block;">
 
-                <!-- Gitterlinien + Y-Achsenbeschriftung -->
-                <f:for each="{monthlyStatistics.svgBarChart.gridLines}" as="gl">
-                    <line x1="{gl.x1}" y1="{gl.y1}" x2="{gl.x2}" y2="{gl.y2}"
-                          stroke="#e0e0e0" stroke-width="1"/>
-                    <text x="{gl.labelX}" y="{gl.labelY}"
-                          text-anchor="end" font-size="10" fill="#888">{gl.label}</text>
+                    <!-- Gitterlinien + Y-Achsenbeschriftung -->
+                    <f:for each="{monthlyStatistics.svgBarChart.gridLines}" as="gl">
+                        <line x1="{gl.x1}" y1="{gl.y1}" x2="{gl.x2}" y2="{gl.y2}"
+                              stroke="#e0e0e0" stroke-width="1"/>
+                        <text x="{gl.labelX}" y="{gl.labelY}"
+                              text-anchor="end" font-size="10" fill="#888">{gl.label}</text>
+                    </f:for>
+
+                    <!-- X-Achse -->
+                    <line x1="{monthlyStatistics.svgBarChart.axisLeft}"
+                          y1="{monthlyStatistics.svgBarChart.axisBottom}"
+                          x2="{monthlyStatistics.svgBarChart.axisRight}"
+                          y2="{monthlyStatistics.svgBarChart.axisBottom}"
+                          stroke="#ccc" stroke-width="1"/>
+
+                    <!-- Balken -->
+                    <f:for each="{monthlyStatistics.svgBarChart.bars}" as="bar">
+                        <rect class="bar"
+                              x="{bar.x}" y="{bar.y}"
+                              width="{bar.width}" height="{bar.height}"
+                              fill="{bar.color}">
+                            <title>{bar.tooltip}</title>
+                        </rect>
+                    </f:for>
+
+                    <!-- Monatsbeschriftungen -->
+                    <f:for each="{monthlyStatistics.svgBarChart.monthLabels}" as="ml">
+                        <text x="{ml.x}" y="{ml.y}"
+                              text-anchor="middle" font-size="10" fill="#555">{ml.text}</text>
+                    </f:for>
+
+                    <!-- Legende -->
+                    <f:for each="{monthlyStatistics.svgBarChart.legend}" as="lg">
+                        <rect x="{lg.rx}" y="{lg.ry}" width="10" height="10" fill="{lg.color}"/>
+                        <text x="{lg.tx}" y="{lg.ty}" font-size="11" fill="#333">{lg.label}</text>
+                    </f:for>
+                </svg>
+            </div>
+
+            <div class="rescue-statistics__bar-chart-mobile">
+                <f:for each="{monthlyStatistics.mobileRows}" as="row">
+                    <div class="rescue-statistics__mobile-row">
+                        <div class="rescue-statistics__mobile-month">{row.month}</div>
+                        <f:for each="{row.values}" as="value">
+                            <div class="rescue-statistics__mobile-line">
+                                <span class="rescue-statistics__mobile-year">{value.year}</span>
+                                <div class="rescue-statistics__mobile-track">
+                                    <span class="rescue-statistics__mobile-fill"
+                                          style="width:{value.percent}%;background:{value.color};"></span>
+                                </div>
+                                <span class="rescue-statistics__mobile-count">{value.count}</span>
+                            </div>
+                        </f:for>
+                    </div>
                 </f:for>
-
-                <!-- X-Achse -->
-                <line x1="{monthlyStatistics.svgBarChart.axisLeft}"
-                      y1="{monthlyStatistics.svgBarChart.axisBottom}"
-                      x2="{monthlyStatistics.svgBarChart.axisRight}"
-                      y2="{monthlyStatistics.svgBarChart.axisBottom}"
-                      stroke="#ccc" stroke-width="1"/>
-
-                <!-- Balken -->
-                <f:for each="{monthlyStatistics.svgBarChart.bars}" as="bar">
-                    <rect class="bar"
-                          x="{bar.x}" y="{bar.y}"
-                          width="{bar.width}" height="{bar.height}"
-                          fill="{bar.color}">
-                        <title>{bar.tooltip}</title>
-                    </rect>
-                </f:for>
-
-                <!-- Monatsbeschriftungen -->
-                <f:for each="{monthlyStatistics.svgBarChart.monthLabels}" as="ml">
-                    <text x="{ml.x}" y="{ml.y}"
-                          text-anchor="middle" font-size="10" fill="#555">{ml.text}</text>
-                </f:for>
-
-                <!-- Legende -->
-                <f:for each="{monthlyStatistics.svgBarChart.legend}" as="lg">
-                    <rect x="{lg.rx}" y="{lg.ry}" width="10" height="10" fill="{lg.color}"/>
-                    <text x="{lg.tx}" y="{lg.ty}" font-size="11" fill="#333">{lg.label}</text>
-                </f:for>
-
-            </svg>
+            </div>
         </div>
     </f:if>
 
 </div>
-
-<style>
-.rescue-statistics__layout      { display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap; margin:1rem 0 2rem; }
-.rescue-statistics__chart-wrap  { flex:0 0 220px; }
-.rescue-statistics__table-wrap  { flex:1 1 300px; }
-.rescue-statistics__table       { width:100%; border-collapse:collapse; }
-.rescue-statistics__table th,
-.rescue-statistics__table td    { padding:.35rem .6rem; border-bottom:1px solid #ddd; vertical-align:middle; }
-.rescue-statistics__num         { text-align:right; white-space:nowrap; }
-.rescue-statistics__dot         { display:inline-block; width:14px; height:14px; border-radius:50%; }
-.rescue-statistics__total       { font-size:.85em; font-weight:normal; color:#666; margin-left:.5rem; }
-.rescue-statistics__year-title  { margin-bottom:.25rem; }
-.rescue-statistics__compare     { font-size:.85em; color:#666; margin-top:.5rem; }
-</style>
 
 </f:section>

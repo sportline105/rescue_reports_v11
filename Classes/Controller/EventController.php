@@ -172,11 +172,12 @@ class EventController extends ActionController
                 $pageRenderer->addCssInlineBlock(
                     'rescueStatisticsPieTooltip',
                     '.pie-wrap{position:relative;display:inline-block;}'
-                    . '.pie-tooltip{display:none;position:absolute;top:calc(100% + 6px);left:50%;'
-                    .   'transform:translateX(-50%);min-width:160px;max-width:240px;'
+                    . '.pie-tooltip{display:none;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);'
+                    .   'min-width:0;width:max-content;max-width:min(360px,calc(100vw - 20px));'
                     .   'background:rgba(255,255,255,.97);border:1px solid #ddd;border-radius:4px;'
                     .   'padding:6px 10px;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,.15);'
                     .   'pointer-events:none;font-size:.82em;line-height:1.4;}'
+                    . 'html.rescue-pie-tooltip--enhanced .pie-tooltip{position:fixed;left:0;top:0;transform:none;}'
                     . '.pie-tooltip strong{display:block;margin-bottom:3px;}'
                     . '.pie-tooltip__types{margin:2px 0 4px;padding-left:14px;}'
                     . '.pie-tooltip__meta{color:#666;font-size:.9em;}'
@@ -188,12 +189,49 @@ class EventController extends ActionController
                         if ($uid > 0 && !in_array($uid, $seenTooltipUids, true)) {
                             $seenTooltipUids[] = $uid;
                             $pageRenderer->addCssInlineBlock(
-                                'rescueStatisticsPieTooltip' . $uid,
-                                ".pie-wrap:has(.pie-slice--{$uid}:hover) .pie-tooltip--{$uid}{display:block;}"
+                                'rescueStatisticsPieTooltipFallback' . $uid,
+                                "html:not(.rescue-pie-tooltip--enhanced) .pie-wrap:has(.pie-slice--{$uid}:hover) .pie-tooltip--{$uid}{display:block;}"
                             );
                         }
                     }
                 }
+                $pageRenderer->addJsInlineCode(
+                    'rescueStatisticsPieTooltip',
+                    '(function(){'
+                    . 'if(window.__rescuePieTooltipInit){return;}window.__rescuePieTooltipInit=true;'
+                    . 'document.documentElement.classList.add("rescue-pie-tooltip--enhanced");'
+                    . 'var clamp=function(v,min,max){return Math.max(min,Math.min(max,v));};'
+                    . 'var position=function(t,e){'
+                    . 'var gap=14;var rect=t.getBoundingClientRect();'
+                    . 'var x=e.clientX+gap;var y=e.clientY+gap;'
+                    . 'if(x+rect.width>window.innerWidth-8){x=e.clientX-rect.width-gap;}'
+                    . 'if(y+rect.height>window.innerHeight-8){y=e.clientY-rect.height-gap;}'
+                    . 't.style.left=clamp(x,8,Math.max(8,window.innerWidth-rect.width-8))+"px";'
+                    . 't.style.top=clamp(y,8,Math.max(8,window.innerHeight-rect.height-8))+"px";'
+                    . '};'
+                    . 'document.addEventListener("mouseover",function(e){'
+                    . 'var slice=e.target.closest(".pie-slice[data-category-uid]");if(!slice){return;}'
+                    . 'var wrap=slice.closest(".pie-wrap");if(!wrap){return;}'
+                    . 'var uid=slice.getAttribute("data-category-uid");'
+                    . 'var tooltip=wrap.querySelector(".pie-tooltip[data-category-uid=\'"+uid+"\']");'
+                    . 'if(!tooltip){return;}tooltip.style.display="block";position(tooltip,e);'
+                    . '});'
+                    . 'document.addEventListener("mousemove",function(e){'
+                    . 'var slice=e.target.closest(".pie-slice[data-category-uid]");if(!slice){return;}'
+                    . 'var wrap=slice.closest(".pie-wrap");if(!wrap){return;}'
+                    . 'var uid=slice.getAttribute("data-category-uid");'
+                    . 'var tooltip=wrap.querySelector(".pie-tooltip[data-category-uid=\'"+uid+"\']");'
+                    . 'if(!tooltip||tooltip.style.display!=="block"){return;}position(tooltip,e);'
+                    . '});'
+                    . 'document.addEventListener("mouseout",function(e){'
+                    . 'var slice=e.target.closest(".pie-slice[data-category-uid]");if(!slice){return;}'
+                    . 'var wrap=slice.closest(".pie-wrap");if(!wrap){return;}'
+                    . 'var uid=slice.getAttribute("data-category-uid");'
+                    . 'var tooltip=wrap.querySelector(".pie-tooltip[data-category-uid=\'"+uid+"\']");'
+                    . 'if(tooltip){tooltip.style.display="none";}'
+                    . '});'
+                    . '})();'
+                );
             }
         }
 
@@ -305,11 +343,12 @@ class EventController extends ActionController
             $pageRenderer->addCssInlineBlock(
                 'rescueStatisticsPieTooltip',
                 '.pie-wrap{position:relative;display:inline-block;}'
-                . '.pie-tooltip{display:none;position:absolute;top:calc(100% + 6px);left:50%;'
-                .   'transform:translateX(-50%);min-width:160px;max-width:240px;'
+                . '.pie-tooltip{display:none;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);'
+                .   'min-width:0;width:max-content;max-width:min(360px,calc(100vw - 20px));'
                 .   'background:rgba(255,255,255,.97);border:1px solid #ddd;border-radius:4px;'
                 .   'padding:6px 10px;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,.15);'
                 .   'pointer-events:none;font-size:.82em;line-height:1.4;}'
+                . 'html.rescue-pie-tooltip--enhanced .pie-tooltip{position:fixed;left:0;top:0;transform:none;}'
                 . '.pie-tooltip strong{display:block;margin-bottom:3px;}'
                 . '.pie-tooltip__types{margin:2px 0 4px;padding-left:14px;}'
                 . '.pie-tooltip__meta{color:#666;font-size:.9em;}'
@@ -321,17 +360,67 @@ class EventController extends ActionController
                     if ($uid > 0 && !in_array($uid, $seenTooltipUids, true)) {
                         $seenTooltipUids[] = $uid;
                         $pageRenderer->addCssInlineBlock(
-                            'rescueStatisticsPieTooltip' . $uid,
-                            ".pie-wrap:has(.pie-slice--{$uid}:hover) .pie-tooltip--{$uid}{display:block;}"
+                            'rescueStatisticsPieTooltipFallback' . $uid,
+                            "html:not(.rescue-pie-tooltip--enhanced) .pie-wrap:has(.pie-slice--{$uid}:hover) .pie-tooltip--{$uid}{display:block;}"
                         );
                     }
                 }
             }
+            $pageRenderer->addJsInlineCode(
+                'rescueStatisticsPieTooltip',
+                '(function(){'
+                . 'if(window.__rescuePieTooltipInit){return;}window.__rescuePieTooltipInit=true;'
+                . 'document.documentElement.classList.add("rescue-pie-tooltip--enhanced");'
+                . 'var clamp=function(v,min,max){return Math.max(min,Math.min(max,v));};'
+                . 'var position=function(t,e){'
+                . 'var gap=14;var rect=t.getBoundingClientRect();'
+                . 'var x=e.clientX+gap;var y=e.clientY+gap;'
+                . 'if(x+rect.width>window.innerWidth-8){x=e.clientX-rect.width-gap;}'
+                . 'if(y+rect.height>window.innerHeight-8){y=e.clientY-rect.height-gap;}'
+                . 't.style.left=clamp(x,8,Math.max(8,window.innerWidth-rect.width-8))+"px";'
+                . 't.style.top=clamp(y,8,Math.max(8,window.innerHeight-rect.height-8))+"px";'
+                . '};'
+                . 'document.addEventListener("mouseover",function(e){'
+                . 'var slice=e.target.closest(".pie-slice[data-category-uid]");if(!slice){return;}'
+                . 'var wrap=slice.closest(".pie-wrap");if(!wrap){return;}'
+                . 'var uid=slice.getAttribute("data-category-uid");'
+                . 'var tooltip=wrap.querySelector(".pie-tooltip[data-category-uid=\'"+uid+"\']");'
+                . 'if(!tooltip){return;}tooltip.style.display="block";position(tooltip,e);'
+                . '});'
+                . 'document.addEventListener("mousemove",function(e){'
+                . 'var slice=e.target.closest(".pie-slice[data-category-uid]");if(!slice){return;}'
+                . 'var wrap=slice.closest(".pie-wrap");if(!wrap){return;}'
+                . 'var uid=slice.getAttribute("data-category-uid");'
+                . 'var tooltip=wrap.querySelector(".pie-tooltip[data-category-uid=\'"+uid+"\']");'
+                . 'if(!tooltip||tooltip.style.display!=="block"){return;}position(tooltip,e);'
+                . '});'
+                . 'document.addEventListener("mouseout",function(e){'
+                . 'var slice=e.target.closest(".pie-slice[data-category-uid]");if(!slice){return;}'
+                . 'var wrap=slice.closest(".pie-wrap");if(!wrap){return;}'
+                . 'var uid=slice.getAttribute("data-category-uid");'
+                . 'var tooltip=wrap.querySelector(".pie-tooltip[data-category-uid=\'"+uid+"\']");'
+                . 'if(tooltip){tooltip.style.display="none";}'
+                . '});'
+                . '})();'
+            );
             $pageRenderer->addCssInlineBlock(
                 'rescueStatisticsBar',
                 '.rescue-statistics__bar-chart{margin:2rem 0 1rem;}'
+                . '.rescue-statistics__bar-chart-desktop{display:block;}'
+                . '.rescue-statistics__bar-chart-mobile{display:none;}'
                 . '.rescue-statistics__bar-chart svg rect.bar{transition:opacity .15s;cursor:default;}'
                 . '.rescue-statistics__bar-chart svg rect.bar:hover{opacity:.8;}'
+                . '.rescue-statistics__mobile-row{margin:0 0 .75rem;padding:.5rem .6rem;border:1px solid #e5e5e5;border-radius:6px;}'
+                . '.rescue-statistics__mobile-month{font-weight:600;margin-bottom:.35rem;}'
+                . '.rescue-statistics__mobile-line{display:flex;align-items:center;gap:.45rem;margin:.2rem 0;}'
+                . '.rescue-statistics__mobile-year{flex:0 0 2.8rem;font-size:.9em;color:#555;}'
+                . '.rescue-statistics__mobile-track{flex:1;height:10px;background:#f1f1f1;border-radius:999px;overflow:hidden;}'
+                . '.rescue-statistics__mobile-fill{display:block;height:100%;min-width:2px;border-radius:999px;}'
+                . '.rescue-statistics__mobile-count{flex:0 0 1.8rem;text-align:right;font-variant-numeric:tabular-nums;}'
+                . '@media (max-width:720px){'
+                . '.rescue-statistics__bar-chart-desktop{display:none;}'
+                . '.rescue-statistics__bar-chart-mobile{display:block;}'
+                . '}'
             );
         }
 
