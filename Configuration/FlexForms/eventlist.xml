@@ -150,6 +150,27 @@
                         </TCEforms>
                     </settings.enableYearFilter>
 
+                    <settings.yearFilterDefault>
+                        <TCEforms>
+                            <label>Jahresfilter: Standardauswahl beim ersten Aufruf</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingle</renderType>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">Aktuelles Jahr</numIndex>
+                                        <numIndex index="1">current</numIndex>
+                                    </numIndex>
+                                    <numIndex index="1">
+                                        <numIndex index="0">Alle Jahre</numIndex>
+                                        <numIndex index="1">all</numIndex>
+                                    </numIndex>
+                                </items>
+                                <default>current</default>
+                            </config>
+                        </TCEforms>
+                    </settings.yearFilterDefault>
+
                     <settings.statisticsYears>
                         <TCEforms>
                             <label>Statistik: Anzahl angezeigter Jahre (0 = alle)</label>
@@ -238,6 +259,27 @@
                             </config>
                         </TCEforms>
                     </settings.mapZoom>
+
+                    <settings.mapPosition>
+                        <TCEforms>
+                            <label>Position der Karte</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingle</renderType>
+                                <items>
+                                    <numIndex index="0">
+                                        <numIndex index="0">Unterhalb der Einsatzliste</numIndex>
+                                        <numIndex index="1">below</numIndex>
+                                    </numIndex>
+                                    <numIndex index="1">
+                                        <numIndex index="0">Oberhalb der Einsatzliste</numIndex>
+                                        <numIndex index="1">above</numIndex>
+                                    </numIndex>
+                                </items>
+                                <default>below</default>
+                            </config>
+                        </TCEforms>
+                    </settings.mapPosition>
 
                 </el>
             </ROOT>

@@ -47,10 +47,12 @@ class EventController extends ActionController
         $enableYearFilter    = (bool)($this->settings['enableYearFilter'] ?? false);
         $enableDateFilter    = (bool)($this->settings['enableDateFilter'] ?? false);
         $showMapView         = (bool)($this->settings['showMapView'] ?? false);
-        // $year === null  → erster Aufruf (kein Submit) → aktuelles Jahr vorauswählen
+        $mapPosition         = (string)($this->settings['mapPosition'] ?? 'below');
+        $yearFilterDefault   = (string)($this->settings['yearFilterDefault'] ?? 'current');
+        // $year === null  → erster Aufruf (kein Submit) → Standardauswahl aus Backend
         // $year === '0'   → Nutzer hat explizit „Alle Jahre" gewählt → 0 behalten
         $selectedYear = ($year === null && $enableYearFilter)
-            ? (int)date('Y')
+            ? ($yearFilterDefault === 'all' ? 0 : (int)date('Y'))
             : (int)($year ?? 0);
 
         // Request-Datumswerte überschreiben FlexForm-Einstellung wenn Datumsfilter aktiv
@@ -259,6 +261,7 @@ class EventController extends ActionController
             'availableYears'      => $availableYears,
             'selectedYear'        => $selectedYear,
             'showMapView'         => $showMapView,
+            'mapPosition'         => $mapPosition,
         ]);
 
         return $this->htmlResponse();
