@@ -56,6 +56,10 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         ]
     );
 
+    // RTE-Preset 'rescue_reports' registrieren (mit TextSnippets-Plugin, AJAX-basiert)
+    $GLOBALS['TYPO3_CONF_VARS']['RTE']['Presets']['rescue_reports'] =
+        'EXT:rescue_reports/Configuration/RTE/RteConfig.yaml';
+
 })();
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][] = [
