@@ -46,6 +46,7 @@ class EventController extends ActionController
         $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
         $enableYearFilter    = (bool)($this->settings['enableYearFilter'] ?? false);
         $enableDateFilter    = (bool)($this->settings['enableDateFilter'] ?? false);
+        $showMapView         = (bool)($this->settings['showMapView'] ?? false);
         // $year === null  → erster Aufruf (kein Submit) → aktuelles Jahr vorauswählen
         // $year === '0'   → Nutzer hat explizit „Alle Jahre" gewählt → 0 behalten
         $selectedYear = ($year === null && $enableYearFilter)
@@ -257,6 +258,7 @@ class EventController extends ActionController
             'enableYearFilter'    => $enableYearFilter,
             'availableYears'      => $availableYears,
             'selectedYear'        => $selectedYear,
+            'showMapView'         => $showMapView,
         ]);
 
         return $this->htmlResponse();
