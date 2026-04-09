@@ -20,12 +20,12 @@
                                     <f:for each="{yearData.svgPaths}" as="slice">
                                         <f:if condition="{slice.type} == 'circle'">
                                             <f:then>
-                                                <circle cx="110" cy="110" r="100" fill="{slice.color}" class="pie-slice pie-slice--{slice.categoryUid}">
-                                                    <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
-                                                </circle>
+                                            <circle cx="110" cy="110" r="100" fill="{slice.color}" class="pie-slice pie-slice--{slice.categoryUid}" data-category-uid="{slice.categoryUid}">
+                                                <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
+                                            </circle>
                                             </f:then>
                                             <f:else>
-                                                <path d="{slice.d}" fill="{slice.color}" class="pie-slice pie-slice--{slice.categoryUid}">
+                                                <path d="{slice.d}" fill="{slice.color}" class="pie-slice pie-slice--{slice.categoryUid}" data-category-uid="{slice.categoryUid}">
                                                     <title>{slice.title}: {slice.count} Einsätze ({slice.percent} %)</title>
                                                 </path>
                                             </f:else>
@@ -33,7 +33,7 @@
                                     </f:for>
                                 </svg>
                                 <f:for each="{yearData.categories}" as="cat">
-                                    <div class="pie-tooltip pie-tooltip--{cat.uid}">
+                                    <div class="pie-tooltip pie-tooltip--{cat.uid}" data-category-uid="{cat.uid}">
                                         <strong>{cat.title}</strong>
                                         <f:if condition="{cat.types}">
                                             <ul class="pie-tooltip__types">
