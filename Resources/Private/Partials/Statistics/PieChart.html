@@ -37,8 +37,14 @@
                                         <strong>{cat.title}</strong>
                                         <f:if condition="{cat.types}">
                                             <ul class="pie-tooltip__types">
-                                                <f:for each="{cat.types}" as="typeName">
-                                                    <li>{typeName}</li>
+                                                <f:for each="{cat.types}" as="typeItem">
+                                                    <li>
+                                                        {typeItem.title}
+                                                        ({typeItem.count}
+                                                        ·
+                                                        <f:format.number decimals="1" decimalSeparator="," thousandsSeparator=".">{typeItem.percent}</f:format.number>
+                                                        %)
+                                                    </li>
                                                 </f:for>
                                             </ul>
                                         </f:if>
