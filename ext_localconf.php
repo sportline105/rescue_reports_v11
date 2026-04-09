@@ -28,7 +28,7 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
             EventController::class => 'statistics',
         ],
         [
-            EventController::class => '',
+            EventController::class => 'statistics',
         ]
     );
 
