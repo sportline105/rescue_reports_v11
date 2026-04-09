@@ -84,6 +84,12 @@
                     </f:if>
                 </f:if>
 
+                <f:if condition="{showMapView}">
+                    <f:if condition="{mapPosition} == 'above'">
+                        <f:render partial="Map/EventList" arguments="{events: events, settings: settings}" />
+                    </f:if>
+                </f:if>
+
                 <f:if condition="{maxCount} > 0">
                     <f:then>
                         <div class="filter-info mb-4 p-3 bg-light border-start border-4 border-danger small text-muted">
@@ -111,10 +117,6 @@
                             </div>
                         </f:if>
                     </f:else>
-                </f:if>
-
-                <f:if condition="{showMapView}">
-                    <f:render partial="Map/EventList" arguments="{events: events, settings: settings}" />
                 </f:if>
 
                 <f:if condition="{enableSearch}">
@@ -240,6 +242,12 @@
                 </f:if>
             </f:if>
 
+            <f:if condition="{showMapView}">
+                <f:if condition="{mapPosition} == 'above'">
+                    <f:render partial="Map/EventList" arguments="{events: events, settings: settings}" />
+                </f:if>
+            </f:if>
+
             <div class="filter-info" style="margin-bottom: 10px; font-size: 0.9em; color: #555;">
                 <f:if condition="{maxCount} > 0">
                     <div>Anzeige auf maximal {maxCount} Einsätze begrenzt.</div>
@@ -338,6 +346,12 @@
         <f:if condition="{statisticsPosition} != 'above'">
             <hr class="my-4">
             <f:render partial="Statistics/PieChart" arguments="{statistics: statistics, title: 'Einsatzstatistik'}" />
+        </f:if>
+    </f:if>
+
+    <f:if condition="{showMapView}">
+        <f:if condition="{mapPosition} != 'above'">
+            <f:render partial="Map/EventList" arguments="{events: events, settings: settings}" />
         </f:if>
     </f:if>
 
