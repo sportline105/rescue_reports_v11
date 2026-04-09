@@ -301,9 +301,27 @@ class EventController extends ActionController
     /**
      * Jahresstatistik nach Kategorie, optional gefiltert nach Ortsfeuerwehr
      */
-    public function statisticsAction(): ResponseInterface
+    public function statisticsAction(?string $station = null): ResponseInterface
     {
-        $stationUid       = (int)($this->settings['station'] ?? 0);
+        $defaultStationUid = (int)($this->settings['station'] ?? 0);
+        $selectedStationUid = $this->normalizeRecordUid($station);
+        $stations = $this->stationRepository->findPrimaryBrigadeStations();
+        $allowedStationUids = [];
+        foreach ($stations as $stationRecord) {
+            $allowedStationUids[] = (int)$stationRecord->getUid();
+        }
+
+        $stationUid = $selectedStationUid > 0 ? $selectedStationUid : $defaultStationUid;
+        if ($stationUid > 0 && !in_array($stationUid, $allowedStationUids, true)) {
+            $stationUid = 0;
+        }
+        if ($stationUid === 0) {
+            $firstStation = $stations->getFirst();
+            if ($firstStation) {
+                $stationUid = (int)$firstStation->getUid();
+            }
+        }
+
         $statisticsYears  = (int)($this->settings['statisticsYears'] ?? 0);
         $showMonthlyChart = (bool)($this->settings['showMonthlyChart'] ?? true);
         $statistics       = $this->eventRepository->getYearlyStatistics($stationUid, $statisticsYears);
@@ -323,7 +341,10 @@ class EventController extends ActionController
             $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
             $pageRenderer->addCssInlineBlock(
                 'rescueStatisticsLayout',
-                '.rescue-statistics__layout{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin:1rem 0 2rem;}'
+                '.rescue-statistics__station-filter{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.25rem 0 1rem;}'
+                . '.rescue-statistics__station-label{font-weight:600;margin:0;}'
+                . '.rescue-statistics__station-filter select{min-width:220px;}'
+                . '.rescue-statistics__layout{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;margin:1rem 0 2rem;}'
                 . '.rescue-statistics__chart-wrap{flex:0 0 220px;}'
                 . '.rescue-statistics__table-wrap{flex:1 1 300px;}'
                 . '.rescue-statistics__table{width:100%;border-collapse:collapse;}'
@@ -430,6 +451,8 @@ class EventController extends ActionController
             'showMonthlyChart'  => $showMonthlyChart,
             'stationName'       => $stationName,
             'stationUid'        => $stationUid,
+            'activeStationUid'  => $stationUid,
+            'stations'          => $stations,
         ]);
 
         return $this->htmlResponse();
