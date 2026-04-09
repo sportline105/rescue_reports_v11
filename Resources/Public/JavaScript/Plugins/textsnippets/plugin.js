@@ -8,8 +8,8 @@
  *   Da der Pre-Fetch schon beim Plugin-Load startet, ist loadedItems in aller
  *   Regel bereits gesetzt, wenn init() aufgerufen wird – und kann synchron
  *   übergeben werden (identisch zum Original-Ansatz mit config-Items).
- *   onOpen dient als Fallback für den unwahrscheinlichen Fall, dass der Request
- *   noch läuft.
+ *   Falls der Fetch noch läuft, wenn init() aufgerufen wird, wird comboRef
+ *   gespeichert und der Fetch befüllt das Combo retroaktiv nach Abschluss.
  */
 CKEDITOR.plugins.add('textSnippets', {
     requires: 'richcombo',
@@ -21,6 +21,8 @@ CKEDITOR.plugins.add('textSnippets', {
 
         // null = wird noch geladen, Array = fertig (auch leer)
         var loadedItems = null;
+        // Referenz auf das Combo, sobald init() aufgerufen wurde
+        var comboRef = null;
 
         var ajaxUrl = (typeof TYPO3 !== 'undefined' &&
                        TYPO3.settings &&
@@ -29,13 +31,39 @@ CKEDITOR.plugins.add('textSnippets', {
             ? TYPO3.settings.ajaxUrls['rescue_reports_snippets']
             : null;
 
+        function fillCombo(combo, items) {
+            if (!items || items.length === 0) {
+                combo.add(
+                    '_empty',
+                    '<span style="color:#999;font-style:italic">(keine Textbausteine vorhanden)</span>',
+                    '(keine Textbausteine vorhanden)'
+                );
+            } else {
+                for (var i = 0; i < items.length; i++) {
+                    combo.add(items[i].id, items[i].title, items[i].title);
+                }
+            }
+        }
+
         if (ajaxUrl) {
             // Pre-Fetch sofort starten – init() wird erst beim ersten Klick aufgerufen,
             // daher ist der Request meistens schon fertig.
             fetch(ajaxUrl)
                 .then(function (r) { return r.json(); })
-                .then(function (items) { loadedItems = items; })
-                .catch(function () { loadedItems = []; });
+                .then(function (items) {
+                    loadedItems = items;
+                    // Retroaktiv befüllen, falls init() schon gelaufen ist,
+                    // das Combo aber noch leer ist (Pre-Fetch war noch nicht fertig)
+                    if (comboRef && !(comboRef._.items && Object.keys(comboRef._.items).length > 0)) {
+                        fillCombo(comboRef, items);
+                    }
+                })
+                .catch(function () {
+                    loadedItems = [];
+                    if (comboRef && !(comboRef._.items && Object.keys(comboRef._.items).length > 0)) {
+                        fillCombo(comboRef, []);
+                    }
+                });
         } else {
             loadedItems = [];
         }
@@ -55,20 +83,6 @@ CKEDITOR.plugins.add('textSnippets', {
             (document.head || document.getElementsByTagName('head')[0]).appendChild(style);
         });
 
-        function fillCombo(combo, items) {
-            if (!items || items.length === 0) {
-                combo.add(
-                    '_empty',
-                    '<span style="color:#999;font-style:italic">(keine Textbausteine vorhanden)</span>',
-                    '(keine Textbausteine vorhanden)'
-                );
-            } else {
-                for (var i = 0; i < items.length; i++) {
-                    combo.add(items[i].id, items[i].title, items[i].title);
-                }
-            }
-        }
-
         editor.ui.add('TextSnippets', CKEDITOR.UI_RICHCOMBO, {
             label: groupTitle,
             title: groupTitle,
@@ -85,15 +99,14 @@ CKEDITOR.plugins.add('textSnippets', {
             init: function () {
                 // init() wird LAZY beim ersten open() aufgerufen – Pre-Fetch ist
                 // zu diesem Zeitpunkt normalerweise bereits abgeschlossen.
-                var combo = this;
+                comboRef = this;
                 if (loadedItems !== null) {
-                    fillCombo(combo, loadedItems);
+                    fillCombo(this, loadedItems);
                 }
-                // Falls noch nicht fertig: onOpen greift als Fallback
+                // Falls noch nicht fertig: Pre-Fetch befüllt retroaktiv nach Abschluss
             },
 
             onOpen: function () {
-                var combo = this;
                 var panel = this._.panel;
 
                 // Panel-Breite erzwingen
@@ -106,39 +119,6 @@ CKEDITOR.plugins.add('textSnippets', {
                         }
                     }
                 }, 0);
-
-                // Fallback: init() hatte keine Items (Pre-Fetch war noch nicht fertig)
-                var hasItems = combo._.items && Object.keys(combo._.items).length > 0;
-                if (!hasItems) {
-                    if (loadedItems !== null) {
-                        // Inzwischen fertig
-                        fillCombo(combo, loadedItems);
-                    } else if (ajaxUrl) {
-                        // Noch am Laden – jetzt synchron nachladen und Panel neu öffnen
-                        combo.add(
-                            '_loading',
-                            '<span style="color:#999;font-style:italic">Wird geladen\u2026</span>',
-                            'Wird geladen\u2026'
-                        );
-                        fetch(ajaxUrl)
-                            .then(function (r) { return r.json(); })
-                            .then(function (items) {
-                                loadedItems = items;
-                                // Panel schließen, Items zurücksetzen, neu öffnen
-                                combo.close();
-                                combo._.items = {};
-                                fillCombo(combo, items);
-                                combo.open();
-                            })
-                            .catch(function () {
-                                loadedItems = [];
-                                combo.close();
-                                combo._.items = {};
-                                fillCombo(combo, []);
-                                combo.open();
-                            });
-                    }
-                }
             },
 
             onClick: function (value) {

@@ -22,7 +22,7 @@ return [
                 'type'       => 'check',
                 'renderType' => 'checkboxToggle',
                 'items'      => [
-                    [0 => '', 1 => ''],
+                    [0 => '', 1 => '', 'invertStateDisplay' => true],
                 ],
                 'default' => 0,
             ],
