@@ -95,10 +95,14 @@ class EventController extends ActionController
             }
         }
 
+        if ($templateVariant === 'newdesign') {
+            $templateVariant = 'standard';
+        }
+
         $allowedTemplateVariants = [
             'standard',
+            'foundation',
             'sidebar',
-            'newdesign',
             'newdesignsidebar',
         ];
 
@@ -159,7 +163,7 @@ class EventController extends ActionController
         $stations = $this->stationRepository->findPrimaryBrigadeStations();
 
         $statistics = [];
-        if ($showStatistics && in_array($templateVariant, ['standard', 'newdesign'], true)) {
+        if ($showStatistics && in_array($templateVariant, ['standard', 'foundation'], true)) {
             $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid, $statisticsYears);
             if (!empty($statistics)) {
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
@@ -484,6 +488,16 @@ class EventController extends ActionController
     {
         $event = $this->eventRepository->findByUid($event->getUid());
         $groupedVehicleData = $this->groupVehiclesByBrigadeAndStation($event);
+        $templateVariant = (string)($this->settings['templateVariant'] ?? 'standard');
+        if ($templateVariant === 'newdesign') {
+            $templateVariant = 'standard';
+        }
+        if (in_array($templateVariant, ['sidebar', 'newdesignsidebar'], true)) {
+            $templateVariant = 'standard';
+        }
+        if (!in_array($templateVariant, ['standard', 'foundation', 'sidebar', 'newdesignsidebar'], true)) {
+            $templateVariant = 'standard';
+        }
 
         $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
         $selectedStationUid = $this->normalizeRecordUid($station);
@@ -549,7 +563,7 @@ class EventController extends ActionController
             'displayNumber' => $displayNumber,
             'displayPlainNumber' => $displayPlainNumber,
             'displayStationName' => $displayStationName,
-            'templateVariant' => (string)($this->settings['templateVariant'] ?? 'standard'),
+            'templateVariant' => $templateVariant,
             'settings' => $this->settings,
         ]);
 
