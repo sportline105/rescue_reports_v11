@@ -17,7 +17,7 @@
                                 <renderType>selectSingle</renderType>
                                 <items>
                                     <numIndex index="0">
-                                        <numIndex index="0">Standard</numIndex>
+                                        <numIndex index="0">Standard (NewDesign)</numIndex>
                                         <numIndex index="1">standard</numIndex>
                                     </numIndex>
                                     <numIndex index="1">
@@ -25,8 +25,8 @@
                                         <numIndex index="1">sidebar</numIndex>
                                     </numIndex>
                                     <numIndex index="2">
-                                        <numIndex index="0">NewDesign</numIndex>
-                                        <numIndex index="1">newdesign</numIndex>
+                                        <numIndex index="0">Foundation (Legacy)</numIndex>
+                                        <numIndex index="1">foundation</numIndex>
                                     </numIndex>
                                     <numIndex index="3">
                                         <numIndex index="0">NewDesignSidebar</numIndex>
