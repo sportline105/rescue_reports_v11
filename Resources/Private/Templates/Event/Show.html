@@ -2,9 +2,9 @@
 <f:section name="main">
     <f:switch expression="{templateVariant}">
         <!-- =========================================================
-             NewDesign
+             Standard
         ========================================================== -->
-        <f:case value="newdesign">
+        <f:case value="standard">
             <div class="row">
                 <div class="col-12">
                     <h1 class="element-header">{event.title}</h1>
@@ -221,20 +221,20 @@
 
                                                 <div id="lightboxCarousel-{event.uid}" class="carousel slide" data-bs-ride="false">
                                                     <div class="carousel-indicators">
-                                                        <f:for each="{event.images}" as="image" iteration="it">
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
                                                             <button type="button"
                                                                     data-bs-target="#lightboxCarousel-{event.uid}"
-                                                                    data-bs-slide-to="{it.index}"
-                                                                    class="{f:if(condition: it.isFirst, then: 'active')}"
-                                                                    aria-current="{f:if(condition: it.isFirst, then: 'true')}"
-                                                                    aria-label="Bild {it.cycle}"></button>
+                                                                    data-bs-slide-to="{slideIt.index}"
+                                                                    class="{f:if(condition: slideIt.isFirst, then: 'active')}"
+                                                                    aria-current="{f:if(condition: slideIt.isFirst, then: 'true', else: 'false')}"
+                                                                    aria-label="Bild {slideIt.cycle}"></button>
                                                         </f:for>
                                                     </div>
 
                                                     <div class="carousel-inner">
-                                                        <f:for each="{event.images}" as="image" iteration="it">
-                                                            <div class="carousel-item {f:if(condition: it.isFirst, then: 'active')}">
-                                                                <f:image image="{image}" maxWidth="1800" alt="{event.title}" class="d-block w-100" additionalAttributes="{loading:'lazy'}" />
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
+                                                            <div class="carousel-item {f:if(condition: slideIt.isFirst, then: 'active')}">
+                                                                <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100" additionalAttributes="{loading:'lazy'}" />
                                                             </div>
                                                         </f:for>
                                                     </div>
@@ -255,21 +255,37 @@
                                 </div>
 
                                 <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    var modalId = 'lightbox-{event.uid}';
-                                    var modalCarouselId = 'lightboxCarousel-{event.uid}';
+                                (function () {
+                                    var modalEl = document.getElementById('lightbox-{event.uid}');
+                                    var carouselEl = document.getElementById('lightboxCarousel-{event.uid}');
+                                    var startIndex = 0;
 
-                                    document.querySelectorAll('#einsatzCarousel-{event.uid} [data-bs-target="#' + modalId + '"]').forEach(function (el) {
-                                        el.addEventListener('click', function () {
-                                            var index = parseInt(el.getAttribute('data-index'), 10) || 0;
-                                            var carouselEl = document.getElementById(modalCarouselId);
-                                            if (carouselEl) {
-                                                var carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl, { interval: false, wrap: true });
-                                                carousel.to(index);
-                                            }
+                                    if (!modalEl || !carouselEl || typeof bootstrap === 'undefined' || !bootstrap.Carousel) {
+                                        return;
+                                    }
+
+                                    document.querySelectorAll('#einsatzCarousel-{event.uid} [data-bs-target="#lightbox-{event.uid}"]').forEach(function (el) {
+                                        el.addEventListener('click', function (event) {
+                                            event.preventDefault();
+                                            startIndex = parseInt(el.getAttribute('data-index'), 10) || 0;
                                         });
                                     });
-                                });
+
+                                    modalEl.addEventListener('shown.bs.modal', function () {
+                                        var carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl, { interval: false, wrap: true });
+                                        carousel.to(startIndex);
+                                    });
+
+                                    modalEl.addEventListener('hidden.bs.modal', function () {
+                                        carouselEl.querySelectorAll('.carousel-item').forEach(function (item, index) {
+                                            item.classList.toggle('active', index === 0);
+                                        });
+                                        carouselEl.querySelectorAll('.carousel-indicators button').forEach(function (button, index) {
+                                            button.classList.toggle('active', index === 0);
+                                            button.setAttribute('aria-current', index === 0 ? 'true' : 'false');
+                                        });
+                                    });
+                                })();
                                 </script>
                             </f:if>
                         </div>
@@ -283,9 +299,9 @@
         </f:case>
 
         <!-- =========================================================
-             Standard
+             Foundation
         ========================================================== -->
-        <f:defaultCase>
+        <f:case value="foundation">
             <div class="row">
                 <div class="large-12 medium-12 small-12 column">
                     <h1>{event.title}</h1>
@@ -402,27 +418,104 @@
                         <div class="large-12 medium-6 small-12 column">
                             <f:if condition="{event.images}">
                                 <h2><b>Einsatzbilder:</b></h2>
-                                <div id="einsatzslider" class="owl-carousel">
-                                    <f:for each="{event.images}" as="image">
-                                        <a href="{f:uri.image(image: image, maxWidth: 1600)}" class="lightbox-img" rel="lightbox[event-{event.uid}]">
-                                            <f:image image="{image}" maxWidth="400" alt="{event.title}" />
-                                        </a>
-                                    </f:for>
+                                <div id="einsatzCarouselFoundation-{event.uid}" class="carousel slide" data-bs-ride="false">
+                                    <div class="carousel-inner">
+                                        <f:for each="{event.images}" as="image" iteration="it">
+                                            <div class="carousel-item {f:if(condition: it.isFirst, then: 'active')}">
+                                                <a href="#"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#lightboxFoundation-{event.uid}"
+                                                   data-index="{it.index}">
+                                                    <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
+                                                </a>
+                                            </div>
+                                        </f:for>
+                                    </div>
+
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#einsatzCarouselFoundation-{event.uid}" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Zurück</span>
+                                    </button>
+
+                                    <button class="carousel-control-next" type="button" data-bs-target="#einsatzCarouselFoundation-{event.uid}" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Weiter</span>
+                                    </button>
+                                </div>
+
+                                <div class="modal fade" id="lightboxFoundation-{event.uid}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                                        <div class="modal-content bg-dark">
+                                            <div class="modal-body p-0 position-relative">
+                                                <button type="button" class="btn-close btn-close-white position-absolute end-0 m-3" data-bs-dismiss="modal" aria-label="Schließen"></button>
+
+                                                <div id="lightboxCarouselFoundation-{event.uid}" class="carousel slide" data-bs-ride="false">
+                                                    <div class="carousel-indicators">
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
+                                                            <button type="button"
+                                                                    data-bs-target="#lightboxCarouselFoundation-{event.uid}"
+                                                                    data-bs-slide-to="{slideIt.index}"
+                                                                    class="{f:if(condition: slideIt.isFirst, then: 'active')}"
+                                                                    aria-current="{f:if(condition: slideIt.isFirst, then: 'true', else: 'false')}"
+                                                                    aria-label="Bild {slideIt.cycle}"></button>
+                                                        </f:for>
+                                                    </div>
+
+                                                    <div class="carousel-inner">
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
+                                                            <div class="carousel-item {f:if(condition: slideIt.isFirst, then: 'active')}">
+                                                                <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100" additionalAttributes="{loading:'lazy'}" />
+                                                            </div>
+                                                        </f:for>
+                                                    </div>
+
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#lightboxCarouselFoundation-{event.uid}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Zurück</span>
+                                                    </button>
+
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#lightboxCarouselFoundation-{event.uid}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Weiter</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <script>
-                                $(document).ready(function() {
-                                    $("#einsatzslider").owlCarousel({
-                                        singleItem: true,
-                                        navigation: true,
-                                        navigationText: ["zur&uuml;ck", "weiter"],
-                                        slideSpeed: 400,
-                                        autoHeight: true,
-                                        lazyLoad: true,
-                                        lazyFollow: true,
-                                        addClassActive: true
+                                (function () {
+                                    var modalEl = document.getElementById('lightboxFoundation-{event.uid}');
+                                    var carouselEl = document.getElementById('lightboxCarouselFoundation-{event.uid}');
+                                    var startIndex = 0;
+
+                                    if (!modalEl || !carouselEl || typeof bootstrap === 'undefined' || !bootstrap.Carousel) {
+                                        return;
+                                    }
+
+                                    document.querySelectorAll('#einsatzCarouselFoundation-{event.uid} [data-bs-target="#lightboxFoundation-{event.uid}"]').forEach(function (el) {
+                                        el.addEventListener('click', function (event) {
+                                            event.preventDefault();
+                                            startIndex = parseInt(el.getAttribute('data-index'), 10) || 0;
+                                        });
                                     });
-                                });
+
+                                    modalEl.addEventListener('shown.bs.modal', function () {
+                                        var carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl, { interval: false, wrap: true });
+                                        carousel.to(startIndex);
+                                    });
+
+                                    modalEl.addEventListener('hidden.bs.modal', function () {
+                                        carouselEl.querySelectorAll('.carousel-item').forEach(function (item, index) {
+                                            item.classList.toggle('active', index === 0);
+                                        });
+                                        carouselEl.querySelectorAll('.carousel-indicators button').forEach(function (button, index) {
+                                            button.classList.toggle('active', index === 0);
+                                            button.setAttribute('aria-current', index === 0 ? 'true' : 'false');
+                                        });
+                                    });
+                                })();
                                 </script>
                             </f:if>
                         </div>
@@ -433,7 +526,7 @@
                     <a href="javascript:history.back()" class="button small">zur&uuml;ck zur Einsatzliste</a>
                 </div>
             </div>
-        </f:defaultCase>
+        </f:case>
 
     </f:switch>
 </f:section>
