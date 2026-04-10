@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Nkfire\RescueReports\Controller\Backend;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
