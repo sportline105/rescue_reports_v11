@@ -195,7 +195,7 @@
                                                 <a href="#"
                                                    data-bs-toggle="modal"
                                                    data-bs-target="#lightbox-{event.uid}-{it.index}">
-                                                    <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
+                                                    <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 h-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
                                                 </a>
                                             </div>
                                         </f:for>
@@ -234,7 +234,7 @@
                                                         <div class="carousel-inner">
                                                             <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
                                                                 <div class="carousel-item {f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'active', else: '')}">
-                                                                    <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100" additionalAttributes="{loading:'lazy'}" />
+                                                                    <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100 h-100" additionalAttributes="{loading:'lazy'}" />
                                                                 </div>
                                                             </f:for>
                                                         </div>
@@ -392,7 +392,7 @@
                                                 <a href="#"
                                                    data-bs-toggle="modal"
                                                    data-bs-target="#lightboxFoundation-{event.uid}-{it.index}">
-                                                    <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
+                                                    <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 h-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
                                                 </a>
                                             </div>
                                         </f:for>
@@ -431,7 +431,7 @@
                                                         <div class="carousel-inner">
                                                             <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
                                                                 <div class="carousel-item {f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'active', else: '')}">
-                                                                    <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100" additionalAttributes="{loading:'lazy'}" />
+                                                                    <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100 h-100" additionalAttributes="{loading:'lazy'}" />
                                                                 </div>
                                                             </f:for>
                                                         </div>
