@@ -26,9 +26,9 @@
         </f:case>
 
         <!-- =========================================================
-             NewDesign
+             Standard (NewDesign)
         ========================================================== -->
-        <f:case value="newdesign">
+        <f:case value="standard">
             <div class="rescue-reports rescue-reports--newdesign">
                 <h1 class="element-header">
                     Einsatzübersicht
@@ -238,9 +238,9 @@
         </f:case>
 
         <!-- =========================================================
-             Standard
+             Foundation (Legacy)
         ========================================================== -->
-        <f:defaultCase>
+        <f:case value="foundation">
             <h1 class="csc-firstHeader">
                 Einsatzübersicht
                 <f:if condition="{activeStationName}">
@@ -369,7 +369,7 @@
             </f:if>
 
             <f:render section="EventListContent" arguments="{_all}" />
-        </f:defaultCase>
+        </f:case>
 
     </f:switch>
 
