@@ -418,7 +418,9 @@
                 <f:for each="{yearGroupsWithStats}" as="yearGroup" key="year">
                     <h2 id="event-year-{year}" style="margin:16px 0 8px;">{year}</h2>
                     <f:if condition="{showStatistics} && {yearGroup.statistics}">
-                        <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
+                        <f:if condition="{statisticsPosition} == 'above'">
+                            <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
+                        </f:if>
                     </f:if>
                     <f:for each="{yearGroup.events}" as="item">
                         <f:variable name="event" value="{item.event}" />
@@ -462,6 +464,11 @@
                             </f:if>
                         </div>
                     </f:for>
+                    <f:if condition="{showStatistics} && {yearGroup.statistics}">
+                        <f:if condition="{statisticsPosition} != 'above'">
+                            <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
+                        </f:if>
+                    </f:if>
                 </f:for>
                 </f:then>
                 <f:else>
@@ -594,7 +601,9 @@
                 <f:for each="{yearGroupsWithStats}" as="yearGroup" key="year">
                     <h3 id="event-year-nd-{year}" class="mt-3 mb-2">{year}</h3>
                     <f:if condition="{showStatistics} && {yearGroup.statistics}">
-                        <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
+                        <f:if condition="{statisticsPosition} == 'above'">
+                            <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
+                        </f:if>
                     </f:if>
                     <ul class="list-group list-group-flush no-bullet event-list-newdesign"
                         style="margin:0; padding:0; list-style:none;">
@@ -638,6 +647,11 @@
                             </li>
                         </f:for>
                     </ul>
+                    <f:if condition="{showStatistics} && {yearGroup.statistics}">
+                        <f:if condition="{statisticsPosition} != 'above'">
+                            <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
+                        </f:if>
+                    </f:if>
                 </f:for>
                 </f:then>
                 <f:else>
