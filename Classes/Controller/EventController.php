@@ -52,7 +52,8 @@ class EventController extends ActionController
         $yearFilterDefault   = (string)($this->settings['yearFilterDefault'] ?? 'current');
         // $year === null  → erster Aufruf (kein Submit) → Standardauswahl aus Backend
         // $year === '0'   → Nutzer hat explizit „Alle Jahre" gewählt → 0 behalten
-        $selectedYear = ($year === null && $enableYearFilter)
+        // yearFilterDefault gilt immer; enableYearFilter steuert nur die UI-Anzeige des Filters
+        $selectedYear = ($year === null)
             ? ($yearFilterDefault === 'all' ? 0 : (int)date('Y'))
             : (int)($year ?? 0);
 
@@ -115,16 +116,14 @@ class EventController extends ActionController
         $dateFrom = $dateFromValue;
         $dateTo = $dateToValue;
 
-        // Jahresfilter überschreibt FlexForm-Datumsbereich
-        if ($enableYearFilter) {
-            if ($selectedYear > 0) {
-                $dateFrom = $selectedYear . '-01-01';
-                $dateTo   = $selectedYear . '-12-31';
-            } else {
-                // "Alle Jahre": FlexForm-Datumseinschränkungen aufheben
-                $dateFrom = null;
-                $dateTo   = null;
-            }
+        // Jahresauswahl überschreibt FlexForm-Datumsbereich (unabhängig von enableYearFilter)
+        if ($selectedYear > 0) {
+            $dateFrom = $selectedYear . '-01-01';
+            $dateTo   = $selectedYear . '-12-31';
+        } elseif ($yearFilterDefault === 'all' || $enableYearFilter) {
+            // "Alle Jahre" als Standard oder Jahresfilter aktiv → FlexForm-Datumseinschränkungen aufheben
+            $dateFrom = null;
+            $dateTo   = null;
         }
 
         $availableYears = $enableYearFilter
@@ -157,7 +156,8 @@ class EventController extends ActionController
         }
 
         $eventItems = $this->buildEventItemsForStations($events, $activeStationUid);
-        $eventItemsByYear = ($enableYearFilter && $selectedYear === 0)
+        // Gruppierung nach Jahr wenn "Alle Jahre" angezeigt werden (unabhängig von enableYearFilter)
+        $eventItemsByYear = ($selectedYear === 0)
             ? $this->groupEventItemsByYear($eventItems)
             : [];
         $stations = $this->stationRepository->findPrimaryBrigadeStations();
