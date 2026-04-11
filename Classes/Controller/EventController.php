@@ -40,7 +40,7 @@ class EventController extends ActionController
         $dateFromValue = $this->settings['dateFrom'] ?? null;
         $dateToValue   = $this->settings['dateTo'] ?? null;
         $enableSearch = (bool)($this->settings['enableSearch'] ?? false);
-        $templateVariant     = (string)($this->settings['templateVariant'] ?? 'standard');
+        $templateVariant     = (string)($this->settings['templateVariant'] ?? 'bootstrap');
         $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
         $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
         $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
@@ -96,19 +96,26 @@ class EventController extends ActionController
             }
         }
 
-        if ($templateVariant === 'newdesign') {
-            $templateVariant = 'standard';
+        // Backward-Compat: alte Werte aus bestehenden DB-Einträgen auf neue Namen mappen
+        $templateVariantCompat = [
+            'newdesign'      => 'bootstrap',
+            'standard'       => 'bootstrap',
+            'sidebar'        => 'sidebar-foundation',
+            'newdesignsidebar' => 'sidebar-bootstrap',
+        ];
+        if (isset($templateVariantCompat[$templateVariant])) {
+            $templateVariant = $templateVariantCompat[$templateVariant];
         }
 
         $allowedTemplateVariants = [
-            'standard',
+            'bootstrap',
             'foundation',
-            'sidebar',
-            'newdesignsidebar',
+            'sidebar-bootstrap',
+            'sidebar-foundation',
         ];
 
         if (!in_array($templateVariant, $allowedTemplateVariants, true)) {
-            $templateVariant = 'standard';
+            $templateVariant = 'bootstrap';
         }
 
         $searchWord = trim((string)($searchWord ?? ''));
@@ -163,7 +170,7 @@ class EventController extends ActionController
         $stations = $this->stationRepository->findPrimaryBrigadeStations();
 
         $statistics = [];
-        if ($showStatistics && in_array($templateVariant, ['standard', 'foundation'], true)) {
+        if ($showStatistics && in_array($templateVariant, ['bootstrap', 'foundation'], true)) {
             $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid, $statisticsYears);
             if (!empty($statistics)) {
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
@@ -490,15 +497,22 @@ class EventController extends ActionController
     {
         $event = $this->eventRepository->findByUid($event->getUid());
         $groupedVehicleData = $this->groupVehiclesByBrigadeAndStation($event);
-        $templateVariant = (string)($this->settings['templateVariant'] ?? 'standard');
-        if ($templateVariant === 'newdesign') {
-            $templateVariant = 'standard';
+        $templateVariant = (string)($this->settings['templateVariant'] ?? 'bootstrap');
+        $templateVariantCompat = [
+            'newdesign'        => 'bootstrap',
+            'standard'         => 'bootstrap',
+            'sidebar'          => 'sidebar-foundation',
+            'newdesignsidebar' => 'sidebar-bootstrap',
+        ];
+        if (isset($templateVariantCompat[$templateVariant])) {
+            $templateVariant = $templateVariantCompat[$templateVariant];
         }
-        if (in_array($templateVariant, ['sidebar', 'newdesignsidebar'], true)) {
-            $templateVariant = 'standard';
+        // Sidebar-Varianten haben keine eigene Detailansicht → auf Bootstrap zurückfallen
+        if (in_array($templateVariant, ['sidebar-bootstrap', 'sidebar-foundation'], true)) {
+            $templateVariant = 'bootstrap';
         }
-        if (!in_array($templateVariant, ['standard', 'foundation', 'sidebar', 'newdesignsidebar'], true)) {
-            $templateVariant = 'standard';
+        if (!in_array($templateVariant, ['bootstrap', 'foundation'], true)) {
+            $templateVariant = 'bootstrap';
         }
 
         $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);

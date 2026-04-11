@@ -5,10 +5,10 @@
     <f:switch expression="{templateVariant}">
 
         <!-- =========================================================
-             Sidebar
+             Sidebar Foundation
              Keine Filter-Info, kein Suchformular
         ========================================================== -->
-        <f:case value="sidebar">
+        <f:case value="sidebar-foundation">
             <h1 class="element-header">
                 <f:if condition="{widgetTitle}">
                     <f:then>{widgetTitle}</f:then>
@@ -26,9 +26,9 @@
         </f:case>
 
         <!-- =========================================================
-             Standard (NewDesign)
+             Bootstrap
         ========================================================== -->
-        <f:case value="standard">
+        <f:case value="bootstrap">
             <div class="rescue-reports rescue-reports--newdesign">
                 <h1 class="element-header">
                     Einsatzübersicht
@@ -217,11 +217,11 @@
         </f:case>
 
         <!-- =========================================================
-             NewDesignSidebar
+             Sidebar Bootstrap
              Keine Filter-Info, kein Suchformular
         ========================================================== -->
-        <f:case value="newdesignsidebar">
-            <div class="rescue-reports rescue-reports--newdesignsidebar">
+        <f:case value="sidebar-bootstrap">
+            <div class="rescue-reports rescue-reports--sidebar-bootstrap">
                 <h1 class="element-header">
                     <f:if condition="{widgetTitle}">
                         <f:then>{widgetTitle}</f:then>
@@ -238,7 +238,7 @@
         </f:case>
 
         <!-- =========================================================
-             Foundation (Legacy)
+             Foundation
         ========================================================== -->
         <f:case value="foundation">
             <h1 class="csc-firstHeader">
@@ -389,7 +389,7 @@
 </f:section>
 
 <!-- =========================================================
-     Standard-Ausgabeliste
+     Foundation-Ausgabeliste
 ========================================================== -->
 <f:section name="EventListContent">
     <f:if condition="{events}">
@@ -520,8 +520,7 @@
 </f:section>
 
 <!-- =========================================================
-     Sidebar-Ausgabeliste
-     Übernommen aus firefighter, angepasst auf rescue_reports
+     Sidebar-Foundation-Ausgabeliste
 ========================================================== -->
 <f:section name="EventListContentSidebar">
     <f:if condition="{events}">
@@ -564,7 +563,7 @@
 </f:section>
 
 <!-- =========================================================
-     NewDesign-Ausgabeliste
+     Bootstrap-Ausgabeliste
 ========================================================== -->
 <f:section name="EventListContentNewDesign">
     <f:if condition="{events}">
@@ -693,13 +692,12 @@
 </f:section>
 
 <!-- =========================================================
-     NewDesignSidebar-Ausgabeliste
-     firefighter-Stil + NewDesign-Optik
+     Sidebar-Bootstrap-Ausgabeliste
 ========================================================== -->
 <f:section name="EventListContentSidebarNewDesign">
     <f:if condition="{events}">
         <f:then>
-            <ul class="einsaetze einsaetze--sidebar einsaetze--sidebar-newdesign">
+            <ul class="einsaetze einsaetze--sidebar einsaetze--sidebar-bootstrap">
                 <f:for each="{eventItems}" as="item" iteration="i">
                     <f:variable name="event" value="{item.event}" />
 

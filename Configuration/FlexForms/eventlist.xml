@@ -18,14 +18,14 @@
                                 <items>
                                     <numIndex index="0">
                                         <numIndex index="0">Bootstrap</numIndex>
-                                        <numIndex index="1">standard</numIndex>
+                                        <numIndex index="1">bootstrap</numIndex>
                                     </numIndex>
                                     <numIndex index="1">
                                         <numIndex index="0">Foundation</numIndex>
                                         <numIndex index="1">foundation</numIndex>
                                     </numIndex>
                                 </items>
-                                <default>standard</default>
+                                <default>bootstrap</default>
                             </config>
                         </TCEforms>
                     </settings.templateVariant>
