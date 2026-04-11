@@ -3,7 +3,7 @@
 <f:section name="main">
 <div class="rescue-statistics">
 
-    <f:if condition="{stations}">
+    <f:if condition="{stations} && {showStationFilter}">
         <f:form action="statistics" method="post" class="rescue-statistics__station-filter">
             <label for="statistics-station" class="form-label fw-semibold">Ortsfeuerwehr</label>
             <f:form.select
