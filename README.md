@@ -9,8 +9,17 @@ Detaillierte Einsatzberichte für Feuerwehren und BOS. Die Extension stellt Fron
 
 ---
 
-Für einen leichteren Start kann nach der Installation der Upgrade Wizard durchgeführt werden.
-Dieser erstellt einen Speicherordner für die Extension und fügt diverse (deutsche) BOS (Behörden und Organisationen mit Sicherheitsaufgaben) sowie typische Fahrzeugtypen hinzu.
+## Installation & Ersteinrichtung
+
+Nach der Installation wird empfohlen, den **Upgrade Wizard** in der TYPO3-Backend-Systemwartung auszuführen. Dieser richtet folgendes ein:
+
+- Einen Speicherordner für die Extension-Datensätze
+- Gängige deutsche BOS-Organisationen (Behörden und Organisationen mit Sicherheitsaufgaben)
+- Typische Fahrzeugtypen
+
+Der Wizard ist optional; alle Datensätze lassen sich auch manuell anlegen.
+
+---
 
 ## Plugins
 
