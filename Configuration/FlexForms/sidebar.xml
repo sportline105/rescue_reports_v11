@@ -61,11 +61,11 @@
                                 <renderType>selectSingle</renderType>
                                 <items>
                                     <numIndex index="0">
-                                        <numIndex index="0">NewDesign (Bootstrap)</numIndex>
+                                        <numIndex index="0">Bootstrap</numIndex>
                                         <numIndex index="1">newdesignsidebar</numIndex>
                                     </numIndex>
                                     <numIndex index="1">
-                                        <numIndex index="0">Standard</numIndex>
+                                        <numIndex index="0">Foundation</numIndex>
                                         <numIndex index="1">sidebar</numIndex>
                                     </numIndex>
                                 </items>
