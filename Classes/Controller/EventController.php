@@ -172,6 +172,10 @@ class EventController extends ActionController
         $statistics = [];
         if ($showStatistics && in_array($templateVariant, ['bootstrap', 'foundation'], true)) {
             $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid, $statisticsYears);
+            // Wenn ein konkretes Jahr ausgewählt ist, nur dieses Jahr in der Statistik anzeigen
+            if ($selectedYear > 0 && !empty($statistics)) {
+                $statistics = array_intersect_key($statistics, [$selectedYear => null]);
+            }
             if (!empty($statistics)) {
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
                 $pageRenderer->addCssInlineBlock(
@@ -260,6 +264,16 @@ class EventController extends ActionController
             }
         }
 
+        // Statistiken per Jahr als Einzelarray für Inline-Rendering (Jahresgruppen-Ansicht)
+        // Format: [2025 => [2025 => yearData], 2024 => [2024 => yearData]]
+        // Damit PieChart-Partial für jedes Jahr einzeln aufgerufen werden kann
+        $statisticsByYear = [];
+        foreach ($statistics as $year => $yearData) {
+            $statisticsByYear[(int)$year] = [(int)$year => $yearData];
+        }
+        // Block-Statistik nur anzeigen wenn keine Jahresgruppen aktiv (dann erfolgt Inline-Rendering)
+        $showBlockStatistics = $showStatistics && empty($eventItemsByYear);
+
         $this->view->assignMultiple([
             'events' => $events,
             'eventItems' => $eventItems,
@@ -279,7 +293,9 @@ class EventController extends ActionController
             'activeStationUid'    => $activeStationUid,
             'settings'            => $this->settings,
             'statistics'          => $statistics,
+            'statisticsByYear'    => $statisticsByYear,
             'showStatistics'      => $showStatistics,
+            'showBlockStatistics' => $showBlockStatistics,
             'statisticsPosition'  => $statisticsPosition,
             'widgetTitle'         => $widgetTitle,
             'listPageUid'         => $listPageUid,
