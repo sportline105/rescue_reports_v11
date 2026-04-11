@@ -1,39 +1,172 @@
-# Detaillierte Einsatzberichte für Feuerwehren und BOS
+# rescue_reports – TYPO3-Extension für Detaillierte Einsatzberichte von Feuerwehr und BOS
 
-Entwickelt mithilfe TYPO3 Dev Assist [by in2code]. Weiterentwicklung auf Grundlage der TYPO3-Extension "firefighter".
+Detaillierte Einsatzberichte für Feuerwehren und BOS. Die Extension stellt Frontend-Plugins für Einsatzlisten, Statistiken, ein Sidebar-Widget und einen RSS-Feed bereit.
+
+**Extension-Key:** `rescue_reports`  
+**TYPO3:** 11.5+  
+**PHP:** 7.4 – 8.2  
+**Lizenz:** GPL-2.0-or-later
 
 ---
 
 Für einen leichteren Start kann nach der Installation der Upgrade Wizard durchgeführt werden.
 Dieser erstellt einen Speicherordner für die Extension und fügt diverse (deutsche) BOS (Behörden und Organisationen mit Sicherheitsaufgaben) sowie typische Fahrzeugtypen hinzu.
 
+## Plugins
+
+### 1. Einsatzliste (`tx_rescuereports_eventlist`)
+
+Hauptansicht mit Listenansicht und Detailansicht der Einsätze.
+
+**Aktionen:** `list`, `show`
+
+#### FlexForm-Einstellungen
+
+| Einstellung | Beschreibung | Standard |
+|---|---|---|
+| **Design** | Template-Variante: Bootstrap oder Foundation | Bootstrap |
+| **Standard-Ortsfeuerwehr** | Vorausgewählte Station beim Seitenaufruf | – (keine) |
+| **Auswahl der Ortsfeuerwehr im Frontend anzeigen** | Stationsfilter sichtbar schalten | Ja |
+| **Anzahl angezeigter Einsätze** | 0 = unbegrenzt | 0 |
+| **Datum von / bis** | Feste Datumsbereichseinschränkung | – |
+| **Suche aktivieren** | Volltextsuche (Titel, Beschreibung, Ort, Typ, Nummer) | Nein |
+| **Seite für Einsatz-Detailansicht** | Zielseite für „Zum Einsatz"-Link | – |
+| **Datumsfilter im Frontend anzeigen** | Datumseingabe für Besucher | Nein |
+| **Jahresfilter anzeigen** | Jahresauswahl im Frontend | Ja |
+| **Jahresfilter: Standardauswahl beim ersten Aufruf** | „Alle Jahre" oder „Aktuelles Jahr" | Alle Jahre |
+| **Statistik anzeigen** | Tortendiagramm-Statistik einblenden | Nein |
+| **Statistik: Anzahl angezeigter Jahre** | 0 = alle Jahre | 0 |
+| **Position der Statistik** | Oberhalb oder unterhalb der Einsatzliste | Unterhalb |
+| **Kartenansicht anzeigen** | OpenStreetMap-Karte einblenden | Nein |
+| **Kartenhöhe in Pixeln** | | 400 |
+| **Standard-Zoomstufe (1–19)** | | 11 |
+| **Position der Karte** | Oberhalb oder unterhalb der Einsatzliste | Unterhalb |
+
+#### Jahresfilter-Verhalten
+
+- Ist „Alle Jahre" gewählt, werden Einsätze jahresweise gruppiert mit Sprungmarken-Navigation und optionaler Inline-Statistik je Jahresgruppe.
+- Ist „Aktuelles Jahr" gewählt, wird die Liste beim ersten Aufruf automatisch auf das laufende Jahr gefiltert; der Besucher kann per Jahresauswahl wechseln.
+- **„Jahresfilter anzeigen"** steuert nur die Sichtbarkeit der Jahresauswahl im Frontend – der Datenbereich und die Gruppierung sind davon unabhängig.
+
+#### Statistik
+
+Die Statistik basiert auf dem Tortendiagramm-Partial (`Statistics/PieChart.html`) und wird sowohl als Block (einzelnes Jahr) als auch inline über jeder Jahresgruppe (alle Jahre) gerendert. Beim Hover über ein Tortenstück erscheint ein CSS-Tooltip mit Kategoriename, zugehörigen Einsatzarten und Anzahl/Prozentsatz. Die Position (ober-/unterhalb) wird über `statisticsPosition` gesteuert.
+
 ---
 
-## Die Extension bietet folgende Datensätze:
+### 2. Statistik (`tx_rescuereports_statistics`)
 
-- <ins>__Stadtfeuerwehr:__</ins> Hier werden die Einheiten angelegt. Es können zu jeder Stadtfeuerwehr mehrere Ortsfeuerwehren und zu diesen mehrere Fahrzeuge hinzugefügt werden. Zur Sortierung im Backend wird jedem Datensatz eine Priorität zugewiesen. Bei Erstellung kann der Fahrzeugname aus den vordefinierten Fahrzeugtypen generiert oder händisch eingegeben werden. Jedem Fahrzeug kann ein Link zum dazugehörigen Datensatz sowie ein Bild hinzugefügt werden, welche im FE angezeigt werden.
+Eigenständige Statistikseite mit Jahres- und Monatsdiagrammen.
 
-- <ins>__Organisation:__</ins> Wie der Name schon sagt, werden hier die Organisationen angelegt. Jeder Organisation kann ein Kürzel sowie ein Symbol zugewiesen werden (Beispielsweise: Feuerwehr; FF; 🚒)
+**Aktion:** `statistics`
 
-- <ins>__Fahrzeugtyp:__</ins> Hier werden die gängigen Fahrzeugbezeichnungen sowie die dazugehörige Organisationhinterlegt. Die Fahrzeugtypen können dann im Datensatz Stadtfeuerwehr > Ortsfeuerwehr > Fahrzeug ausgewählt werden. 
-
-- <ins>__Einsatzstichwort:__</ins> neben dem Selbsterklärenden Namen können hier Datensätze zur Auswahl deaktiviert werden. Bestehende Einträge werden weiterhin im FE angezeigt
-
-- <ins>__Einsatz:__</ins> Hier kommen alle Datensätze zusammen:
-
-  - <b>Allgemein</b>:              hier werden Einsatztitel, Einsatzbeginn- und ende, -nummer, -art, -ort sowie der Einsatzbericht eingegeben.
-  - Eingesetzte Einheiten:  hier werden die erstellten Stadt- sowie Ortsfeuerwehren angezeigt und ausgewählt.
-  - Fahrzeuge:              nach Auswahl der eingesetzten Einheiten und Zwischenspeichern können hier die eingesetzten Fahrzeuge ausgewählt werden.
-                             Diese werden zur einfacheren Übersicht sortiert nach Stadtfeuerwehr angezeigt.
+| Einstellung | Beschreibung | Standard |
+|---|---|---|
+| **Station** | Filterung auf eine Ortsfeuerwehr | – (alle) |
+| **Stationsauswahl im Frontend anzeigen** | | Ja |
+| **Anzahl angezeigter Jahre** | 0 = alle | 0 |
+| **Monatsvergleich anzeigen** | Monatliches Balkendiagramm | Ja |
 
 ---
-  
-## Frontend-Plugins:
 
-- <b>Rescue Reports: Sidebar:</b>   kleine Einsatzübersicht mit den nötigsten Informationen - perfekt für einen Einsatzticker oder eine Übersicht in der Sidebar. Das Plugin ist standardmäßig auf 5 Einträge begrenzt, eine geringere Anzahl kann über das Flexform ausgewählt werden. Benötigt zur Detailansicht einen "Rescue Reports: Einsätze"-Datensatz
+### 3. Sidebar-Widget (`tx_rescuereports_sidebar`)
 
-- <b>Rescue Reports: Einsätze:</b>  Vollständige Einsatzübersicht mit Suchfunktion und Detailansicht.
+Kompaktes Widget für die Seitenleiste – zeigt die letzten N Einsätze.
 
-## Templates:
-- Standard/Sidebar > Foundation 7 Framework
-- NewDesign/NewDesignSidebar > Bootstrap Framework
+**Aktion:** `list` (gecacht)
+
+| Einstellung | Beschreibung | Standard |
+|---|---|---|
+| **Widget-Überschrift** | Freitext | „Letzte Einsätze" |
+| **Standard-Ortsfeuerwehr** | 0 = alle | – (alle) |
+| **Anzahl angezeigter Einsätze** | | 5 |
+| **Design** | Bootstrap oder Foundation | Bootstrap |
+| **Seite für Einsatz-Detailansicht** | | – |
+| **Seite der vollständigen Einsatzliste** | Ziel des „Alle Einsätze"-Links | – |
+
+---
+
+### 4. RSS-Feed (`tx_rescuereports_rss`)
+
+RSS 2.0-Feed der neuesten Einsätze.
+
+**Aktion:** `rss` (gecacht)  
+**Seitentyp:** `typeNum = 100`
+
+| Einstellung | Beschreibung | Standard |
+|---|---|---|
+| **Feed-Titel** | Freitext | – |
+| **Station** | Filterung auf eine Ortsfeuerwehr | – (alle) |
+| **Anzahl der Einträge** | | 20 |
+| **Seite für Einsatz-Detailansicht** | | – |
+
+---
+
+## Template-Varianten
+
+| Wert | Beschreibung | Verwendung |
+|---|---|---|
+| `bootstrap` | Bootstrap 5 | Einsatzliste, Detailansicht |
+| `foundation` | Foundation | Einsatzliste, Detailansicht |
+| `sidebar-bootstrap` | Bootstrap 5 | Sidebar-Widget |
+| `sidebar-foundation` | Foundation | Sidebar-Widget |
+
+> Bestehende Plugin-Instanzen mit alten Werten (`standard`, `newdesign`, `sidebar`, `newdesignsidebar`) werden automatisch auf die entsprechenden neuen Werte gemappt.
+
+---
+
+## Bildergalerie & Lightbox
+
+### Bootstrap-Template
+
+Die Detailansicht verwendet einen **Bootstrap-Carousel** als Vorschau-Slider. Ein Klick auf ein Bild öffnet die Vollansicht über **GLightbox** (kein jQuery, kein Bootstrap-Modal). Navigation per Mausklick, Tastatur und Touch/Swipe.
+
+GLightbox wird automatisch über jsDelivr-CDN geladen:
+```
+https://cdn.jsdelivr.net/npm/glightbox@3/dist/css/glightbox.min.css
+https://cdn.jsdelivr.net/npm/glightbox@3/dist/js/glightbox.min.js
+```
+
+Für Produktionsumgebungen ohne CDN-Zugriff können die Dateien lokal abgelegt und der Pfad in `EventController::showAction()` angepasst werden.
+
+### Foundation-Template
+
+Die Detailansicht verwendet **Owl Carousel** (jQuery-basiert) als Slider. Ein Klick auf ein Bild öffnet GLightbox (identische Lightbox wie Bootstrap-Template). Voraussetzung: jQuery und Owl Carousel müssen im TYPO3-Seitenlayout geladen sein.
+
+---
+
+## Karte (OpenStreetMap)
+
+Erfordert Koordinaten (`lat`/`lng`) im Einsatzdatensatz. Die Karte wird via **Leaflet.js 1.9.4** (CDN) eingebunden. Das Partial `Map/EventList.html` zeigt alle sichtbaren Einsätze als Marker.
+
+Position (ober-/unterhalb der Liste) und Höhe/Zoomstufe sind über FlexForm konfigurierbar.
+
+---
+
+## Domänenmodell (Überblick)
+
+| Tabelle | Beschreibung |
+|---|---|
+| `tx_rescuereports_domain_model_event` | Einsätze (Titel, Beschreibung, Ort, Koordinaten, Datum, Bilder, Fahrzeuge) |
+| `tx_rescuereports_domain_model_station` | Ortsfeuerwehren (Name, Kürzel, Fahrzeuge) |
+| `tx_rescuereports_domain_model_brigade` | Feuerwehren / BOS-Organisationen |
+| `tx_rescuereports_domain_model_vehicle` | Fahrzeuge (Name, Bild, Verlinkung) |
+| `tx_rescuereports_domain_model_category` | Einsatzkategorien (Titel, Farbe für Statistik) |
+| `tx_rescuereports_domain_model_type` | Einsatzarten (Titel, Kategorie) |
+| `tx_rescuereports_domain_model_snippet` | Textbausteine für das Backend |
+| `tx_rescuereports_domain_model_deployment` | Einsatzabschnitte |
+
+---
+
+## Volltextsuche
+
+Die Suche durchsucht folgende Felder: Titel, Beschreibung, Einsatzort, Einsatzart-Bezeichnung, Einsatznummer. Optional kombinierbar mit Stationsfilter und Datumsbereich.
+
+---
+
+## Technische Hinweise
+
+- **Einsatznummern** werden dynamisch per Station und Jahr berechnet (laufende Nummer `001`, `002`, …) und können stationsspezifische Präfixe tragen.
+- **Slug-Routing** für sprechende URLs der Detailansicht ist vorbereitet.
+- **RSS-Feed** wird über einen eigenen `typeNum = 100` ausgeliefert; Content-Type `application/rss+xml`.
+- **TypoScript-Einbindung** über `Configuration/TypoScript/setup.typoscript`.
