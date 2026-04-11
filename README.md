@@ -147,11 +147,11 @@ Position (ober-/unterhalb der Liste) und Höhe/Zoomstufe sind über FlexForm kon
 | `tx_rescuereports_domain_model_event` | Einsätze (Titel, Beschreibung, Ort, Koordinaten, Datum, Bilder, Fahrzeuge) |
 | `tx_rescuereports_domain_model_station` | Ortsfeuerwehren (Name, Kürzel, Fahrzeuge) |
 | `tx_rescuereports_domain_model_brigade` | Feuerwehren / BOS-Organisationen |
+| `tx_rescuereports_domain_model_car` | Fahrzeugtypen (Name, Organisation) |
 | `tx_rescuereports_domain_model_vehicle` | Fahrzeuge (Name, Bild, Verlinkung) |
 | `tx_rescuereports_domain_model_category` | Einsatzkategorien (Titel, Farbe für Statistik) |
 | `tx_rescuereports_domain_model_type` | Einsatzarten (Titel, Kategorie) |
 | `tx_rescuereports_domain_model_snippet` | Textbausteine für das Backend |
-| `tx_rescuereports_domain_model_deployment` | Einsatzabschnitte |
 
 ---
 
