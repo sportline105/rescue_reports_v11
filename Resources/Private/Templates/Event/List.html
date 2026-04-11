@@ -406,21 +406,21 @@
                 </div>
             </f:if>
 
-            <f:if condition="{eventItemsByYear}">
+            <f:if condition="{yearGroupsWithStats}">
                 <f:then>
                 <div class="year-jump-nav" style="margin: 0 0 10px;">
                     <strong>Sprungmarken:</strong>
-                    <f:for each="{eventItemsByYear}" as="yearItems" key="year" iteration="i">
+                    <f:for each="{yearGroupsWithStats}" as="yearGroup" key="year" iteration="i">
                         <a href="#event-year-{year}" style="margin-left:8px;">{year}</a><f:if condition="{!i.isLast}"> ·</f:if>
                     </f:for>
                 </div>
 
-                <f:for each="{eventItemsByYear}" as="yearItems" key="year">
+                <f:for each="{yearGroupsWithStats}" as="yearGroup" key="year">
                     <h2 id="event-year-{year}" style="margin:16px 0 8px;">{year}</h2>
-                    <f:if condition="{showStatistics} && {statisticsByYear.{year}}">
-                        <f:render partial="Statistics/PieChart" arguments="{statistics: statisticsByYear.{year}}" />
+                    <f:if condition="{showStatistics} && {yearGroup.statistics}">
+                        <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
                     </f:if>
-                    <f:for each="{yearItems}" as="item">
+                    <f:for each="{yearGroup.events}" as="item">
                         <f:variable name="event" value="{item.event}" />
 
                         <div class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>">
@@ -583,22 +583,22 @@
                 </div>
             </f:if>
 
-            <f:if condition="{eventItemsByYear}">
+            <f:if condition="{yearGroupsWithStats}">
                 <f:then>
                 <div class="year-jump-nav mb-2 small">
                     <strong>Sprungmarken:</strong>
-                    <f:for each="{eventItemsByYear}" as="yearItems" key="year" iteration="i">
+                    <f:for each="{yearGroupsWithStats}" as="yearGroup" key="year" iteration="i">
                         <a href="#event-year-nd-{year}" class="ms-2">{year}</a><f:if condition="{!i.isLast}"> ·</f:if>
                     </f:for>
                 </div>
-                <f:for each="{eventItemsByYear}" as="yearItems" key="year">
+                <f:for each="{yearGroupsWithStats}" as="yearGroup" key="year">
                     <h3 id="event-year-nd-{year}" class="mt-3 mb-2">{year}</h3>
-                    <f:if condition="{showStatistics} && {statisticsByYear.{year}}">
-                        <f:render partial="Statistics/PieChart" arguments="{statistics: statisticsByYear.{year}}" />
+                    <f:if condition="{showStatistics} && {yearGroup.statistics}">
+                        <f:render partial="Statistics/PieChart" arguments="{statistics: yearGroup.statistics}" />
                     </f:if>
                     <ul class="list-group list-group-flush no-bullet event-list-newdesign"
                         style="margin:0; padding:0; list-style:none;">
-                        <f:for each="{yearItems}" as="item">
+                        <f:for each="{yearGroup.events}" as="item">
                             <f:variable name="event" value="{item.event}" />
 
                             <li class="panelsmall <f:if condition='!{event.disableDetail}'>panelsmall--clickable</f:if>" style="padding:12px 10px; border-bottom:1px solid #e5e9f2; position:relative;">

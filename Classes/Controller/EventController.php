@@ -264,12 +264,14 @@ class EventController extends ActionController
             }
         }
 
-        // Statistiken per Jahr als Einzelarray für Inline-Rendering (Jahresgruppen-Ansicht)
-        // Format: [2025 => [2025 => yearData], 2024 => [2024 => yearData]]
-        // Damit PieChart-Partial für jedes Jahr einzeln aufgerufen werden kann
-        $statisticsByYear = [];
-        foreach ($statistics as $year => $yearData) {
-            $statisticsByYear[(int)$year] = [(int)$year => $yearData];
+        // Jahresgruppen mit eingebetteten Statistiken für Inline-Rendering
+        // Vermeidet dynamischen Array-Zugriff {statisticsByYear.{year}} in Fluid (unzuverlässig)
+        $yearGroupsWithStats = [];
+        foreach ($eventItemsByYear as $year => $yearItems) {
+            $yearGroupsWithStats[$year] = [
+                'events'     => $yearItems,
+                'statistics' => isset($statistics[$year]) ? [(int)$year => $statistics[$year]] : [],
+            ];
         }
         // Block-Statistik nur anzeigen wenn keine Jahresgruppen aktiv (dann erfolgt Inline-Rendering)
         $showBlockStatistics = $showStatistics && empty($eventItemsByYear);
@@ -293,7 +295,7 @@ class EventController extends ActionController
             'activeStationUid'    => $activeStationUid,
             'settings'            => $this->settings,
             'statistics'          => $statistics,
-            'statisticsByYear'    => $statisticsByYear,
+            'yearGroupsWithStats' => $yearGroupsWithStats,
             'showStatistics'      => $showStatistics,
             'showBlockStatistics' => $showBlockStatistics,
             'statisticsPosition'  => $statisticsPosition,
