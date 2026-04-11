@@ -160,7 +160,7 @@
                                         <numIndex index="0">Ja</numIndex>
                                     </numIndex>
                                 </items>
-                                <default>0</default>
+                                <default>1</default>
                             </config>
                         </TCEforms>
                     </settings.enableYearFilter>
