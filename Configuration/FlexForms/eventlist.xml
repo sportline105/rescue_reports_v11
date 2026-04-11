@@ -173,15 +173,15 @@
                                 <renderType>selectSingle</renderType>
                                 <items>
                                     <numIndex index="0">
-                                        <numIndex index="0">Aktuelles Jahr</numIndex>
-                                        <numIndex index="1">current</numIndex>
-                                    </numIndex>
-                                    <numIndex index="1">
                                         <numIndex index="0">Alle Jahre</numIndex>
                                         <numIndex index="1">all</numIndex>
                                     </numIndex>
+                                    <numIndex index="1">
+                                        <numIndex index="0">Aktuelles Jahr</numIndex>
+                                        <numIndex index="1">current</numIndex>
+                                    </numIndex>
                                 </items>
-                                <default>current</default>
+                                <default>all</default>
                             </config>
                         </TCEforms>
                     </settings.yearFilterDefault>

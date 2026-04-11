@@ -407,6 +407,7 @@
             </f:if>
 
             <f:if condition="{eventItemsByYear}">
+                <f:then>
                 <div class="year-jump-nav" style="margin: 0 0 10px;">
                     <strong>Sprungmarken:</strong>
                     <f:for each="{eventItemsByYear}" as="yearItems" key="year" iteration="i">
@@ -459,8 +460,8 @@
                         </div>
                     </f:for>
                 </f:for>
-            </f:if>
-            <f:if condition="!{eventItemsByYear}">
+                </f:then>
+                <f:else>
                 <f:for each="{eventItems}" as="item">
                     <f:variable name="event" value="{item.event}" />
 
@@ -503,6 +504,7 @@
                         </f:if>
                     </div>
                 </f:for>
+                </f:else>
             </f:if>
         </f:then>
 
@@ -580,6 +582,7 @@
             </f:if>
 
             <f:if condition="{eventItemsByYear}">
+                <f:then>
                 <div class="year-jump-nav mb-2 small">
                     <strong>Sprungmarken:</strong>
                     <f:for each="{eventItemsByYear}" as="yearItems" key="year" iteration="i">
@@ -631,8 +634,8 @@
                         </f:for>
                     </ul>
                 </f:for>
-            </f:if>
-            <f:if condition="!{eventItemsByYear}">
+                </f:then>
+                <f:else>
                 <ul class="list-group list-group-flush no-bullet event-list-newdesign"
                     style="margin:0; padding:0; list-style:none;">
                     <f:for each="{eventItems}" as="item">
@@ -674,6 +677,7 @@
                         </li>
                     </f:for>
                 </ul>
+                </f:else>
             </f:if>
         </f:then>
 
