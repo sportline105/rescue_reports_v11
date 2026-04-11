@@ -188,13 +188,15 @@
                             <f:if condition="{event.images}">
                                 <h2 class="h4">Bilder</h2>
 
+                                <!-- Vorschau-Karussell: alle Links öffnen dasselbe Modal, data-slide-to gibt den Index vor -->
                                 <div id="einsatzCarousel-{event.uid}" class="carousel slide" data-bs-ride="false">
                                     <div class="carousel-inner">
                                         <f:for each="{event.images}" as="image" iteration="it">
                                             <div class="carousel-item {f:if(condition: it.isFirst, then: 'active')}">
                                                 <a href="#"
                                                    data-bs-toggle="modal"
-                                                   data-bs-target="#lightbox-{event.uid}-{it.index}">
+                                                   data-bs-target="#lightbox-{event.uid}"
+                                                   data-slide-to="{it.index}">
                                                     <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 h-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
                                                 </a>
                                             </div>
@@ -212,48 +214,74 @@
                                     </button>
                                 </div>
 
-                                <f:for each="{event.images}" as="modalImage" iteration="modalIt">
-                                    <div class="modal fade" id="lightbox-{event.uid}-{modalIt.index}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-xl">
-                                            <div class="modal-content bg-dark">
-                                                <div class="modal-body p-0 position-relative">
-                                                    <button type="button" class="btn-close btn-close-white position-absolute end-0 m-3" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                                <!-- Lightbox: einziges Modal für alle Bilder -->
+                                <div class="modal fade" id="lightbox-{event.uid}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                                        <div class="modal-content bg-dark">
+                                            <div class="modal-body p-0 position-relative">
+                                                <button type="button" class="btn-close btn-close-white position-absolute end-0 m-3" data-bs-dismiss="modal" aria-label="Schließen"></button>
 
-                                                    <div id="lightboxCarousel-{event.uid}-{modalIt.index}" class="carousel slide" data-bs-ride="false">
-                                                        <div class="carousel-indicators">
-                                                            <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
-                                                                <button type="button"
-                                                                        data-bs-target="#lightboxCarousel-{event.uid}-{modalIt.index}"
-                                                                        data-bs-slide-to="{slideIt.index}"
-                                                                        class="{f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'active', else: '')}"
-                                                                        aria-current="{f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'true', else: 'false')}"
-                                                                        aria-label="Bild {slideIt.cycle}"></button>
-                                                            </f:for>
-                                                        </div>
-
-                                                        <div class="carousel-inner">
-                                                            <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
-                                                                <div class="carousel-item {f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'active', else: '')}">
-                                                                    <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100 h-100" additionalAttributes="{loading:'lazy'}" />
-                                                                </div>
-                                                            </f:for>
-                                                        </div>
-
-                                                        <button class="carousel-control-prev" type="button" data-bs-target="#lightboxCarousel-{event.uid}-{modalIt.index}" data-bs-slide="prev">
-                                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                            <span class="visually-hidden">Zurück</span>
-                                                        </button>
-
-                                                        <button class="carousel-control-next" type="button" data-bs-target="#lightboxCarousel-{event.uid}-{modalIt.index}" data-bs-slide="next">
-                                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                            <span class="visually-hidden">Weiter</span>
-                                                        </button>
+                                                <div id="lightboxCarousel-{event.uid}" class="carousel slide" data-bs-ride="false">
+                                                    <div class="carousel-indicators">
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
+                                                            <button type="button"
+                                                                    data-bs-target="#lightboxCarousel-{event.uid}"
+                                                                    data-bs-slide-to="{slideIt.index}"
+                                                                    class="{f:if(condition: slideIt.isFirst, then: 'active', else: '')}"
+                                                                    aria-current="{f:if(condition: slideIt.isFirst, then: 'true', else: 'false')}"
+                                                                    aria-label="Bild {slideIt.cycle}"></button>
+                                                        </f:for>
                                                     </div>
+
+                                                    <div class="carousel-inner">
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
+                                                            <div class="carousel-item {f:if(condition: slideIt.isFirst, then: 'active', else: '')}">
+                                                                <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100 h-100" additionalAttributes="{loading:'lazy'}" />
+                                                            </div>
+                                                        </f:for>
+                                                    </div>
+
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#lightboxCarousel-{event.uid}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Zurück</span>
+                                                    </button>
+
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#lightboxCarousel-{event.uid}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Weiter</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </f:for>
+                                </div>
+
+                                <script>
+                                (function() {
+                                    var modal = document.getElementById('lightbox-{event.uid}');
+                                    if (!modal) return;
+                                    modal.addEventListener('show.bs.modal', function(e) {
+                                        var trigger = e.relatedTarget;
+                                        var slideTo = parseInt(trigger ? trigger.getAttribute('data-slide-to') || '0' : '0', 10);
+                                        var carouselEl = document.getElementById('lightboxCarousel-{event.uid}');
+                                        if (!carouselEl) return;
+                                        if (typeof bootstrap !== 'undefined') {
+                                            var existing = bootstrap.Carousel.getInstance(carouselEl);
+                                            if (existing) existing.dispose();
+                                        }
+                                        var items = carouselEl.querySelectorAll('.carousel-item');
+                                        var btns = carouselEl.querySelectorAll('.carousel-indicators button');
+                                        items.forEach(function(el, i) { el.classList.toggle('active', i === slideTo); });
+                                        btns.forEach(function(el, i) {
+                                            el.classList.toggle('active', i === slideTo);
+                                            el.setAttribute('aria-current', i === slideTo ? 'true' : 'false');
+                                        });
+                                        if (typeof bootstrap !== 'undefined') {
+                                            new bootstrap.Carousel(carouselEl, { interval: false });
+                                        }
+                                    });
+                                })();
+                                </script>
                             </f:if>
                         </div>
                     </div>
@@ -385,13 +413,16 @@
                         <div class="large-12 medium-6 small-12 column">
                             <f:if condition="{event.images}">
                                 <h2><b>Einsatzbilder:</b></h2>
+
+                                <!-- Vorschau-Karussell: alle Links öffnen dasselbe Modal, data-slide-to gibt den Index vor -->
                                 <div id="einsatzCarouselFoundation-{event.uid}" class="carousel slide" data-bs-ride="false">
                                     <div class="carousel-inner">
                                         <f:for each="{event.images}" as="image" iteration="it">
                                             <div class="carousel-item {f:if(condition: it.isFirst, then: 'active')}">
                                                 <a href="#"
                                                    data-bs-toggle="modal"
-                                                   data-bs-target="#lightboxFoundation-{event.uid}-{it.index}">
+                                                   data-bs-target="#lightboxFoundation-{event.uid}"
+                                                   data-slide-to="{it.index}">
                                                     <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 h-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
                                                 </a>
                                             </div>
@@ -409,48 +440,74 @@
                                     </button>
                                 </div>
 
-                                <f:for each="{event.images}" as="modalImage" iteration="modalIt">
-                                    <div class="modal fade" id="lightboxFoundation-{event.uid}-{modalIt.index}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-xl">
-                                            <div class="modal-content bg-dark">
-                                                <div class="modal-body p-0 position-relative">
-                                                    <button type="button" class="btn-close btn-close-white position-absolute end-0 m-3" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                                <!-- Lightbox: einziges Modal für alle Bilder -->
+                                <div class="modal fade" id="lightboxFoundation-{event.uid}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-xl">
+                                        <div class="modal-content bg-dark">
+                                            <div class="modal-body p-0 position-relative">
+                                                <button type="button" class="btn-close btn-close-white position-absolute end-0 m-3" data-bs-dismiss="modal" aria-label="Schließen"></button>
 
-                                                    <div id="lightboxCarouselFoundation-{event.uid}-{modalIt.index}" class="carousel slide" data-bs-ride="false">
-                                                        <div class="carousel-indicators">
-                                                            <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
-                                                                <button type="button"
-                                                                        data-bs-target="#lightboxCarouselFoundation-{event.uid}-{modalIt.index}"
-                                                                        data-bs-slide-to="{slideIt.index}"
-                                                                        class="{f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'active', else: '')}"
-                                                                        aria-current="{f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'true', else: 'false')}"
-                                                                        aria-label="Bild {slideIt.cycle}"></button>
-                                                            </f:for>
-                                                        </div>
-
-                                                        <div class="carousel-inner">
-                                                            <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
-                                                                <div class="carousel-item {f:if(condition: '{slideIt.index} == {modalIt.index}', then: 'active', else: '')}">
-                                                                    <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100 h-100" additionalAttributes="{loading:'lazy'}" />
-                                                                </div>
-                                                            </f:for>
-                                                        </div>
-
-                                                        <button class="carousel-control-prev" type="button" data-bs-target="#lightboxCarouselFoundation-{event.uid}-{modalIt.index}" data-bs-slide="prev">
-                                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                            <span class="visually-hidden">Zurück</span>
-                                                        </button>
-
-                                                        <button class="carousel-control-next" type="button" data-bs-target="#lightboxCarouselFoundation-{event.uid}-{modalIt.index}" data-bs-slide="next">
-                                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                            <span class="visually-hidden">Weiter</span>
-                                                        </button>
+                                                <div id="lightboxCarouselFoundation-{event.uid}" class="carousel slide" data-bs-ride="false">
+                                                    <div class="carousel-indicators">
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
+                                                            <button type="button"
+                                                                    data-bs-target="#lightboxCarouselFoundation-{event.uid}"
+                                                                    data-bs-slide-to="{slideIt.index}"
+                                                                    class="{f:if(condition: slideIt.isFirst, then: 'active', else: '')}"
+                                                                    aria-current="{f:if(condition: slideIt.isFirst, then: 'true', else: 'false')}"
+                                                                    aria-label="Bild {slideIt.cycle}"></button>
+                                                        </f:for>
                                                     </div>
+
+                                                    <div class="carousel-inner">
+                                                        <f:for each="{event.images}" as="lightboxImage" iteration="slideIt">
+                                                            <div class="carousel-item {f:if(condition: slideIt.isFirst, then: 'active', else: '')}">
+                                                                <f:image image="{lightboxImage}" maxWidth="1800" alt="{event.title}" class="d-block w-100 h-100" additionalAttributes="{loading:'lazy'}" />
+                                                            </div>
+                                                        </f:for>
+                                                    </div>
+
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#lightboxCarouselFoundation-{event.uid}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Zurück</span>
+                                                    </button>
+
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#lightboxCarouselFoundation-{event.uid}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Weiter</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </f:for>
+                                </div>
+
+                                <script>
+                                (function() {
+                                    var modal = document.getElementById('lightboxFoundation-{event.uid}');
+                                    if (!modal) return;
+                                    modal.addEventListener('show.bs.modal', function(e) {
+                                        var trigger = e.relatedTarget;
+                                        var slideTo = parseInt(trigger ? trigger.getAttribute('data-slide-to') || '0' : '0', 10);
+                                        var carouselEl = document.getElementById('lightboxCarouselFoundation-{event.uid}');
+                                        if (!carouselEl) return;
+                                        if (typeof bootstrap !== 'undefined') {
+                                            var existing = bootstrap.Carousel.getInstance(carouselEl);
+                                            if (existing) existing.dispose();
+                                        }
+                                        var items = carouselEl.querySelectorAll('.carousel-item');
+                                        var btns = carouselEl.querySelectorAll('.carousel-indicators button');
+                                        items.forEach(function(el, i) { el.classList.toggle('active', i === slideTo); });
+                                        btns.forEach(function(el, i) {
+                                            el.classList.toggle('active', i === slideTo);
+                                            el.setAttribute('aria-current', i === slideTo ? 'true' : 'false');
+                                        });
+                                        if (typeof bootstrap !== 'undefined') {
+                                            new bootstrap.Carousel(carouselEl, { interval: false });
+                                        }
+                                    });
+                                })();
+                                </script>
                             </f:if>
                         </div>
                     </div>
