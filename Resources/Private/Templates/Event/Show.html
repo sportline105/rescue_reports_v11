@@ -271,13 +271,37 @@
 
                                     var modal = document.getElementById('lightbox-{event.uid}');
                                     if (!modal) return;
+                                    var carouselEl = document.getElementById('lightboxCarousel-{event.uid}');
+                                    if (!carouselEl) return;
+
+                                    // Pfeile direkt verdrahten – Bootstrap-Delegation (data-bs-slide)
+                                    // ist im Modal-Kontext unzuverlässig
+                                    var prevBtn = carouselEl.querySelector('.carousel-control-prev');
+                                    var nextBtn = carouselEl.querySelector('.carousel-control-next');
+                                    if (prevBtn) {
+                                        prevBtn.addEventListener('click', function(e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                            if (typeof bootstrap === 'undefined') return;
+                                            var inst = bootstrap.Carousel.getInstance(carouselEl);
+                                            if (inst) inst.prev();
+                                        });
+                                    }
+                                    if (nextBtn) {
+                                        nextBtn.addEventListener('click', function(e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                            if (typeof bootstrap === 'undefined') return;
+                                            var inst = bootstrap.Carousel.getInstance(carouselEl);
+                                            if (inst) inst.next();
+                                        });
+                                    }
 
                                     modal.addEventListener('show.bs.modal', function() {
-                                        var carouselEl = document.getElementById('lightboxCarousel-{event.uid}');
-                                        if (!carouselEl || typeof bootstrap === 'undefined') return;
+                                        if (typeof bootstrap === 'undefined') return;
 
-                                        // Aktives Item direkt im DOM setzen – Modal noch unsichtbar, kein Flackern
+                                        // Residuale Animations-Klassen bereinigen und richtiges Item aktivieren
                                         carouselEl.querySelectorAll('.carousel-item').forEach(function(el, i) {
+                                            el.classList.remove('carousel-item-next', 'carousel-item-prev',
+                                                                 'carousel-item-start', 'carousel-item-end');
                                             el.classList.toggle('active', i === pendingSlide);
                                         });
                                         carouselEl.querySelectorAll('.carousel-indicators button').forEach(function(btn, i) {
@@ -285,10 +309,9 @@
                                             btn.setAttribute('aria-current', i === pendingSlide ? 'true' : 'false');
                                         });
 
-                                        // Alte Instanz entsorgen und neu erstellen, damit Bootstrap den
-                                        // korrekten DOM-Zustand liest und _isSliding zurückgesetzt wird
+                                        // Alte Instanz entsorgen und neu erstellen
                                         var inst = bootstrap.Carousel.getInstance(carouselEl);
-                                        if (inst) { inst.dispose(); }
+                                        if (inst) inst.dispose();
                                         bootstrap.Carousel.getOrCreateInstance(carouselEl, { interval: false, wrap: true });
                                     });
                                 })();
@@ -508,13 +531,37 @@
 
                                     var modal = document.getElementById('lightboxFoundation-{event.uid}');
                                     if (!modal) return;
+                                    var carouselEl = document.getElementById('lightboxCarouselFoundation-{event.uid}');
+                                    if (!carouselEl) return;
+
+                                    // Pfeile direkt verdrahten – Bootstrap-Delegation (data-bs-slide)
+                                    // ist im Modal-Kontext unzuverlässig
+                                    var prevBtn = carouselEl.querySelector('.carousel-control-prev');
+                                    var nextBtn = carouselEl.querySelector('.carousel-control-next');
+                                    if (prevBtn) {
+                                        prevBtn.addEventListener('click', function(e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                            if (typeof bootstrap === 'undefined') return;
+                                            var inst = bootstrap.Carousel.getInstance(carouselEl);
+                                            if (inst) inst.prev();
+                                        });
+                                    }
+                                    if (nextBtn) {
+                                        nextBtn.addEventListener('click', function(e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                            if (typeof bootstrap === 'undefined') return;
+                                            var inst = bootstrap.Carousel.getInstance(carouselEl);
+                                            if (inst) inst.next();
+                                        });
+                                    }
 
                                     modal.addEventListener('show.bs.modal', function() {
-                                        var carouselEl = document.getElementById('lightboxCarouselFoundation-{event.uid}');
-                                        if (!carouselEl || typeof bootstrap === 'undefined') return;
+                                        if (typeof bootstrap === 'undefined') return;
 
-                                        // Aktives Item direkt im DOM setzen – Modal noch unsichtbar, kein Flackern
+                                        // Residuale Animations-Klassen bereinigen und richtiges Item aktivieren
                                         carouselEl.querySelectorAll('.carousel-item').forEach(function(el, i) {
+                                            el.classList.remove('carousel-item-next', 'carousel-item-prev',
+                                                                 'carousel-item-start', 'carousel-item-end');
                                             el.classList.toggle('active', i === pendingSlide);
                                         });
                                         carouselEl.querySelectorAll('.carousel-indicators button').forEach(function(btn, i) {
@@ -522,10 +569,9 @@
                                             btn.setAttribute('aria-current', i === pendingSlide ? 'true' : 'false');
                                         });
 
-                                        // Alte Instanz entsorgen und neu erstellen, damit Bootstrap den
-                                        // korrekten DOM-Zustand liest und _isSliding zurückgesetzt wird
+                                        // Alte Instanz entsorgen und neu erstellen
                                         var inst = bootstrap.Carousel.getInstance(carouselEl);
-                                        if (inst) { inst.dispose(); }
+                                        if (inst) inst.dispose();
                                         bootstrap.Carousel.getOrCreateInstance(carouselEl, { interval: false, wrap: true });
                                     });
                                 })();
