@@ -588,6 +588,18 @@ class EventController extends ActionController
             }
         }
 
+        $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+        $pageRenderer->addHeaderData('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3/dist/css/glightbox.min.css">');
+        $pageRenderer->addJsFooterLibrary(
+            'glightbox',
+            'https://cdn.jsdelivr.net/npm/glightbox@3/dist/js/glightbox.min.js',
+            'text/javascript',
+            false,
+            false,
+            '',
+            true
+        );
+
         $this->view->assignMultiple([
             'event' => $event,
             'groupedVehicleData' => $groupedVehicleData,
