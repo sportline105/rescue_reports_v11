@@ -1,4 +1,4 @@
-# rescue_reports – TYPO3-Extension für Detaillierte Einsatzberichte von Feuerwehr und BOS
+# rescue_reports – TYPO3-Extension für Feuerwehr-Einsatzberichte
 
 Detaillierte Einsatzberichte für Feuerwehren und BOS. Die Extension stellt Frontend-Plugins für Einsatzlisten, Statistiken, ein Sidebar-Widget und einen RSS-Feed bereit.
 
