@@ -40,7 +40,7 @@ class EventController extends ActionController
         $dateFromValue = $this->settings['dateFrom'] ?? null;
         $dateToValue   = $this->settings['dateTo'] ?? null;
         $enableSearch = (bool)($this->settings['enableSearch'] ?? false);
-        $templateVariant     = (string)($this->settings['templateVariant'] ?? 'standard');
+        $templateVariant     = (string)($this->settings['templateVariant'] ?? 'bootstrap');
         $showStatistics      = (bool)($this->settings['showStatistics'] ?? false);
         $statisticsPosition  = (string)($this->settings['statisticsPosition'] ?? 'below');
         $statisticsYears     = (int)($this->settings['statisticsYears'] ?? 0);
@@ -52,7 +52,8 @@ class EventController extends ActionController
         $yearFilterDefault   = (string)($this->settings['yearFilterDefault'] ?? 'current');
         // $year === null  → erster Aufruf (kein Submit) → Standardauswahl aus Backend
         // $year === '0'   → Nutzer hat explizit „Alle Jahre" gewählt → 0 behalten
-        $selectedYear = ($year === null && $enableYearFilter)
+        // yearFilterDefault gilt immer; enableYearFilter steuert nur die UI-Anzeige des Filters
+        $selectedYear = ($year === null)
             ? ($yearFilterDefault === 'all' ? 0 : (int)date('Y'))
             : (int)($year ?? 0);
 
@@ -95,19 +96,26 @@ class EventController extends ActionController
             }
         }
 
-        if ($templateVariant === 'newdesign') {
-            $templateVariant = 'standard';
+        // Backward-Compat: alte Werte aus bestehenden DB-Einträgen auf neue Namen mappen
+        $templateVariantCompat = [
+            'newdesign'      => 'bootstrap',
+            'standard'       => 'bootstrap',
+            'sidebar'        => 'sidebar-foundation',
+            'newdesignsidebar' => 'sidebar-bootstrap',
+        ];
+        if (isset($templateVariantCompat[$templateVariant])) {
+            $templateVariant = $templateVariantCompat[$templateVariant];
         }
 
         $allowedTemplateVariants = [
-            'standard',
+            'bootstrap',
             'foundation',
-            'sidebar',
-            'newdesignsidebar',
+            'sidebar-bootstrap',
+            'sidebar-foundation',
         ];
 
         if (!in_array($templateVariant, $allowedTemplateVariants, true)) {
-            $templateVariant = 'standard';
+            $templateVariant = 'bootstrap';
         }
 
         $searchWord = trim((string)($searchWord ?? ''));
@@ -115,16 +123,14 @@ class EventController extends ActionController
         $dateFrom = $dateFromValue;
         $dateTo = $dateToValue;
 
-        // Jahresfilter überschreibt FlexForm-Datumsbereich
-        if ($enableYearFilter) {
-            if ($selectedYear > 0) {
-                $dateFrom = $selectedYear . '-01-01';
-                $dateTo   = $selectedYear . '-12-31';
-            } else {
-                // "Alle Jahre": FlexForm-Datumseinschränkungen aufheben
-                $dateFrom = null;
-                $dateTo   = null;
-            }
+        // Jahresauswahl überschreibt FlexForm-Datumsbereich (unabhängig von enableYearFilter)
+        if ($selectedYear > 0) {
+            $dateFrom = $selectedYear . '-01-01';
+            $dateTo   = $selectedYear . '-12-31';
+        } elseif ($yearFilterDefault === 'all' || $enableYearFilter) {
+            // "Alle Jahre" als Standard oder Jahresfilter aktiv → FlexForm-Datumseinschränkungen aufheben
+            $dateFrom = null;
+            $dateTo   = null;
         }
 
         $availableYears = $enableYearFilter
@@ -157,14 +163,19 @@ class EventController extends ActionController
         }
 
         $eventItems = $this->buildEventItemsForStations($events, $activeStationUid);
-        $eventItemsByYear = ($enableYearFilter && $selectedYear === 0)
+        // Gruppierung nach Jahr wenn "Alle Jahre" angezeigt werden (unabhängig von enableYearFilter)
+        $eventItemsByYear = ($selectedYear === 0)
             ? $this->groupEventItemsByYear($eventItems)
             : [];
         $stations = $this->stationRepository->findPrimaryBrigadeStations();
 
         $statistics = [];
-        if ($showStatistics && in_array($templateVariant, ['standard', 'foundation'], true)) {
+        if ($showStatistics && in_array($templateVariant, ['bootstrap', 'foundation'], true)) {
             $statistics = $this->eventRepository->getYearlyStatistics($activeStationUid, $statisticsYears);
+            // Wenn ein konkretes Jahr ausgewählt ist, nur dieses Jahr in der Statistik anzeigen
+            if ($selectedYear > 0 && !empty($statistics)) {
+                $statistics = array_intersect_key($statistics, [$selectedYear => null]);
+            }
             if (!empty($statistics)) {
                 $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
                 $pageRenderer->addCssInlineBlock(
@@ -253,6 +264,18 @@ class EventController extends ActionController
             }
         }
 
+        // Jahresgruppen mit eingebetteten Statistiken für Inline-Rendering
+        // Vermeidet dynamischen Array-Zugriff {statisticsByYear.{year}} in Fluid (unzuverlässig)
+        $yearGroupsWithStats = [];
+        foreach ($eventItemsByYear as $year => $yearItems) {
+            $yearGroupsWithStats[$year] = [
+                'events'     => $yearItems,
+                'statistics' => isset($statistics[$year]) ? [(int)$year => $statistics[$year]] : [],
+            ];
+        }
+        // Block-Statistik nur anzeigen wenn keine Jahresgruppen aktiv (dann erfolgt Inline-Rendering)
+        $showBlockStatistics = $showStatistics && empty($eventItemsByYear);
+
         $this->view->assignMultiple([
             'events' => $events,
             'eventItems' => $eventItems,
@@ -272,7 +295,9 @@ class EventController extends ActionController
             'activeStationUid'    => $activeStationUid,
             'settings'            => $this->settings,
             'statistics'          => $statistics,
+            'yearGroupsWithStats' => $yearGroupsWithStats,
             'showStatistics'      => $showStatistics,
+            'showBlockStatistics' => $showBlockStatistics,
             'statisticsPosition'  => $statisticsPosition,
             'widgetTitle'         => $widgetTitle,
             'listPageUid'         => $listPageUid,
@@ -490,15 +515,22 @@ class EventController extends ActionController
     {
         $event = $this->eventRepository->findByUid($event->getUid());
         $groupedVehicleData = $this->groupVehiclesByBrigadeAndStation($event);
-        $templateVariant = (string)($this->settings['templateVariant'] ?? 'standard');
-        if ($templateVariant === 'newdesign') {
-            $templateVariant = 'standard';
+        $templateVariant = (string)($this->settings['templateVariant'] ?? 'bootstrap');
+        $templateVariantCompat = [
+            'newdesign'        => 'bootstrap',
+            'standard'         => 'bootstrap',
+            'sidebar'          => 'sidebar-foundation',
+            'newdesignsidebar' => 'sidebar-bootstrap',
+        ];
+        if (isset($templateVariantCompat[$templateVariant])) {
+            $templateVariant = $templateVariantCompat[$templateVariant];
         }
-        if (in_array($templateVariant, ['sidebar', 'newdesignsidebar'], true)) {
-            $templateVariant = 'standard';
+        // Sidebar-Varianten haben keine eigene Detailansicht → auf Bootstrap zurückfallen
+        if (in_array($templateVariant, ['sidebar-bootstrap', 'sidebar-foundation'], true)) {
+            $templateVariant = 'bootstrap';
         }
-        if (!in_array($templateVariant, ['standard', 'foundation', 'sidebar', 'newdesignsidebar'], true)) {
-            $templateVariant = 'standard';
+        if (!in_array($templateVariant, ['bootstrap', 'foundation'], true)) {
+            $templateVariant = 'bootstrap';
         }
 
         $defaultStationUid = (int)($this->settings['defaultStation'] ?? 0);
@@ -555,6 +587,18 @@ class EventController extends ActionController
                 }
             }
         }
+
+        $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+        $pageRenderer->addHeaderData('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3/dist/css/glightbox.min.css">');
+        $pageRenderer->addJsFooterLibrary(
+            'glightbox',
+            'https://cdn.jsdelivr.net/npm/glightbox@3/dist/js/glightbox.min.js',
+            'text/javascript',
+            false,
+            false,
+            '',
+            true
+        );
 
         $this->view->assignMultiple([
             'event' => $event,

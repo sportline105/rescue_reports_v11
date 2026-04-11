@@ -17,23 +17,15 @@
                                 <renderType>selectSingle</renderType>
                                 <items>
                                     <numIndex index="0">
-                                        <numIndex index="0">Standard (NewDesign)</numIndex>
-                                        <numIndex index="1">standard</numIndex>
+                                        <numIndex index="0">Bootstrap</numIndex>
+                                        <numIndex index="1">bootstrap</numIndex>
                                     </numIndex>
                                     <numIndex index="1">
-                                        <numIndex index="0">Sidebar</numIndex>
-                                        <numIndex index="1">sidebar</numIndex>
-                                    </numIndex>
-                                    <numIndex index="2">
-                                        <numIndex index="0">Foundation (Legacy)</numIndex>
+                                        <numIndex index="0">Foundation</numIndex>
                                         <numIndex index="1">foundation</numIndex>
                                     </numIndex>
-                                    <numIndex index="3">
-                                        <numIndex index="0">NewDesignSidebar</numIndex>
-                                        <numIndex index="1">newdesignsidebar</numIndex>
-                                    </numIndex>
                                 </items>
-                                <default>standard</default>
+                                <default>bootstrap</default>
                             </config>
                         </TCEforms>
                     </settings.templateVariant>
@@ -160,7 +152,7 @@
                                         <numIndex index="0">Ja</numIndex>
                                     </numIndex>
                                 </items>
-                                <default>0</default>
+                                <default>1</default>
                             </config>
                         </TCEforms>
                     </settings.enableYearFilter>
@@ -173,15 +165,15 @@
                                 <renderType>selectSingle</renderType>
                                 <items>
                                     <numIndex index="0">
-                                        <numIndex index="0">Aktuelles Jahr</numIndex>
-                                        <numIndex index="1">current</numIndex>
-                                    </numIndex>
-                                    <numIndex index="1">
                                         <numIndex index="0">Alle Jahre</numIndex>
                                         <numIndex index="1">all</numIndex>
                                     </numIndex>
+                                    <numIndex index="1">
+                                        <numIndex index="0">Aktuelles Jahr</numIndex>
+                                        <numIndex index="1">current</numIndex>
+                                    </numIndex>
                                 </items>
-                                <default>current</default>
+                                <default>all</default>
                             </config>
                         </TCEforms>
                     </settings.yearFilterDefault>
