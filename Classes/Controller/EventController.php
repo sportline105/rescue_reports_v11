@@ -347,6 +347,7 @@ class EventController extends ActionController
 
         $statisticsYears  = (int)($this->settings['statisticsYears'] ?? 0);
         $showMonthlyChart = (bool)($this->settings['showMonthlyChart'] ?? true);
+        $showStationFilter = (bool)($this->settings['showStationFilter'] ?? true);
         $statistics       = $this->eventRepository->getYearlyStatistics($stationUid, $statisticsYears);
         $monthlyStatistics = $showMonthlyChart
             ? $this->eventRepository->getMonthlyStatistics($stationUid, $statisticsYears)
@@ -476,6 +477,7 @@ class EventController extends ActionController
             'stationUid'        => $stationUid,
             'activeStationUid'  => $stationUid,
             'stations'          => $stations,
+            'showStationFilter' => $showStationFilter,
         ]);
 
         return $this->htmlResponse();
