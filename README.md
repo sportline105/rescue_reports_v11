@@ -9,6 +9,18 @@ Detaillierte Einsatzberichte für Feuerwehren und BOS. Die Extension stellt Fron
 
 ---
 
+## Installation & Ersteinrichtung
+
+Nach der Installation wird empfohlen, den **Upgrade Wizard** in der TYPO3-Backend-Systemwartung auszuführen. Dieser richtet folgendes ein:
+
+- Einen Speicherordner für die Extension-Datensätze
+- Gängige deutsche BOS-Organisationen (Behörden und Organisationen mit Sicherheitsaufgaben)
+- Typische Fahrzeugtypen
+
+Der Wizard ist optional; alle Datensätze lassen sich auch manuell anlegen.
+
+---
+
 ## Plugins
 
 ### 1. Einsatzliste (`tx_rescuereports_eventlist`)
