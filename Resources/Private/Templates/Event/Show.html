@@ -342,30 +342,30 @@
                         <div class="large-12 medium-6 small-12 column">
                             <f:if condition="{event.images}">
                                 <h2><b>Einsatzbilder:</b></h2>
-
-                                <div id="einsatzCarouselFoundation-{event.uid}" class="carousel slide" data-bs-ride="false">
-                                    <div class="carousel-inner">
-                                        <f:for each="{event.images}" as="image" iteration="it">
-                                            <div class="carousel-item {f:if(condition: it.isFirst, then: 'active')}">
-                                                <a href="{f:uri.image(image: image, maxWidth: 1800)}"
-                                                   class="glightbox"
-                                                   data-gallery="einsatz-{event.uid}">
-                                                    <f:image image="{image}" maxWidth="900" alt="{event.title}" class="d-block w-100 h-100 img-fluid rounded" additionalAttributes="{loading:'lazy'}" />
-                                                </a>
-                                            </div>
-                                        </f:for>
-                                    </div>
-
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#einsatzCarouselFoundation-{event.uid}" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Zurück</span>
-                                    </button>
-
-                                    <button class="carousel-control-next" type="button" data-bs-target="#einsatzCarouselFoundation-{event.uid}" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Weiter</span>
-                                    </button>
+                                <div id="einsatzslider" class="owl-carousel">
+                                    <f:for each="{event.images}" as="image">
+                                        <a href="{f:uri.image(image: image, maxWidth: 1600)}"
+                                           class="glightbox"
+                                           data-gallery="einsatz-{event.uid}">
+                                            <f:image image="{image}" maxWidth="400" alt="{event.title}" />
+                                        </a>
+                                    </f:for>
                                 </div>
+
+                                <script>
+                                $(document).ready(function() {
+                                    $("#einsatzslider").owlCarousel({
+                                        singleItem: true,
+                                        navigation: true,
+                                        navigationText: ["zurück", "weiter"],
+                                        slideSpeed: 400,
+                                        autoHeight: true,
+                                        lazyLoad: true,
+                                        lazyFollow: true,
+                                        addClassActive: true
+                                    });
+                                });
+                                </script>
                             </f:if>
                         </div>
                     </div>
